@@ -8,7 +8,7 @@ local schedule = {}
 -- Fisher-Yates shuffle
 local function shuffle(t)
     for i = #t, 2, -1 do
-        local j = math.random(i)
+        local j = ZombRand(i) + 1
         t[i], t[j] = t[j], t[i]
     end
 end
