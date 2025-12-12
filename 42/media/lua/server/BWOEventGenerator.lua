@@ -65,7 +65,14 @@ local function everyOneMinute()
     print ("H: " .. hours .. " M: " .. minutes)
     print ("PLAYERS: " .. #allPlayers .. " PLAYER GROUPS: " .. #distantPlayers)
 
-    local args = {test = true}
+    local args = {}
+
+    local pids = {}
+    for i = 1, #distantPlayers do
+        table.insert(pids, distantPlayers[i]:getOnlineID())
+    end
+    args.pids = pids
+
     sendServerCommand('Events', 'Ping', args)
 
     if schedule[hours] and schedule[hours][minutes] then
