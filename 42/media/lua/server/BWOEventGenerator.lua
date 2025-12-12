@@ -31,7 +31,7 @@ local function everyOneMinute()
         local isDistant = true
         for j = 1, #allPlayers do
             local p2 = allPlayers[j]
-            if i ~= j then
+            if i ~= j then 
                 local dist = BanditUtils.DistTo(p1:getX(), p1:getY(), p2:getX(), p2:getY())
                 if dist < 200 then
                     isDistant = false
