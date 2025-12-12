@@ -13,17 +13,7 @@ local function shuffle(t)
     end
 end
 
--- triggering scheduled events 
-local function everyOneMinute()
-
-    if not isServer() then return end
-
-    -- time events
-    local gt = getGameTime()
-    local hours = math.floor(gt:getWorldAgeHours()) - 10
-    local minutes = gt:getMinutes()
-
-    -- build allPlayers as you already do
+local function getAllPlayers()
     local playerList = getOnlinePlayers()
     local allPlayers = {}
     for i = 0, playerList:size() - 1 do
@@ -32,13 +22,14 @@ local function everyOneMinute()
             table.insert(allPlayers, player)
         end
     end
+    return allPlayers
+end
 
-    -- shuffle so selection among close players is random
-    shuffle(allPlayers)
-
-    -- keep only players that are not within minDist of any already-kept player
+local function getDistantPlayers(allPlayers)
     local minDist = 200
     local distantPlayers = {}
+
+    shuffle(allPlayers)
 
     for i = 1, #allPlayers do
         local p1 = allPlayers[i]
@@ -55,9 +46,27 @@ local function everyOneMinute()
             table.insert(distantPlayers, p1)
         end
     end
+    return distantPlayers
+end
+
+-- triggering scheduled events 
+local function everyOneMinute()
+
+    -- time events
+    local gt = getGameTime()
+    local hours = math.floor(gt:getWorldAgeHours()) - 10
+    local minutes = gt:getMinutes()
+
+    if not isServer() then return end
+
+    local allPlayers = getAllPlayers()
+    local distantPlayers = getDistantPlayers(allPlayers)
 
     print ("H: " .. hours .. " M: " .. minutes)
     print ("PLAYERS: " .. #allPlayers .. " PLAYER GROUPS: " .. #distantPlayers)
+
+    local args = {test = true}
+    sendServerCommand('Events', 'Ping', args)
 
     if schedule[hours] and schedule[hours][minutes] then
         local event = schedule[hours][minutes]
