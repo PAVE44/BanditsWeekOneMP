@@ -5,6 +5,14 @@ BWOEventGenerator.Events = {}
 
 local schedule = {}
 
+-- Fisher-Yates shuffle
+local function shuffle(t)
+    for i = #t, 2, -1 do
+        local j = math.random(i)
+        t[i], t[j] = t[j], t[i]
+    end
+end
+
 -- triggering scheduled events 
 local function everyOneMinute()
 
@@ -15,31 +23,35 @@ local function everyOneMinute()
     local hours = math.floor(gt:getWorldAgeHours()) - 10
     local minutes = gt:getMinutes()
 
+    -- build allPlayers as you already do
     local playerList = getOnlinePlayers()
-
     local allPlayers = {}
-    for i=0, playerList:size()-1 do
+    for i = 0, playerList:size() - 1 do
         local player = playerList:get(i)
         if player then
             table.insert(allPlayers, player)
         end
     end
 
+    -- shuffle so selection among close players is random
+    shuffle(allPlayers)
+
+    -- keep only players that are not within minDist of any already-kept player
+    local minDist = 200
     local distantPlayers = {}
+
     for i = 1, #allPlayers do
         local p1 = allPlayers[i]
-        local isDistant = true
-        for j = 1, #allPlayers do
-            local p2 = allPlayers[j]
-            if i ~= j then 
-                local dist = BanditUtils.DistTo(p1:getX(), p1:getY(), p2:getX(), p2:getY())
-                if dist < 200 then
-                    isDistant = false
-                    break
-                end
+        local keep = true
+        for k = 1, #distantPlayers do
+            local p2 = distantPlayers[k]
+            local dist = BanditUtils.DistTo(p1:getX(), p1:getY(), p2:getX(), p2:getY())
+            if dist < minDist then
+                keep = false
+                break
             end
         end
-        if isDistant then
+        if keep then
             table.insert(distantPlayers, p1)
         end
     end
