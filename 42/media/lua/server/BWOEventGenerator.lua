@@ -1,3 +1,6 @@
+require "BWOUtils"
+require "BWOServerEvents"
+
 BWOEventGenerator = BWOEventGenerator or {}
 
 -- table for enqueued events
@@ -5,90 +8,69 @@ BWOEventGenerator.Events = {}
 
 local schedule = {}
 
--- Fisher-Yates shuffle
-local function shuffle(t)
-    for i = #t, 2, -1 do
-        local j = ZombRand(i) + 1
-        t[i], t[j] = t[j], t[i]
-    end
-end
-
-local function getAllPlayers()
-    local playerList = getOnlinePlayers()
-    local allPlayers = {}
-    for i = 0, playerList:size() - 1 do
-        local player = playerList:get(i)
-        if player then
-            table.insert(allPlayers, player)
-        end
-    end
-    return allPlayers
-end
-
-local function getDistantPlayers(allPlayers)
-    local minDist = 200
-    local distantPlayers = {}
-
-    shuffle(allPlayers)
-
-    for i = 1, #allPlayers do
-        local p1 = allPlayers[i]
-        local keep = true
-        for k = 1, #distantPlayers do
-            local p2 = distantPlayers[k]
-            local dist = BanditUtils.DistTo(p1:getX(), p1:getY(), p2:getX(), p2:getY())
-            if dist < minDist then
-                keep = false
-                break
-            end
-        end
-        if keep then
-            table.insert(distantPlayers, p1)
-        end
-    end
-    return distantPlayers
-end
-
--- triggering scheduled events 
+-- server is the orchestrator of all events
 local function everyOneMinute()
-
-    -- time events
-    local gt = getGameTime()
-    local hours = math.floor(gt:getWorldAgeHours()) - 10
-    local minutes = gt:getMinutes()
-
     if not isServer() then return end
 
-    local allPlayers = getAllPlayers()
-    local distantPlayers = getDistantPlayers(allPlayers)
+    local gametime = getGameTime()
+    local minute = gametime:getMinutes()
+    local worldAge = BWOUtils.GetWorldAge()
+    print("[EVENT GENERATOR] CHECK FOR EVENTS [" .. worldAge .. "][" .. minute .. "]")
 
-    print ("H: " .. hours .. " M: " .. minutes)
-    print ("PLAYERS: " .. #allPlayers .. " PLAYER GROUPS: " .. #distantPlayers)
-
-    local args = {}
-
-    local pids = {}
-    for i = 1, #distantPlayers do
-        table.insert(pids, distantPlayers[i]:getOnlineID())
-    end
-    args.pids = pids
-
-    sendServerCommand('Events', 'Ping', args)
-
-    if schedule[hours] and schedule[hours][minutes] then
-        local event = schedule[hours][minutes]
+    if schedule[worldAge] and schedule[worldAge][minute] then
+        print("[EVENT GENERATOR] FOUND EVENT TO TRIGGER")
+        local event = schedule[worldAge][minute]
         if event and event[1] and event[2] then
-            local eventName = event[1]
-            local eventParams = event[2]
-            if BWOASequence[eventName] then
-                BWOASequence[eventName](eventParams)
-            else
-                BWOEventGenerator.Add(eventName, eventParams, 1)
+            print("[EVENT GENERATOR] EVENT NAME: " .. event[1])
+            if BWOServerEvents and BWOServerEvents[event[1]] then
+                print("[EVENT GENERATOR] EXECUTING EVENT")
+                BWOServerEvents[event[1]](event[2])
             end
         end
     end
 
 end
+
+local function addEventDebug(args)
+    local worldAge = BWOUtils.GetWorldAge()
+    local gametime = getGameTime()
+    local minute = gametime:getMinutes()
+
+    minute = minute + 1
+    if minute == 60 then
+        minute = 0
+        worldAge = worldAge + 1
+    end
+    print("[EVENT GENERATOR] ADDING EVENT " .. args[1] .. " [" .. worldAge .. "][" .. minute .. "]")
+
+    for k, v in pairs(args[2]) do
+        print("    " .. tostring(k) .. "=" .. tostring(v))
+    end
+
+    if not schedule[worldAge] then
+        schedule[worldAge] = {}
+    end
+    schedule[worldAge][minute] = {args[1], args[2]} -- eventName, eventParams
+end
+
+local onClientCommand = function(module, command, player, args)
+    if module == "EventGenerator" then
+        if command == "AddEventDebug" then
+            --[[
+            local argStr = ""
+            for k, v in pairs(args) do
+                argStr = argStr .. " " .. k .. "=" .. tostring(v)
+            end
+            print ("[EVENT GENERATOR] " .. module .. "." .. command .. " "  .. argStr)
+            ]]
+            addEventDebug(args)
+        end
+    end
+end
+
 
 Events.EveryOneMinute.Remove(everyOneMinute)
 Events.EveryOneMinute.Add(everyOneMinute)
+
+Events.OnClientCommand.Remove(onClientCommand)
+Events.OnClientCommand.Add(onClientCommand)

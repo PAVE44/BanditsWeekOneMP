@@ -139,10 +139,13 @@ BWOMenu.EventBombRun = function(player)
 end
 
 BWOMenu.EventChopperAlert = function(player)
+    local player = getPlayer()
+    if not player then return end
 
     local params = {name="heli2", sound="BWOChopperGeneric", dir = 90, speed=1.8}
+    local args = {"ChopperAlert", params}
 
-    BWOScheduler.Add("ChopperAlert", params, 100)
+    sendClientCommand(player, "EventGenerator", "AddEventDebug", args)
 end
 
 BWOMenu.EventNuke = function(player)
