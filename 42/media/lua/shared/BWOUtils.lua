@@ -48,6 +48,48 @@ BWOUtils.GetDistantPlayers = function()
     return distantPlayers
 end
 
+-- returns a list of groups of players, where each player in a group is at least
+-- minDist apart from at least one other player in the same group
+BWOUtils.GetPlayerGroups = function()
+    local allPlayers = BWOUtils.GetAllPlayers()
+    local minDist = 200
+
+    local groups = {}
+
+    for i = 1, #allPlayers do
+        local player = allPlayers[i]
+        local placed = false
+
+        -- try to place player into an existing group
+        for g = 1, #groups do
+            local group = groups[g]
+
+            for k = 1, #group do
+                local other = group[k]
+                local dist = BanditUtils.DistTo(
+                    player:getX(), player:getY(),
+                    other:getX(), other:getY()
+                )
+
+                if dist < minDist then
+                    table.insert(group, player)
+                    placed = true
+                    break
+                end
+            end
+
+            if placed then break end
+        end
+
+        -- if no group was close enough, create a new one
+        if not placed then
+            table.insert(groups, { player })
+        end
+    end
+
+    return groups
+end
+
 BWOUtils.GetWorldAge = function()
 
     local function daysInMonth(month)

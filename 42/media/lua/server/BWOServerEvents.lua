@@ -2,26 +2,30 @@ BWOServerEvents = BWOServerEvents or {}
 
 BWOServerEvents.ChopperAlert = function(params)
     print("[SERVER_EVENT] [ChopperAlert] Init")
-    local players = BWOUtils.GetDistantPlayers()
-    for i = 1, #players do
-        local player = players[i]
-        
-        local paramsClient = {}
-        
-        -- always required
-        paramsClient.pid = player:getOnlineID()
 
-        -- server to decide
+    local paramsClient = {}
+    paramsClient.speed = params.speed
+    paramsClient.name = params.name
+    paramsClient.dir = params.dir
+    paramsClient.sound = params.sound
+
+    local groups = BWOUtils.GetPlayerGroups()
+    for i = 1, #groups do
+        -- pick a random player from the group
+        local player = players[1 + ZombRand(#groups[i])]
+        
         paramsClient.cx = player:getX() - 3 + ZombRand(4)
         paramsClient.cy = player:getY() - 3 + ZombRand(4)
 
         print("[SERVER_EVENT] [ChopperAlert] cx: " .. paramsClient.cx .. " cy: " .. paramsClient.cy)
-        -- event to decide
-        paramsClient.speed = params.speed
-        paramsClient.name = params.name
-        paramsClient.dir = params.dir
-        paramsClient.sound = params.sound
 
-        sendServerCommand("Events", "ChopperAlert", paramsClient)
+        -- all players in the group get the same event
+        for j = 1, #groups[i] do
+            local player = groups[i][j]
+
+            paramsClient.pid = player:getOnlineID()
+            print("[SERVER_EVENT] [ChopperAlert] Sending to player " .. tostring(paramsClient.pid))
+            sendServerCommand("Events", "ChopperAlert", paramsClient)
+        end
     end
 end
