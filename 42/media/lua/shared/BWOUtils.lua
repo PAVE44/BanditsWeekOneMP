@@ -97,13 +97,18 @@ BWOUtils.GetWorldAge = function()
         return daysPerMonth[month]
     end
 
+    local dayDict = {7, 9, 12, 14, 17, 21, 2, 5}
+
+    local startYear = 1992 + SandboxVars.StartYear
+    local startMonth = SandboxVars.StartMonth
+    local startDay = SandboxVars.StartDay
+    local startHour = dayDict[SandboxVars.StartTime]
+
     local gametime = getGameTime()
-    local startYear = gametime:getStartYear()
-    local startMonth = gametime:getStartMonth()
-    local startDay = gametime:getStartDay()
-    local startHour = gametime:getStartTimeOfDay()
     local year = gametime:getYear()
-    local month = gametime:getMonth()
+    local month = gametime:getMonth() + 1
+    if month > 12 then month = 1 end
+
     local day = gametime:getDay()
     local hour = gametime:getHour()
     local minute = gametime:getMinutes()
