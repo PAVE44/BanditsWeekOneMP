@@ -7,7 +7,6 @@ BWOClientEvents.ChopperAlert = function(params)
     if not player then return end
     
     getCore():setOptionUIRenderFPS(60)
-    -- BanditPlayer.WakeEveryone()
 
     local effect = {}
     effect.cx = params.cx
@@ -25,6 +24,18 @@ BWOClientEvents.ChopperAlert = function(params)
     effect.frameCnt = 3
     effect.cycles = 400
     table.insert(BWOFlyingObject.tab, effect)
+end
+
+BWOClientEvents.StartDay = function(params)
+    local player = getSpecificPlayer(0)
+    if not player then return end
+
+    player:playSound("ZSDayStart")
+    
+    BWOTex.tex = getTexture("media/textures/day_" .. params.day .. ".png")
+    BWOTex.speed = 0.011
+    BWOTex.mode = "center"
+    BWOTex.alpha = 2.4
 end
 
 local onServerCommand = function(module, command, args)

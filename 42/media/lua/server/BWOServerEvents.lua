@@ -30,3 +30,18 @@ BWOServerEvents.ChopperAlert = function(params)
         end
     end
 end
+
+BWOServerEvents.StartDay = function(params)
+    print("[SERVER_EVENT] [StartDay] Init")
+
+    local paramsClient = {}
+    paramsClient.day = params.day
+
+    local players = BWOUtils.GetAllPlayers()
+    for i = 1, #players do
+        local player = players[i]
+        paramsClient.pid = player:getOnlineID()
+        print("[SERVER_EVENT] [StartDay] Sending to player " .. tostring(paramsClient.pid))
+        sendServerCommand("Events", "StartDay", paramsClient)
+    end
+end
