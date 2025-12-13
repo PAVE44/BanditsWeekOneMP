@@ -12,7 +12,8 @@ BWOServerEvents.ChopperAlert = function(params)
     local groups = BWOUtils.GetPlayerGroups()
     for i = 1, #groups do
         -- pick a random player from the group
-        local player = players[1 + ZombRand(#groups[i])]
+        local players = groups[i]
+        local player = BanditUtils.Choice(players)
         
         paramsClient.cx = player:getX() - 3 + ZombRand(4)
         paramsClient.cy = player:getY() - 3 + ZombRand(4)
