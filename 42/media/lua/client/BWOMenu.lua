@@ -246,9 +246,11 @@ BWOMenu.EventStart = function(player)
 end
 
 BWOMenu.EventStartDay = function(player)
-    local params = {}
-    params.day = "wednesday"
-    BWOScheduler.Add("StartDay", params, 100)
+
+    local params = {day="wednesday"}
+    local args = {"StartDay", params}
+
+    sendClientCommand(player, "EventGenerator", "AddEventDebug", args)
 end
 
 BWOMenu.EventPoliceRiot = function(player)
