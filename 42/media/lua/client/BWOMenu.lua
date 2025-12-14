@@ -335,6 +335,17 @@ BWOMenu.EventStorm = function(player)
     BWOScheduler.Add("WeatherStorm", params, 1000)
 end
 
+BWOMenu.SpotRooms = function(player)
+    local cell = getCell()
+    local rooms = cell:getRoomList() 
+    for index=0, rooms:size()-1, 1 do
+        local room = rooms:get(index)
+        if room then
+            cell:roomSpotted(room)
+        end
+    end
+end
+
 function BWOMenu.WorldContextMenuPre(playerID, context, worldobjects, test)
 
     local player = getSpecificPlayer(playerID)
@@ -427,6 +438,8 @@ function BWOMenu.WorldContextMenuPre(playerID, context, worldobjects, test)
         spawnMenu:addOption("Walker", player, BWOMenu.SpawnWave, square, "Walker")
         
         context:addOption("BWO Add Effect", player, BWOMenu.AddEffect, square)
+        context:addOption("BWO Spot Rooms", player, BWOMenu.SpotRooms)
+        
     
     end
 end

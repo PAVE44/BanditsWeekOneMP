@@ -89,14 +89,43 @@ local function loadBanditOptions()
     local options = {}
 
     local clans = {
-        resident = Bandit.clanMap.Resident,
+        resident = {
+            cid = Bandit.clanMap.Resident,
+            program = "Walker",
+        },
+        office = {
+            cid = Bandit.clanMap.Office,
+            program = "Walker",
+        },
+        postal = {
+            cid = Bandit.clanMap.Postal,
+            program = "Walker",
+        },
+        gardener = {
+            cid = Bandit.clanMap.Gardener,
+            program = "Walker",
+        },
+        janitor = {
+            cid = Bandit.clanMap.Janitor,
+            program = "Walker",
+        },
+        walker = {
+            cid = Bandit.clanMap.Walker,
+            program = "Walker",
+        },
+        runner = {
+            cid = Bandit.clanMap.Runner,
+            program = "Walker",
+        },
     }
 
-    for name, cid in pairs(clans) do
+    for name, data in pairs(clans) do
         options[name] = {}
-        local subOptions = BanditCustom.GetFromClan(cid)
+        local subOptions = BanditCustom.GetFromClan(data.cid)
         for bid, subOption in pairs(subOptions) do
+            -- enrich
             subOption.bid = bid
+            subOption.program = data.program
             table.insert(options[name], subOption)
         end
     end
@@ -104,25 +133,27 @@ local function loadBanditOptions()
 end
 
 local function everyOneMinute()
-    if not isServer() then return end
-    print ("[POP CONTROL] Init: ")
-
-    local gmd = GetBanditModData()
-    if not gmd.Queue then return end
     
+    if not isServer() then return end
+    -- print ("[POP CONTROL] Init ")
+
     local worldAge = BWOUtils.GetWorldAge() 
     local cell = getCell()
     local zombieList = cell:getZombieList()
     local zombieListSize = zombieList:size()
     local options = loadBanditOptions()
+    local clusters = {}
 
     print ("[POP CONTROL] Zombie Count: " .. zombieListSize)
     for i = 0, zombieListSize - 1 do
         local zombie = zombieList:get(i)
-        local id = zombie:getPersistentOutfitID()
-        if not gmd.Queue[id] then
+        -- local id = zombie:getPersistentOutfitID()
+        local id = BanditUtils.GetCharacterID(zombie)
+        local gmd = GetBanditClusterData(id)
+        local c = GetBanditCluster(id)
+        if not gmd[id] then
             
-            local bandit = BanditUtils.Choice(options.resident)
+            local bandit = BanditUtils.Choice(options.walker)
             local brain = {}
 
             -- auto-generated properties 
@@ -225,7 +256,7 @@ local function everyOneMinute()
             brain.hostileP = false
 
             brain.program = {}
-            brain.program.name = "Bandit"
+            brain.program.name = bandit.program
             brain.program.stage = "Prepare"
             brain.programFallback = brain.program
 
@@ -240,10 +271,20 @@ local function everyOneMinute()
             brain.voice = Bandit.PickVoice(zombie)
 
             -- ready!
-            gmd.Queue[id] = brain
+            gmd[id] = brain
+            clusters[c] = true
+            
+            -- print ("[POP CONTROL] Zombie " .. id .. " banditized.")
+        else
+            -- print ("[POP CONTROL] Zombie " .. id .. " is already a bandit.")
         end
     end
-    TransmitBanditModData()
+
+
+    for c, _ in pairs(clusters) do
+        -- print ("[POP CONTROL] Transmitting cluser " .. c)
+        TransmitBanditClusterExpicit(c)
+    end
 end
 
 -- Events.OnTick.Remove(onTick)
