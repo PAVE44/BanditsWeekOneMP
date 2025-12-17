@@ -1,3 +1,4 @@
+require "BanditGMD"
 require "BWOUtils"
 
 BWOPopControl = BWOPopControl or {}
@@ -85,51 +86,16 @@ local onTick = function(numTicks)
     end
 end
 
-local function loadBanditOptions()
-    local options = {}
-
-    local clans = {
-        resident = {
-            cid = Bandit.clanMap.Resident,
-            program = "Walker",
-        },
-        office = {
-            cid = Bandit.clanMap.Office,
-            program = "Walker",
-        },
-        postal = {
-            cid = Bandit.clanMap.Postal,
-            program = "Walker",
-        },
-        gardener = {
-            cid = Bandit.clanMap.Gardener,
-            program = "Walker",
-        },
-        janitor = {
-            cid = Bandit.clanMap.Janitor,
-            program = "Walker",
-        },
-        walker = {
-            cid = Bandit.clanMap.Walker,
-            program = "Walker",
-        },
-        runner = {
-            cid = Bandit.clanMap.Runner,
-            program = "Walker",
-        },
-    }
-
-    for name, data in pairs(clans) do
-        options[name] = {}
-        local subOptions = BanditCustom.GetFromClan(data.cid)
-        for bid, subOption in pairs(subOptions) do
-            -- enrich
-            subOption.bid = bid
-            subOption.program = data.program
-            table.insert(options[name], subOption)
-        end
+local function loadBanditOptions(cid)
+    local bandits = {}
+    local options = BanditCustom.GetFromClan(cid)
+    for bid, option in pairs(options) do
+        -- enrich
+        option.bid = bid
+        table.insert(bandits, option)
     end
-    return options
+
+    return bandits
 end
 
 local function everyOneMinute()
@@ -141,8 +107,11 @@ local function everyOneMinute()
     local cell = getCell()
     local zombieList = cell:getZombieList()
     local zombieListSize = zombieList:size()
-    local options = loadBanditOptions()
+
     local clusters = {}
+    for i=0, BanditClusterCount-1 do
+        clusters[i] = false
+    end
 
     print ("[POP CONTROL] Zombie Count: " .. zombieListSize)
     for i = 0, zombieListSize - 1 do
@@ -153,8 +122,19 @@ local function everyOneMinute()
         local c = GetBanditCluster(id)
         if not gmd[id] then
             
-            local bandit = BanditUtils.Choice(options.walker)
+            
+            zombie:dressInPersistentOutfitID(id)
+            local outfitName = zombie:getOutfitName()
+            local outfitData = Bandit.outfit2clan[outfitName] 
+
+            if not outfitData then
+                outfitData = Bandit.outfit2clan["Generic01"]
+            end
+
+            local bandit = BanditUtils.Choice(loadBanditOptions(outfitData.cid))
             local brain = {}
+
+            print ("[POPCONTROL] CONVERTING, OUTFIT: " .. tostring(outfitName) .. ", CID: " .. outfitData.cid)
 
             -- auto-generated properties 
             brain.id = id
@@ -182,6 +162,7 @@ local function everyOneMinute()
             brain.cid = general.cid
             brain.bid = general.bid
             brain.female = general.female or false
+            zombie:setFemaleEtc(general.female)
             brain.skin = general.skin or 1
             brain.hairType = general.hairType or 1
             brain.hairColor = general.hairColor or 1
@@ -256,7 +237,7 @@ local function everyOneMinute()
             brain.hostileP = false
 
             brain.program = {}
-            brain.program.name = bandit.program
+            brain.program.name = "Walker"
             brain.program.stage = "Prepare"
             brain.programFallback = brain.program
 
@@ -270,6 +251,8 @@ local function everyOneMinute()
 
             brain.voice = Bandit.PickVoice(zombie)
 
+            Bandit.ApplyVisuals(zombie, brain)
+
             -- ready!
             gmd[id] = brain
             clusters[c] = true
@@ -280,11 +263,12 @@ local function everyOneMinute()
         end
     end
 
-
-    for c, _ in pairs(clusters) do
-        -- print ("[POP CONTROL] Transmitting cluser " .. c)
-        TransmitBanditClusterExpicit(c)
+    for i=0, BanditClusterCount-1 do
+        if clusters[i] then
+            TransmitBanditClusterExpicit(i)
+        end
     end
+
 end
 
 -- Events.OnTick.Remove(onTick)

@@ -11,6 +11,8 @@ ZombiePrograms.Walker.Prepare = function(bandit)
     local brain = BanditBrain.Get(bandit)
     local id = brain.id
 
+    --[[
+    bags crash game when bandit moves through window
     if math.abs(id) % 13 == 0 and not bandit:isFemale() then
         local brain = BanditBrain.Get(bandit)
         brain.bag = "Briefcase"
@@ -19,7 +21,7 @@ ZombiePrograms.Walker.Prepare = function(bandit)
         --local fakeItem = BanditCompatibility.InstanceItem("Base.Flightcase")
         --local fakeItem = BanditCompatibility.InstanceItem("Base.Cooler")
         bandit:setPrimaryHandItem(fakeItem)
-    end
+    end]]
 
     return {status=true, next="Main", tasks=tasks}
 end

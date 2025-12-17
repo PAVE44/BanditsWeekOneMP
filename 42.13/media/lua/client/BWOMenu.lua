@@ -367,7 +367,13 @@ function BWOMenu.WorldContextMenuPre(playerID, context, worldobjects, test)
         end
     end
 
+
     if isDebugEnabled() or isAdmin() then
+
+        if zombie then
+            local outfit = zombie:getOutfitName()
+        end
+
         local eventsOption = context:addOption("BWO Event")
         local eventsMenu = context:getNew(context)
 
