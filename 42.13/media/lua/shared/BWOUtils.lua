@@ -232,6 +232,9 @@ BWOUtils.Explode = function(x, y, z)
     
     if not isServer() then
 
+        local player = getSpecificPlayer(0)
+        if not player then return end
+
         -- junk placement
         BanditBaseGroupPlacements.Junk (x-4, y-4, 0, 6, 8, 3)
 
