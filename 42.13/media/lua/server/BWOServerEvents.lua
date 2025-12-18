@@ -45,7 +45,7 @@ BWOServerEvents.Arson = function(params)
                 print("[SERVER_EVENT] [Arson] No room found")
             end
         else
-            print("[SERVER_EVENT] [Arson] Skipping due to low density")
+            print("[SERVER_EVENT] [Arson] Skipping due to low density " .. density)
         end
     end
 end

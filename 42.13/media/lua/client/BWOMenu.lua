@@ -372,9 +372,8 @@ function BWOMenu.WorldContextMenuPre(playerID, context, worldobjects, test)
 
     if isDebugEnabled() or isAdmin() then
 
-        if zombie then
-            local outfit = zombie:getOutfitName()
-        end
+        local density = BWOUtils.GetDensityScore(player:getX(), player:getY())
+        print (density)
 
         local eventsOption = context:addOption("BWO Event")
         local eventsMenu = context:getNew(context)

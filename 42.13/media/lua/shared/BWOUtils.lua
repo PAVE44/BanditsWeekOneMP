@@ -180,7 +180,7 @@ BWOUtils.GetDensityScore = function(px, py)
     local sx = math.floor(px / 25)
     local sy = math.floor(py / 25)
     local id = sx .. "-" .. sy
-    local cache = BWOBuildings.densityScoreCache
+    local cache = BWOUtils.densityScoreCache
     if cache[id] then return cache[id] end
 
     local cell = getCell()
@@ -206,7 +206,7 @@ BWOUtils.GetDensityScore = function(px, py)
     end
 
     local density = total / normalizer
-    BWOBuildings.densityScoreCache[id] = density
+    BWOUtils.densityScoreCache[id] = density
     return density
 end
 
