@@ -2,6 +2,67 @@ require "BWOUtils"
 
 BWOServerEvents = BWOServerEvents or {}
 
+BWOEvents.Arson = function(params)
+    print("[SERVER_EVENT] [Arson] Init")
+    local distMin = 45
+    local distMax = 85
+
+    local groups = BWOUtils.GetPlayerGroups()
+    for i = 1, #groups do
+        -- pick a random player from the group
+        local players = groups[i]
+        local playerSelected = BanditUtils.Choice(players)
+        local px, py, pz = playerSelected:getX(), playerSelected:getY(), playerSelected:getZ()
+
+        local density = BWOBuildings.GetDensityScore(px, py)
+        if density > 0.5 then
+            local room = BWOUtils.FindRoomDist(px, py, distMin, distMax)
+
+            if room then
+                local square = room:getRandomSquare()
+                if square then
+                    local cx = square:getX()
+                    local cy = square:getY()
+                    local cz = square:getZ()
+
+                    BWOUtils.Explode(cx, cy, 0)
+
+                    for j = 1, #players do
+                        local player = players[j]
+                        local paramsClient = {
+                            pid = player:getOnlineID(),
+                            cx = cx,
+                            cy = cy,
+                            cz = cz
+                        }
+                        print("[SERVER_EVENT] [Arson] Requesting client logic " .. tostring(paramsClient.pid))
+                        sendServerCommand("Events", "Arson", paramsClient)
+                    end
+                else
+                    print("[SERVER_EVENT] [Arson] Square unavailable")
+                end
+            else
+                print("[SERVER_EVENT] [Arson] No room found")
+            end
+        else
+            print("[SERVER_EVENT] [Arson] Skipping due to low density")
+        end
+    end
+
+    local vparams = {}
+    vparams.alarm = true
+    BWOScheduler.Add("VehiclesUpdate", vparams, 500)
+
+    BWOUtils.FindRoomDist(px, py, distMin, distMax)
+
+    if SandboxVars.Bandits.General_ArrivalIcon then
+        local icon = "media/ui/arson.png"
+        local color = {r=1, g=0, b=0} -- red
+        local desc = "Arson"
+        BanditEventMarkerHandler.set(getRandomUUID(), icon, 3600, square:getX(), square:getY(), color, desc)
+    end
+end
+
 BWOServerEvents.ChopperAlert = function(params)
     print("[SERVER_EVENT] [ChopperAlert] Init")
 
@@ -39,6 +100,9 @@ end
 BWOEvents.SpawnGroup = function(params)
     print("[SERVER_EVENT] [SpawnGroup] Init")
 
+    local multiplierMin = 0.5
+    local multiplierMax = 2
+
     local groups = BWOUtils.GetPlayerGroups()
     for i = 1, #groups do
         -- pick a random player from the group
@@ -53,9 +117,9 @@ BWOEvents.SpawnGroup = function(params)
             local sp = spawnPoints[1]
 
             -- group size calculation
-            local density = BWOBuildings.GetDensityScore(player) / 6000
-            if density > 2 then density = 2 end
-            if density < 0.5 then density = 0.5 end
+            local density = BWOBuildings.GetDensityScore(px, py)
+            if density > multiplierMax then density = multiplierMax end
+            if density < multiplierMin then density = multiplierMin end
             local size = params.size
             size = math.floor(size * #players * density)
             print("[SERVER_EVENT] [SpawnGroup] size: " .. size .. " = " .. params.size .. " * " .. #players .. " * " .. density)
