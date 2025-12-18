@@ -119,11 +119,13 @@ BWOMenu.EventArmyPatrol = function(player)
 end
 
 BWOMenu.EventArson = function(player)
+    local player = getPlayer()
+    if not player then return end
+
     local params = {}
-    params.x = player:getX()
-    params.y = player:getY()
-    params.z = player:getZ()
-    BWOScheduler.Add("Arson", params, 100)
+    local args = {"Arson", params}
+
+    sendClientCommand(player, "EventGenerator", "AddEventDebug", args)
 end
 
 BWOMenu.EventGasRun = function(player)
@@ -380,14 +382,15 @@ function BWOMenu.WorldContextMenuPre(playerID, context, worldobjects, test)
         context:addSubMenu(eventsOption, eventsMenu)
 
         eventsMenu:addOption("Army", player, BWOMenu.EventArmy)
-        eventsMenu:addOption("Army Patrol", player, BWOMenu.EventArmyPatrol)
+        -- eventsMenu:addOption("Army Patrol", player, BWOMenu.EventArmyPatrol)
         eventsMenu:addOption("Arson", player, BWOMenu.EventArson)
-        eventsMenu:addOption("Bandits", player, BWOMenu.EventBandits)
-        eventsMenu:addOption("Bikers", player, BWOMenu.EventBikers)
+        -- eventsMenu:addOption("Bandits", player, BWOMenu.EventBandits)
+        -- eventsMenu:addOption("Bikers", player, BWOMenu.EventBikers)
         eventsMenu:addOption("Chopper Alert", player, BWOMenu.EventChopperAlert)
-        eventsMenu:addOption("Criminals", player, BWOMenu.EventCriminals)
-        eventsMenu:addOption("Dream", player, BWOMenu.EventDream)
+        -- eventsMenu:addOption("Criminals", player, BWOMenu.EventCriminals)
+        -- eventsMenu:addOption("Dream", player, BWOMenu.EventDream)
 
+        --[[
         local entertainerOption = eventsMenu:addOption("Entertainer")
         local entertainerMenu = context:getNew(context)
         eventsMenu:addSubMenu(entertainerOption, entertainerMenu)
@@ -399,33 +402,35 @@ function BWOMenu.WorldContextMenuPre(playerID, context, worldobjects, test)
         entertainerMenu:addOption("Breakdancer", player, BWOMenu.EventEntertainer, 4)
         entertainerMenu:addOption("Clown 1", player, BWOMenu.EventEntertainer, 5)
         entertainerMenu:addOption("Clown 2", player, BWOMenu.EventEntertainer, 6)
+        ]]
 
-        eventsMenu:addOption("Final Solution", player, BWOMenu.EventFinalSolution)
-        eventsMenu:addOption("Fliers", player, BWOMenu.EventFliers)
-        eventsMenu:addOption("Hammer Brothers", player, BWOMenu.EventHammerBrothers)
-        eventsMenu:addOption("Heli Crash", player, BWOMenu.EventHeliCrash)
-        eventsMenu:addOption("Horde", player, BWOMenu.EventHorde)
-        eventsMenu:addOption("House Register", player, BWOMenu.EventHome)
-        eventsMenu:addOption("House Party", player, BWOMenu.EventParty)
-        eventsMenu:addOption("Jetengine", player, BWOMenu.EventJetEngine)
-        eventsMenu:addOption("Jetfighter MG", player, BWOMenu.EventJetFighterRun)
-        eventsMenu:addOption("Jetfighter Bomb", player, BWOMenu.EventBombRun)
-        eventsMenu:addOption("Jetfighter Gas", player, BWOMenu.EventGasRun)
-        eventsMenu:addOption("Nuke", player, BWOMenu.EventNuke)
-        eventsMenu:addOption("Open Doors", player, BWOMenu.EventOpenDoors)
-        eventsMenu:addOption("Rolice Riot", player, BWOMenu.EventPoliceRiot)
-        eventsMenu:addOption("Plane Crash", player, BWOMenu.EventPlaneCrash, true)
-        eventsMenu:addOption("Plane Draw", player, BWOMenu.EventDrawPlane)
-        eventsMenu:addOption("Power On", player, BWOMenu.EventPower, true)
-        eventsMenu:addOption("Power Off", player, BWOMenu.EventPower, false)
-        eventsMenu:addOption("Protest", player, BWOMenu.EventProtest)
-        eventsMenu:addOption("Reanimate", player, BWOMenu.EventReanimate)
-        eventsMenu:addOption("Shahid", player, BWOMenu.EventShahids)
-        eventsMenu:addOption("Start", player, BWOMenu.EventStart)
-        eventsMenu:addOption("Start Day", player, BWOMenu.EventStartDay)
-        eventsMenu:addOption("Storm", player, BWOMenu.EventStorm)
-        eventsMenu:addOption("Thieves", player, BWOMenu.EventThieves)
+        -- eventsMenu:addOption("Final Solution", player, BWOMenu.EventFinalSolution)
+        -- eventsMenu:addOption("Fliers", player, BWOMenu.EventFliers)
+        -- eventsMenu:addOption("Hammer Brothers", player, BWOMenu.EventHammerBrothers)
+        -- eventsMenu:addOption("Heli Crash", player, BWOMenu.EventHeliCrash)
+        -- eventsMenu:addOption("Horde", player, BWOMenu.EventHorde)
+        -- eventsMenu:addOption("House Register", player, BWOMenu.EventHome)
+        -- eventsMenu:addOption("House Party", player, BWOMenu.EventParty)
+        -- eventsMenu:addOption("Jetengine", player, BWOMenu.EventJetEngine)
+        -- eventsMenu:addOption("Jetfighter MG", player, BWOMenu.EventJetFighterRun)
+        -- eventsMenu:addOption("Jetfighter Bomb", player, BWOMenu.EventBombRun)
+        -- eventsMenu:addOption("Jetfighter Gas", player, BWOMenu.EventGasRun)
+        -- eventsMenu:addOption("Nuke", player, BWOMenu.EventNuke)
+        -- eventsMenu:addOption("Open Doors", player, BWOMenu.EventOpenDoors)
+        -- eventsMenu:addOption("Rolice Riot", player, BWOMenu.EventPoliceRiot)
+        -- eventsMenu:addOption("Plane Crash", player, BWOMenu.EventPlaneCrash, true)
+        -- eventsMenu:addOption("Plane Draw", player, BWOMenu.EventDrawPlane)
+        -- eventsMenu:addOption("Power On", player, BWOMenu.EventPower, true)
+        -- eventsMenu:addOption("Power Off", player, BWOMenu.EventPower, false)
+        -- eventsMenu:addOption("Protest", player, BWOMenu.EventProtest)
+        -- eventsMenu:addOption("Reanimate", player, BWOMenu.EventReanimate)
+        -- eventsMenu:addOption("Shahid", player, BWOMenu.EventShahids)
+        -- eventsMenu:addOption("Start", player, BWOMenu.EventStart)
+        -- eventsMenu:addOption("Start Day", player, BWOMenu.EventStartDay)
+        -- eventsMenu:addOption("Storm", player, BWOMenu.EventStorm)
+        -- eventsMenu:addOption("Thieves", player, BWOMenu.EventThieves)
         
+        --[[
         local spawnOption = context:addOption("BWO Spawn")
         local spawnMenu = context:getNew(context)
         context:addSubMenu(spawnOption, spawnMenu)
@@ -445,6 +450,7 @@ function BWOMenu.WorldContextMenuPre(playerID, context, worldobjects, test)
         
         context:addOption("BWO Add Effect", player, BWOMenu.AddEffect, square)
         context:addOption("BWO Spot Rooms", player, BWOMenu.SpotRooms)
+        ]]
         
     
     end

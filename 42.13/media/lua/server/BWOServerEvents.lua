@@ -48,19 +48,6 @@ BWOEvents.Arson = function(params)
             print("[SERVER_EVENT] [Arson] Skipping due to low density")
         end
     end
-
-    local vparams = {}
-    vparams.alarm = true
-    BWOScheduler.Add("VehiclesUpdate", vparams, 500)
-
-    BWOUtils.FindRoomDist(px, py, distMin, distMax)
-
-    if SandboxVars.Bandits.General_ArrivalIcon then
-        local icon = "media/ui/arson.png"
-        local color = {r=1, g=0, b=0} -- red
-        local desc = "Arson"
-        BanditEventMarkerHandler.set(getRandomUUID(), icon, 3600, square:getX(), square:getY(), color, desc)
-    end
 end
 
 BWOServerEvents.ChopperAlert = function(params)

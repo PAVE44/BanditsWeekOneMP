@@ -2,10 +2,9 @@ require "BWOUtils"
 
 BWOClientEvents = BWOClientEvents or {}
 
-BWOEvents.Arson = function(params)
+BWOClientEvents.Arson = function(params)
     BWOUtils.Explode(params.cx, params.cy, params.cz)
     BWOUtils.VehiclesAlarm(params.cx, params.cy, 0, 60)
-
 end
 
 -- params: cx, cy, spped, name, dir, sound
