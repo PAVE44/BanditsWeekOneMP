@@ -2,7 +2,7 @@ require "BWOUtils"
 
 BWOServerEvents = BWOServerEvents or {}
 
-BWOEvents.Arson = function(params)
+BWOServerEvents.Arson = function(params)
     print("[SERVER_EVENT] [Arson] Init")
     local distMin = 45
     local distMax = 85
@@ -84,7 +84,7 @@ BWOServerEvents.ChopperAlert = function(params)
 end
 
 -- params: cid, program, hostile, name]
-BWOEvents.SpawnGroup = function(params)
+BWOServerEvents.SpawnGroup = function(params)
     print("[SERVER_EVENT] [SpawnGroup] Init")
 
     local multiplierMin = 0.5
