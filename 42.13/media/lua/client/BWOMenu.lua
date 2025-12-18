@@ -107,9 +107,16 @@ BWOMenu.AddEffect = function(player, square)
 end
 
 BWOMenu.EventArmy = function(player)
-    local params = {}
-    params.intensity = 12
-    BWOScheduler.Add("Army", params, 100)
+    local params = {
+        cid = Bandit.clanMap.ArmyGreen,
+        size = 4,
+        d = 30,
+        program = "Walker",
+        hostile = false
+    }
+    local args = {"SpawnGroup", params}
+
+    sendClientCommand(player, "EventGenerator", "AddEventDebug", args)
 end
 
 BWOMenu.EventArmyPatrol = function(player)
