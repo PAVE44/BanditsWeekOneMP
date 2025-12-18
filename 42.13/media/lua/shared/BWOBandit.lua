@@ -86,6 +86,9 @@ Bandit.clanMap.Trash = "fe1a8e07-7c73-466d-9ade-2e3e565dcb21"
 Bandit.clanMap.Butcher = "8db5a57f-b0a9-4b04-9228-beeadd2db2fa"
 Bandit.clanMap.Militia = "6e147770-2d41-4fd2-ab7d-05a8acf4157b"
 
+-- mapping cids to spawn notification idons
+Bandit.cidNotification = Bandit.cidNotification or {}
+Bandit.cidNotification[Bandit.clanMap.ArmyGreen] = media/ui/raid.png
 
 -- depending on the original outfit, a proper clan and occupation name is mapped for banditize
 Bandit.outfit2clan = Bandit.outfit2clan or {}

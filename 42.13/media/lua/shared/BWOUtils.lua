@@ -127,3 +127,80 @@ BWOUtils.GetWorldAge = function()
 
     return totalHours - startTotalHours
 end
+
+BWOUtils.GenerateSpawnPoints = function(px, py, pz, d, count)
+
+    local cell = getCell()
+
+    local validSpawnPoints = {}
+    for i=d, d+6 do
+        local spawnPoints = {}
+        table.insert(spawnPoints, {x=px+i, y=py+i, z=pz})
+        table.insert(spawnPoints, {x=px+i, y=py-i, z=pz})
+        table.insert(spawnPoints, {x=px-i, y=py+i, z=pz})
+        table.insert(spawnPoints, {x=px-i, y=py-i, z=pz})
+        table.insert(spawnPoints, {x=px+i, y=py, z=pz})
+        table.insert(spawnPoints, {x=px-i, y=py, z=pz})
+        table.insert(spawnPoints, {x=px, y=py+i, z=pz})
+        table.insert(spawnPoints, {x=px, y=py-i, z=pz})
+
+        for i, sp in pairs(spawnPoints) do
+            local square = cell:getGridSquare(sp.x, sp.y, sp.z)
+            if square then
+                if square:isFree(false) then
+                    table.insert(validSpawnPoints, sp)
+                end
+            end
+        end
+    end
+
+    if #validSpawnPoints >= 1 then
+        local p = 1 + ZombRand(#validSpawnPoints)
+        local spawnPoint = validSpawnPoints[p]
+        local ret = {}
+        for i=1, count do
+            table.insert(ret, spawnPoint)
+        end
+        return ret
+    end
+
+    return {}
+end
+
+BWOUtils.densityScoreCache = {}
+
+BWOUtils.GetDensityScore = function(px, py)
+    local radius = 120
+    local normalizer = 6000
+    local sx = math.floor(px / 25)
+    local sy = math.floor(py / 25)
+    local id = sx .. "-" .. sy
+    local cache = BWOBuildings.densityScoreCache
+    if cache[id] then return cache[id] end
+
+    local cell = getCell()
+    local rooms = cell:getRoomList()
+    local total = 0
+
+    for i = 0, rooms:size() - 1 do
+        local room = rooms:get(i)
+        if room then
+            local roomDef = room:getRoomDef()
+            if roomDef then
+                local x1, y1, x2, y2 = roomDef:getX(), roomDef:getY(), roomDef:getX2(), roomDef:getY2()
+
+                local cx = (x1 + x2) / 2
+                local cy = (y1 + y2) / 2
+
+                if math.abs(px - cx) + math.abs(py - cy) <= radius then
+                    local size = (x2 - x1) * (y2 - y1)
+                    total = total + size
+                end
+            end
+        end
+    end
+
+    local density = total / normalizer
+    BWOBuildings.densityScoreCache[id] = density
+    return density
+end

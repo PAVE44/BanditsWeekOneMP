@@ -2,10 +2,11 @@ require "BWOUtils"
 
 BWOClientEvents = BWOClientEvents or {}
 
+-- paramas: cx, cy, spped, name, dir, sound
 BWOClientEvents.ChopperAlert = function(params)
     local player = getSpecificPlayer(0)
     if not player then return end
-    
+
     getCore():setOptionUIRenderFPS(60)
 
     local effect = {}
@@ -26,12 +27,34 @@ BWOClientEvents.ChopperAlert = function(params)
     table.insert(BWOFlyingObject.tab, effect)
 end
 
+-- paramas: cid, x, y, hostile
+BWOClientEvents.SpawnGroup = function(params)
+    local player = getSpecificPlayer(0)
+    if not player then return end
+
+    local time = 3600
+    if SandboxVars.Bandits.General_ArrivalIcon then
+        local icon = Bandit.cidNotification[params.cid]
+        if not icon then
+            icon = "media/ui/raid.png"
+        end
+
+        local color = {r=0, g=1, b=0} -- green
+        if params.hostile then
+            color = {r=1, g=0, b=0} -- red
+        end
+
+        BanditEventMarkerHandler.set(getRandomUUID(), icon, time, params.x, params.y, color, params.desc)
+    end
+end
+
+-- params: day
 BWOClientEvents.StartDay = function(params)
     local player = getSpecificPlayer(0)
     if not player then return end
 
     player:playSound("ZSDayStart")
-    
+
     BWOTex.tex = getTexture("media/textures/day_" .. params.day .. ".png")
     BWOTex.speed = 0.011
     BWOTex.mode = "center"
