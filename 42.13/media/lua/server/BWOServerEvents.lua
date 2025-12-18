@@ -14,7 +14,7 @@ BWOServerEvents.Arson = function(params)
         local playerSelected = BanditUtils.Choice(players)
         local px, py, pz = playerSelected:getX(), playerSelected:getY(), playerSelected:getZ()
 
-        local density = BWOBuildings.GetDensityScore(px, py)
+        local density = BWOUtils.GetDensityScore(px, py)
         if density > 0.5 then
             local room = BWOUtils.FindRoomDist(px, py, distMin, distMax)
 
@@ -104,7 +104,7 @@ BWOServerEvents.SpawnGroup = function(params)
             local sp = spawnPoints[1]
 
             -- group size calculation
-            local density = BWOBuildings.GetDensityScore(px, py)
+            local density = BWOUtils.GetDensityScore(px, py)
             if density > multiplierMax then density = multiplierMax end
             if density < multiplierMin then density = multiplierMin end
             local size = params.size
