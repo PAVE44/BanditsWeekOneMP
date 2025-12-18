@@ -19,7 +19,7 @@ BWOServerEvents.Arson = function(params)
             local room = BWOUtils.FindRoomDist(px, py, distMin, distMax)
 
             if room then
-                local square = room:getRandomSquare()
+                local square = BWOUtils.GetRandomRoomSquare(room)
                 if square then
                     local cx = square:getX()
                     local cy = square:getY()

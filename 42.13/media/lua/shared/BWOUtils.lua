@@ -430,6 +430,15 @@ BWOUtils.FindRoomDist = function(px, py, min, max)
     end
 end
 
+BWOUtils.GetRandomRoomSquare = function(room)
+    local def = room:getRoomDef()
+    local x1, y1, x2, y2, z = def:getX(), def:getY(), def:getX2(), def:getY2(), def:getZ()
+    local rx = x1 + ZombRand(x2-x1)
+    local ry = y1 + ZombRand(y2-y1)
+    local square = getCell():getGridSquare(rx, ry, z)
+    return square
+end
+
 BWOUtils.VehiclesAlarm = function(px, py, min, max)
     local vehicleList = getCell():getVehicles()
     for i=0, vehicleList:size()-1 do
