@@ -230,9 +230,6 @@ BWOUtils.Explode = function(x, y, z)
         end
     end
 
-    -- junk placement
-    BanditBaseGroupPlacements.Junk (x-4, y-4, 0, 6, 8, 3)
-
     -- details
     [[--
     for dy=-2, 2 do
@@ -269,9 +266,13 @@ BWOUtils.Explode = function(x, y, z)
         end
     end
     ]]
-
-    -- explosion initiating ragdoll eeffect
+    
     if not isServer() then
+
+        -- junk placement
+        BanditBaseGroupPlacements.Junk (x-4, y-4, 0, 6, 8, 3)
+
+        -- explosion initiating ragdoll eeffect
         local item = BanditCompatibility.InstanceItem("Base.PipeBomb")
         item:setExplosionPower(10)
         item:setTriggerExplosionTimer(0)
