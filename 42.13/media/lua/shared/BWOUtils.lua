@@ -229,43 +229,6 @@ BWOUtils.Explode = function(x, y, z)
             end
         end
     end
-
-    -- details
-    [[--
-    for dy=-2, 2 do
-        for dx = -2, 2 do
-            local vsquare = cell:getGridSquare(x + dx, y + dy, 0)
-            if vsquare then
-                -- vehicle burner
-                local vehicle = vsquare:getVehicleContainer()
-                if vehicle then
-                    BWOVehicles.Burn(vehicle)
-                end
-
-                -- street destruction
-                if BanditUtils.HasZoneType(vsquare:getX(), vsquare:getY(), vsquare:getZ(), "Nav") then
-                    local objects = vsquare:getObjects()
-                    for i=0, objects:size()-1 do
-                        local object = objects:get(i)
-                        local sprite = object:getSprite()
-                        if sprite then
-                            local spriteName = sprite:getName()
-                            if spriteName and spriteName:embodies("street") then
-                                local overlaySprite = "blends_streetoverlays_01_" .. ZombRand(32)
-                                local attachments = object:getAttachedAnimSprite()
-                                if not attachments or attachments:size() == 0 then
-                                    object:setAttachedAnimSprite(ArrayList.new())
-                                end
-                                object:getAttachedAnimSprite():add(getSprite(overlaySprite):newInstance())
-                                break
-                            end
-                        end
-                    end
-                end
-            end
-        end
-    end
-    ]]
     
     if not isServer() then
 
