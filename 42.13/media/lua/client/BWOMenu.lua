@@ -116,7 +116,7 @@ BWOMenu.EventArmy = function(player)
     }
     local args = {"SpawnGroup", params}
 
-    sendClientCommand(player, "EventGenerator", "AddEventDebug", args)
+    sendClientCommand(player, "EventManager", "AddEvent", args)
 end
 
 BWOMenu.EventArmyPatrol = function(player)
@@ -132,7 +132,7 @@ BWOMenu.EventArson = function(player)
     local params = {}
     local args = {"Arson", params}
 
-    sendClientCommand(player, "EventGenerator", "AddEventDebug", args)
+    sendClientCommand(player, "EventManager", "AddEvent", args)
 end
 
 BWOMenu.EventGasRun = function(player)
@@ -152,9 +152,12 @@ BWOMenu.EventChopperAlert = function(player)
     if not player then return end
 
     local params = {name="heli2", sound="BWOChopperGeneric", dir = 90, speed=1.8}
-    local args = {"ChopperAlert", params}
+    local args = {
+        {{"ChopperAlert", {name="heli2", sound="BWOChopperGeneric", dir = 90, speed=1.8}}, 1},
+        {{"ChopperAlert", {name="heli", sound="BWOChopperGeneric", dir = 0, speed=1.8}}, 500},
+    }
 
-    sendClientCommand(player, "EventGenerator", "AddEventDebug", args)
+    sendClientCommand(player, "EventManager", "AddSequence", args)
 end
 
 BWOMenu.EventNuke = function(player)
@@ -376,6 +379,9 @@ function BWOMenu.WorldContextMenuPre(playerID, context, worldobjects, test)
         end
     end
 
+    if zombie then
+        zombie:getWornItems():clear()
+    end
 
     if isDebugEnabled() or isAdmin() then
 

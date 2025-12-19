@@ -95,7 +95,71 @@ BWOUtils.GetPlayerGroups = function()
     return groups
 end
 
+BWOUtils.GetBiggestPlayerGroup = function()
+    local groups = BWOUtils.GetPlayerGroups()
+
+    if #groups == 0 then
+        return nil
+    end
+
+    local biggestSize = 0
+    local biggestGroups = {}
+
+    for i = 1, #groups do
+        local size = #groups[i]
+
+        if size > biggestSize then
+            biggestSize = size
+            biggestGroups = {groups[i]}
+        elseif size == biggestSize then
+            table.insert(biggestGroups, groups[i])
+        end
+    end
+
+    return BanditUtils.Choice(biggestGroups)
+end
+
+BWOUtils.GetTime = function()
+    -- local m = getSandboxOptions():getDayLengthMinutes()
+    -- local coeff = 60 / m
+
+    return math.floor(getGameTime():getWorldAgeHours() * 100000) -- multiply to increase resolution
+end
+
 BWOUtils.GetWorldAge = function()
+
+    local function daysInMonth(month)
+        local daysPerMonth = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31}
+        return daysPerMonth[month]
+    end
+
+    local gametime = getGameTime()
+    local startYear = gametime:getStartYear()
+    local startMonth = gametime:getStartMonth()
+    local startDay = gametime:getStartDay()
+    local startHour = gametime:getStartTimeOfDay()
+    local year = gametime:getYear()
+    local month = gametime:getMonth()
+    local day = gametime:getDay()
+    local hour = gametime:getHour()
+    local minute = gametime:getMinutes()
+
+    local startTotalHours = startHour + (startDay - 1) * 24
+    for m = 1, startMonth - 1 do
+        startTotalHours = startTotalHours + daysInMonth(m) * 24
+    end
+    startTotalHours = startTotalHours + (startYear * 365 * 24) 
+
+    local totalHours = hour + (day - 1) * 24
+    for m = 1, month - 1 do
+        totalHours = totalHours + daysInMonth(m) * 24
+    end
+    totalHours = totalHours + (year * 365 * 24) 
+
+    return totalHours - startTotalHours
+end
+
+BWOUtils.GetWorldAgeClient = function()
 
     local function daysInMonth(month)
         local daysPerMonth = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31}
