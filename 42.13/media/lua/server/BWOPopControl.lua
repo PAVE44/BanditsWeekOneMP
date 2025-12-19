@@ -1,4 +1,5 @@
 require "BanditGMD"
+require "BWODebug"
 require "BWOUtils"
 
 BWOPopControl = BWOPopControl or {}
@@ -98,10 +99,11 @@ local function loadBanditOptions(cid)
     return bandits
 end
 
+-- converts zeds into npcs
 local function everyOneMinute()
     
     if not isServer() then return end
-    -- print ("[POP CONTROL] Init ")
+    -- print ("[POP CONTROL][INFO] INIT ")
 
     local worldAge = BWOUtils.GetWorldAge() 
     local cell = getCell()
@@ -113,7 +115,7 @@ local function everyOneMinute()
         clusters[i] = false
     end
 
-    print ("[POP CONTROL] Zombie Count: " .. zombieListSize)
+    dprint ("[POP CONTROL][INFO] ZOMBIES: " .. zombieListSize, 3)
     for i = 0, zombieListSize - 1 do
         local zombie = zombieList:get(i)
         -- local id = zombie:getPersistentOutfitID()
@@ -122,19 +124,27 @@ local function everyOneMinute()
         local c = GetBanditCluster(id)
         if not gmd[id] then
             
-            
+            -- this forces the reclothing so that server knows the outfit
             zombie:dressInPersistentOutfitID(id)
-            local outfitName = zombie:getOutfitName()
-            local outfitData = Bandit.outfit2clan[outfitName] 
 
+            zombie:getModData().brainId = id
+
+            local outfitName = zombie:getOutfitName()
+            if not outfitName then
+                dprint ("[POPCONTROL][ERR] MISSING OUTFIT!", 1)
+                outfitName = "Generic01"
+            end
+            
+            local outfitData = Bandit.outfit2clan[outfitName]
             if not outfitData then
-                outfitData = Bandit.outfit2clan["Generic01"]
+                dprint ("[POPCONTROL][WARN] MISSING OUTFIT MAPPING: " .. tostring(outfitName), 2)
+                outfitData = {cid = Bandit.clanMap.Walker}
             end
 
             local bandit = BanditUtils.Choice(loadBanditOptions(outfitData.cid))
             local brain = {}
 
-            print ("[POPCONTROL] CONVERTING, OUTFIT: " .. tostring(outfitName) .. ", CID: " .. outfitData.cid)
+            dprint ("[POPCONTROL][INFO] CONVERTING, OUTFIT: " .. tostring(outfitName) .. ", CID: " .. outfitData.cid, 1)
 
             -- auto-generated properties 
             brain.id = id
@@ -257,14 +267,15 @@ local function everyOneMinute()
             gmd[id] = brain
             clusters[c] = true
             
-            -- print ("[POP CONTROL] Zombie " .. id .. " banditized.")
+            dprint ("[POP CONTROL][INFO] ZOMBIE " .. id .. " BANDITIZED.", 3)
         else
-            -- print ("[POP CONTROL] Zombie " .. id .. " is already a bandit.")
+            -- dprint ("[POP CONTROL][INFO] ZOMBIE" .. id .. " IS ALREADY A BANDIT.", 3)
         end
     end
 
     for i=0, BanditClusterCount-1 do
         if clusters[i] then
+            dprint ("[POP CONTROL][INFO] TRANSMIT CLUSTER" .. i, 3)
             TransmitBanditClusterExpicit(i)
         end
     end

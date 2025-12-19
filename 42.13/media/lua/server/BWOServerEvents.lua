@@ -1,11 +1,13 @@
+require "BWODebug"
 require "BWOUtils"
 
 BWOServerEvents = BWOServerEvents or {}
 
 BWOServerEvents.Arson = function(params)
-    print("[SERVER_EVENT] [Arson] Init")
+    dprint("[SERVER_EVENT][INFO][Arson] INIT", 3)
     local distMin = 45
     local distMax = 85
+    local densityMin = 0.5
 
     local groups = BWOUtils.GetPlayerGroups()
     for i = 1, #groups do
@@ -15,7 +17,7 @@ BWOServerEvents.Arson = function(params)
         local px, py, pz = playerSelected:getX(), playerSelected:getY(), playerSelected:getZ()
 
         local density = BWOUtils.GetDensityScore(px, py)
-        if density > 0.5 then
+        if density > densityMin then
             local room = BWOUtils.FindRoomDist(px, py, distMin, distMax)
 
             if room then
@@ -35,23 +37,23 @@ BWOServerEvents.Arson = function(params)
                             cy = cy,
                             cz = cz
                         }
-                        print("[SERVER_EVENT] [Arson] Requesting client logic " .. tostring(paramsClient.pid))
+                        dprint("[SERVER_EVENT][INFO][Arson] REQUEST CLIENT LOGIC FOR: " .. tostring(paramsClient.pid), 3)
                         sendServerCommand("Events", "Arson", paramsClient)
                     end
                 else
-                    print("[SERVER_EVENT] [Arson] Square unavailable")
+                    dprint("[SERVER_EVENT][INFO][Arson] SQUARE UNAVAILABLE", 3)
                 end
             else
-                print("[SERVER_EVENT] [Arson] No room found")
+                dprint("[SERVER_EVENT][INFO][Arson] NO ROOM FOUND", 3)
             end
         else
-            print("[SERVER_EVENT] [Arson] Skipping due to low density " .. density)
+            dprint("[SERVER_EVENT][INFO][Arson] SKIPPING DUE TO LOW DENSITY " .. density .. " < " .. densityMin, 3)
         end
     end
 end
 
 BWOServerEvents.ChopperAlert = function(params)
-    print("[SERVER_EVENT] [ChopperAlert] Init")
+    dprint("[SERVER_EVENT][INFO][ChopperAlert] INIT", 3)
 
     local groups = BWOUtils.GetPlayerGroups()
     for i = 1, #groups do
@@ -62,7 +64,7 @@ BWOServerEvents.ChopperAlert = function(params)
         local cx = playerSelected:getX() - 3 + ZombRand(4)
         local cy = playerSelected:getY() - 3 + ZombRand(4)
 
-        print("[SERVER_EVENT] [ChopperAlert] cx: " .. cx .. " cy: " .. cy)
+        dprint("[SERVER_EVENT][INFO][ChopperAlert] cx: " .. cx .. " cy: " .. cy, 3)
 
         -- execute client logic for event
         for j = 1, #players do
@@ -77,7 +79,7 @@ BWOServerEvents.ChopperAlert = function(params)
                 dir = params.dir,
                 sound = params.sound
             }
-            print("[SERVER_EVENT] [ChopperAlert] Requesting client logic " .. tostring(paramsClient.pid))
+            dprint("[SERVER_EVENT][INFO][ChopperAlert] REQUEST CLIENT LOGIC FOR: " .. tostring(paramsClient.pid), 3)
             sendServerCommand("Events", "ChopperAlert", paramsClient)
         end
     end
@@ -85,7 +87,7 @@ end
 
 -- params: cid, program, hostile, name]
 BWOServerEvents.SpawnGroup = function(params)
-    print("[SERVER_EVENT] [SpawnGroup] Init")
+    dprint("[SERVER_EVENT][INFO][SpawnGroup] INIT", 3)
 
     local multiplierMin = 0.5
     local multiplierMax = 2
@@ -109,7 +111,7 @@ BWOServerEvents.SpawnGroup = function(params)
             if density < multiplierMin then density = multiplierMin end
             local size = params.size
             size = math.floor(size * #players * density)
-            print("[SERVER_EVENT] [SpawnGroup] size: " .. size .. " = " .. params.size .. " * " .. #players .. " * " .. density)
+            dprint("[SERVER_EVENT][INFO][SpawnGroup] SIZE: " .. size .. " = " .. params.size .. " * " .. #players .. " * " .. density, 3)
 
             -- spawn
             if size > 0 then
@@ -124,6 +126,7 @@ BWOServerEvents.SpawnGroup = function(params)
                     size = size
                 }
                 BanditServer.Spawner.Clan(playerSelected, args)
+                dprint("[SERVER_EVENT][INFO][SpawnGroup] SPAWN SUCCESSFUL", 3)
 
                 -- execute client logic for event
                 for j = 1, #players do
@@ -138,23 +141,21 @@ BWOServerEvents.SpawnGroup = function(params)
                         y = sp.y,
                         z = sp.z
                     }
-                    print("[SERVER_EVENT] [ChopperAlert] Requesting client logic " .. tostring(paramsClient.pid))
+                    dprint("[SERVER_EVENT][INFO][SpawnGroup] REQUEST CLIENT LOGIC FOR: " .. tostring(paramsClient.pid), 3)
                     sendServerCommand("Events", "SpawnGroup", paramsClient)
                 end
             else
-                print("[SERVER_EVENT] [SpawnGroup] Spawn skipped due to zero group size")
+                dprint("[SERVER_EVENT][INFO][SpawnGroup] SPAWN SKIPPED DUE TO ZERO GROUP SIZE", 3)
             end
 
         else
-            print("[SERVER_EVENT] [SpawnGroup] No suitable spawn point found")
+            dprint("[SERVER_EVENT][INFO][SpawnGroup] NO SUITABLE SPAWN POINT FOUND", 3)
         end
-
     end
-
 end
 
 BWOServerEvents.StartDay = function(params)
-    print("[SERVER_EVENT] [StartDay] Init")
+    dprint("[SERVER_EVENT][INFO][StartDay] INIT", 3)
 
     local players = BWOUtils.GetAllPlayers()
     for i = 1, #players do
@@ -163,7 +164,7 @@ BWOServerEvents.StartDay = function(params)
             pid = player:getOnlineID(),
             day = params.day,
         }
-        print("[SERVER_EVENT] [StartDay] Requesting client logic " .. tostring(paramsClient.pid))
+        dprint("[SERVER_EVENT][INFO][StartDay] REQUEST CLIENT LOGIC FOR: " .. tostring(paramsClient.pid), 3)
         sendServerCommand("Events", "StartDay", paramsClient)
     end
 end

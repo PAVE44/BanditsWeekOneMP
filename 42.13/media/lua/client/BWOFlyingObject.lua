@@ -101,7 +101,8 @@ BWOFlyingObject.Process = function()
             end
 
             -- Visual rendering only if player outside
-            if player:getSquare():isOutside() then
+            local playerSquare = player:getSquare()
+            if playerSquare and playerSquare:isOutside() then
                 local width = effect.width / zoom
                 local offsetX = width / 2
                 local height = effect.height / zoom
