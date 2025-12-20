@@ -89,6 +89,10 @@ Bandit.clanMap.Militia = "6e147770-2d41-4fd2-ab7d-05a8acf4157b"
 -- mapping cids to spawn notification idons
 Bandit.cidNotification = Bandit.cidNotification or {}
 Bandit.cidNotification[Bandit.clanMap.ArmyGreen] = "media/ui/raid.png"
+Bandit.cidNotification[Bandit.clanMap.PoliceBlue] = "media/ui/sheriff.png"
+Bandit.cidNotification[Bandit.clanMap.PoliceGray] = "media/ui/sheriff.png"
+Bandit.cidNotification[Bandit.clanMap.PoliceRiot] = "media/ui/sheriff.png"
+Bandit.cidNotification[Bandit.clanMap.SWAT] = "media/ui/sheriff.png"
 
 -- depending on the original outfit, a proper clan and occupation name is mapped for banditize
 Bandit.outfit2clan = Bandit.outfit2clan or {}

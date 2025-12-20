@@ -43,7 +43,25 @@ BWOClientEvents.SpawnGroup = function(params)
             color = {r=1, g=0, b=0} -- red
         end
 
-        BanditEventMarkerHandler.set(getRandomUUID(), icon, time, params.x, params.y, color, params.desc)
+        BanditEventMarkerHandler.set(getRandomUUID(), icon, time, params.cx, params.cy, color, params.desc)
+    end
+end
+
+-- params: cid, x, y, hostile
+BWOClientEvents.SpawnGroupVehicle = function(params)
+    local time = 3600
+    if SandboxVars.Bandits.General_ArrivalIcon then
+        local icon = Bandit.cidNotification[params.cid]
+        if not icon then
+            icon = "media/ui/raid.png"
+        end
+
+        local color = {r=0, g=1, b=0} -- green
+        if params.hostile then
+            color = {r=1, g=0, b=0} -- red
+        end
+
+        BanditEventMarkerHandler.set(getRandomUUID(), icon, time, params.cx, params.cy, color, params.desc)
     end
 end
 

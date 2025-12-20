@@ -119,10 +119,20 @@ BWOMenu.EventArmy = function(player)
     sendClientCommand(player, "EventManager", "AddEvent", args)
 end
 
-BWOMenu.EventArmyPatrol = function(player)
-    local params = {}
-    params.intensity = 9
-    BWOScheduler.Add("ArmyPatrol", params, 100)
+BWOMenu.EventPoliceVehicle = function(player)
+    local params = {
+        cid = Bandit.clanMap.PoliceBlue,
+        vtype = "Base.CarLightsPolice",
+        lightbar = 2,
+        siren = 2,
+        size = 2,
+        d = 30,
+        program = "Walker",
+        hostile = false
+    }
+    local args = {"SpawnGroupVehicle", params}
+
+    sendClientCommand(player, "EventManager", "AddEvent", args)
 end
 
 BWOMenu.EventArson = function(player)
@@ -379,14 +389,25 @@ function BWOMenu.WorldContextMenuPre(playerID, context, worldobjects, test)
         end
     end
 
-    if zombie then
-        zombie:getWornItems():clear()
-    end
-
     if isDebugEnabled() or isAdmin() then
 
         local density = BWOUtils.GetDensityScore(player:getX(), player:getY())
         print (density)
+
+        local res = BWOUtils.FindVehicleSpawnPoint(player:getX(), player:getY(), 30)
+        if res.valid then
+            local toDirs = {"toNorth", "toSouth", "ToEast", "ToWest"}
+            BWOUtils.Shuffle(toDirs)
+            for _, toDir in pairs(toDirs) do
+                local spawn = res[toDir]
+                if spawn then
+                    dprint("[SERVER_EVENT][INFO][SpawnGroupVehicle] VEHICLE SPOTS SELECTED X: " .. spawn.x .. " Y:" .. spawn.y .. " D: " .. tostring(spawn.dir), 3)
+                    --local vehicle = addVehicle("Base.CarLightsPolice", spawn.x, spawn.y, 0)
+                    -- local vehicle = addVehicleDebug("Base.CarLightsPolice", spawn.dir, nil, square)
+                    break
+                end
+            end
+        end
 
         local eventsOption = context:addOption("BWO Event")
         local eventsMenu = context:getNew(context)
@@ -394,13 +415,13 @@ function BWOMenu.WorldContextMenuPre(playerID, context, worldobjects, test)
         context:addSubMenu(eventsOption, eventsMenu)
 
         eventsMenu:addOption("Army", player, BWOMenu.EventArmy)
-        -- eventsMenu:addOption("Army Patrol", player, BWOMenu.EventArmyPatrol)
         eventsMenu:addOption("Arson", player, BWOMenu.EventArson)
         -- eventsMenu:addOption("Bandits", player, BWOMenu.EventBandits)
         -- eventsMenu:addOption("Bikers", player, BWOMenu.EventBikers)
         eventsMenu:addOption("Chopper Alert", player, BWOMenu.EventChopperAlert)
         -- eventsMenu:addOption("Criminals", player, BWOMenu.EventCriminals)
         -- eventsMenu:addOption("Dream", player, BWOMenu.EventDream)
+        eventsMenu:addOption("Police + Car", player, BWOMenu.EventPoliceVehicle)
 
         --[[
         local entertainerOption = eventsMenu:addOption("Entertainer")

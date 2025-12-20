@@ -470,6 +470,153 @@ BWOUtils.GetRandomRoomSquare = function(room)
     return square
 end
 
+BWOUtils.HasZoneType = function(x, y, z, zoneType)
+    local zones = getZones(x, y, z)
+    if zones then
+        for i=0, zones:size()-1 do
+            local zone = zones:get(i)
+            if zone:getType() == zoneType then
+                return true
+            end
+        end
+    end
+    return false
+end
+
+BWOUtils.FindVehicleSpawnPoint = function(px, py, d)
+    
+    -- detects orientation and width of the road
+    local getInfo = function(x, y)
+        local res = {}
+        res.valid = false
+  
+        -- check in x
+        local xlen = 0
+        local xmin = math.huge
+        local xmax = 0
+        for i = -14, 14 do
+            local dx = x + i
+            if BWOUtils.HasZoneType(dx, y, 0, "Nav") then 
+                xlen = xlen + 1 
+                if dx < xmin then
+                    xmin = dx
+                end
+                if dx > xmax then
+                    xmax = dx
+                end
+            end
+        end
+
+        --check in y
+        local ylen = 0
+        local ymin = math.huge
+        local ymax = 0
+        for i = -14, 14 do
+            local dy = y + i
+            if BWOUtils.HasZoneType(x, dy, 0, "Nav") then 
+                ylen = ylen + 1
+                if dy < ymin then
+                    ymin = dy
+                end
+                if dy > ymax then
+                    ymax = dy
+                end
+            end
+        end
+
+        -- width: 14 - intercity roads
+        -- width: 8 - city main roads
+
+        if xlen > 20 and ylen >= 8 then
+            res.valid = true
+            res.orientation = "X" -- EW
+            res.min = ymin
+            res.max = ymax
+            res.width = ylen
+        elseif ylen > 20 and xlen >= 8 then
+            res.valid = true
+            res.orientation = "Y" -- EW
+            res.min = xmin
+            res.max = xmax
+            res.width = xlen
+        end
+
+        return res
+    end
+
+    -- validates if the point is good for vehicle spawn
+    local checkPoint = function(x, y)
+        local res = {}
+        res.valid = false
+
+        if BWOUtils.HasZoneType(x, y, 0, "Nav") then
+            local roadInfo = getInfo(x, y)
+            if roadInfo.valid then
+                res.valid = true
+                if roadInfo.orientation == "X" then
+                    res.toEast = {}
+                    res.toEast.x = x - 50
+                    res.toEast.y = roadInfo.max - 1
+                    res.toEast.dir = IsoDirections.E
+                    
+                    res.toWest = {}
+                    res.toWest.x = x + 50
+                    res.toWest.y = roadInfo.min + 2
+                    res.toWest.dir = IsoDirections.W
+
+                    for dx=x-50, x+50, 5 do
+                        local roadInfo = getInfo(dx, y)
+                        if not roadInfo.valid then
+                            res.valid = false
+                            break
+                        end
+                    end
+                else
+                    res.toNorth = {}
+                    res.toNorth.x = roadInfo.max - 1
+                    res.toNorth.y = y + 50
+                    res.toNorth.dir = IsoDirections.N
+                    
+                    res.toSouth = {}
+                    res.toSouth.x = roadInfo.min + 2
+                    res.toSouth.y = y - 50
+                    res.toSouth.dir = IsoDirections.S
+
+                    for dy=y-50, y+50, 5 do
+                        local roadInfo = getInfo(x, dy)
+                        if not roadInfo.valid then
+                            res.valid = false
+                            break
+                        end
+                    end
+                end
+            end
+        end
+        return res
+    end
+
+    px = math.floor(px + 0.5)
+    py = math.floor(py + 0.5)
+
+    -- find all possible spawn points
+    local list = {}
+    for x=px-d, px+d, 5 do
+        for y=py-d, py+d, 5 do
+            local res = checkPoint (x, y)
+            if res.valid then 
+                table.insert(list, res)
+            end
+        end
+    end
+
+    if #list == 0 then return {valid=false} end
+
+    BWOUtils.Shuffle(list)
+
+    local res = list[1]
+    return res
+end
+
 BWOUtils.VehiclesAlarm = function(px, py, min, max)
     local vehicleList = getCell():getVehicles()
     for i=0, vehicleList:size()-1 do
