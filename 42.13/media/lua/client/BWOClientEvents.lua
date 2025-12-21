@@ -9,8 +9,18 @@ BWOClientEvents.Arson = function(params)
     if not params.cy then return end
     if not params.cz then return end
 
+    -- const
+    local time = 3600
+    local icon = "media/ui/arson.png"
+    local desc = "Arson"
+    local color = {r=1, g=0, b=0} -- red
+
     BWOUtils.Explode(params.cx, params.cy, params.cz)
     BWOUtils.VehiclesAlarm(params.cx, params.cy, 0, 60)
+
+    if SandboxVars.Bandits.General_ArrivalIcon then
+        BanditEventMarkerHandler.set(getRandomUUID(), icon, time, params.cx, params.cy, color, desc)
+    end
 end
 
 -- params: cx, cy, spped, name, dir, sound
