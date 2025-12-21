@@ -126,7 +126,8 @@ BWOMenu.EventPoliceVehicle = function(player)
         lightbar = 2,
         siren = 2,
         size = 2,
-        d = 30,
+        dmin = 35,
+        dmax = 80,
         program = "Bandit",
         hostile = false
     }
@@ -394,19 +395,9 @@ function BWOMenu.WorldContextMenuPre(playerID, context, worldobjects, test)
         local density = BWOUtils.GetDensityScore(player:getX(), player:getY())
         print (density)
 
-        local res = BWOUtils.FindVehicleSpawnPoint(player:getX(), player:getY(), 30)
+        local res = BWOUtils.FindVehicleSpawnPoint(player:getX(), player:getY(), 35, 80)
         if res.valid then
-            local toDirs = {"toNorth", "toSouth", "toEast", "toWest"}
-            --BWOUtils.Shuffle(toDirs)
-            for _, toDir in pairs(toDirs) do
-                local spawn = res[toDir]
-                if spawn then
-                    dprint("[SERVER_EVENT][INFO][SpawnGroupVehicle] VEHICLE SPOTS SELECTED X: " .. spawn.x .. " Y:" .. spawn.y .. " D: " .. tostring(spawn.dir), 3)
-                    --local vehicle = addVehicle("Base.CarLightsPolice", spawn.x, spawn.y, 0)
-                    -- local vehicle = addVehicleDebug("Base.CarLightsPolice", spawn.dir, nil, square)
-                    break
-                end
-            end
+            dprint("[SERVER_EVENT][INFO][SpawnGroupVehicle] VEHICLE SPOTS SELECTED X: " .. res.x .. " Y:" .. res.y, 3)
         end
 
         local eventsOption = context:addOption("BWO Event")

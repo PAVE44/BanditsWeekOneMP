@@ -166,74 +166,62 @@ BWOServerEvents.SpawnGroupVehicle = function(params)
         local px, py, pz = playerSelected:getX(), playerSelected:getY(), playerSelected:getZ()
 
         -- spawn point selection
-        local res = BWOUtils.FindVehicleSpawnPoint(px, py, params.d)
+        local res = BWOUtils.FindVehicleSpawnPoint(px, py, params.dmin, params.dmax)
 
         if res.valid then
-            local toDirs = {"toNorth", "toSouth", "toEast", "toWest"}
-            BWOUtils.Shuffle(toDirs)
+            dprint("[SERVER_EVENT][INFO][SpawnGroupVehicle] VEHICLE SPOTS SELECTED X: " .. res.x .. " Y:" .. res.y, 3)
+            
+            -- vehicle spawn
+            -- local vehicle = addVehicle("Base.CarLightsPolice", spawn.x, spawn.y, 0)
+            local vehicle = addVehicleDebug(params.vtype, IsoDirections.S, nil, getCell():getGridSquare(res.x, res.y, 0))
+            if vehicle then
+                dprint("[SERVER_EVENT][INFO][SpawnGroupVehicle] VEHICLE SPAWN SUCCESSFUL", 3)
+                vehicle:repair()
 
-            local spawn
-            for _, toDir in pairs(toDirs) do
-                spawn = res[toDir]
-                if spawn then
-                    dprint("[SERVER_EVENT][INFO][SpawnGroupVehicle] VEHICLE SPOTS SELECTED X: " .. spawn.x .. " Y:" .. spawn.y .. " D: " .. tostring(spawn.dir), 3)
-                    break
+                if params.healights then
+                    vehicle:setHeadlightsOn(true)
                 end
+
+                if vehicle:hasLightbar() then 
+                    if params.lightbar then
+                        vehicle:setLightbarLightsMode(params.lightbar)
+                    end
+                    if params.siren then
+                        vehicle:setLightbarSirenMode(params.siren)
+                    end
+                end
+            else
+                dprint("[SERVER_EVENT][ERR][SpawnGroupVehicle] VEHICLE SPAWN ERROR!", 1)
             end
 
-            if spawn then
-                -- vehicle spawn
-                -- local vehicle = addVehicle("Base.CarLightsPolice", spawn.x, spawn.y, 0)
-                local vehicle = addVehicleDebug(params.vtype, spawn.dir, nil, getCell():getGridSquare(spawn.x, spawn.y, 0))
-                if vehicle then
-                    dprint("[SERVER_EVENT][INFO][SpawnGroupVehicle] VEHICLE SPAWN SUCCESSFUL", 3)
-                    vehicle:repair()
+            -- npc spawn
+            local args = {
+                cid = params.cid,
+                program = params.program,
+                voice = params.voice,
+                hostile = params.hostile,
+                x = res.x + 2,
+                y = res.y + 2,
+                z = 0,
+                size = params.size
+            }
+            BanditServer.Spawner.Clan(playerSelected, args)
+            dprint("[SERVER_EVENT][INFO][SpawnGroupVehicle] GROUP SPAWN SUCCESSFUL", 3)
+            
+            -- execute client logic for event
+            for j = 1, #players do
+                local player = players[j]
 
-                    if params.healights then
-                        vehicle:setHeadlightsOn(true)
-                    end
-
-                    if vehicle:hasLightbar() then 
-                        if params.lightbar then
-                            vehicle:setLightbarLightsMode(params.lightbar)
-                        end
-                        if params.siren then
-                            vehicle:setLightbarSirenMode(params.siren)
-                        end
-                    end
-                else
-                    dprint("[SERVER_EVENT][ERR][SpawnGroupVehicle] VEHICLE SPAWN ERROR!", 1)
-                end
-
-                -- npc spawn
-                local args = {
+                local paramsClient = {
+                    pid = player:getOnlineID(),
                     cid = params.cid,
-                    program = params.program,
-                    voice = params.voice,
+                    name = params.name,
                     hostile = params.hostile,
-                    x = spawn.x + 2,
-                    y = spawn.y + 2,
-                    z = 0,
-                    size = params.size
+                    cx = res.x,
+                    cy = res.y,
                 }
-                BanditServer.Spawner.Clan(playerSelected, args)
-                dprint("[SERVER_EVENT][INFO][SpawnGroupVehicle] GROUP SPAWN SUCCESSFUL", 3)
-                
-                -- execute client logic for event
-                for j = 1, #players do
-                    local player = players[j]
-
-                    local paramsClient = {
-                        pid = player:getOnlineID(),
-                        cid = params.cid,
-                        name = params.name,
-                        hostile = params.hostile,
-                        cx = spawn.x,
-                        cy = spawn.y,
-                    }
-                    dprint("[SERVER_EVENT][INFO][SpawnGroupVehicle] REQUEST CLIENT LOGIC FOR: " .. tostring(paramsClient.pid), 3)
-                    sendServerCommand("Events", "SpawnGroupVehicle", paramsClient)
-                end
+                dprint("[SERVER_EVENT][INFO][SpawnGroupVehicle] REQUEST CLIENT LOGIC FOR: " .. tostring(paramsClient.pid), 3)
+                sendServerCommand("Events", "SpawnGroupVehicle", paramsClient)
             end
         end
     end

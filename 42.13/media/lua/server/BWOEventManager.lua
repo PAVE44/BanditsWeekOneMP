@@ -11,9 +11,18 @@ local schedule = {
         [2] = {
             {{"Siren", {}}, 1},
         },
+        [3] = {
+            {{"SpawnGroupVehicle", {cid = Bandit.clanMap.PoliceBlue, vtype = "Base.CarLightsPolice", lightbar = 2, siren = 2, size = 2, d = 30, program = "Bandit", hostile = false}}, 1},
+        },
         [4] = {
             {{"ChopperAlert", {name="heli2", sound="BWOChopperGeneric", dir = 90, speed=1.8}}, 1},
             {{"ChopperAlert", {name="heli", sound="BWOChopperGeneric", dir = 0, speed=1.6}}, 1000},
+        },
+        [10] = {
+            {{"SpawnGroupVehicle", {cid = Bandit.clanMap.PoliceBlue, vtype = "Base.CarLightsPolice", lightbar = 1, siren = 1, size = 2, d = 30, program = "Bandit", hostile = false}}, 1},
+        },
+        [20] = {
+            {{"SpawnGroupVehicle", {cid = Bandit.clanMap.PoliceBlue, vtype = "Base.CarLightsPolice", lightbar = 1, siren = 1, size = 2, d = 30, program = "Bandit", hostile = false}}, 1},
         }
     }
 }
