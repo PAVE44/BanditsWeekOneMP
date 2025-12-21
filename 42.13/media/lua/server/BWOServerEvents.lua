@@ -317,7 +317,7 @@ BWOServerEvents.Siren = function(params)
             cx = player:getX() + 10,
             cy = player:getY() - 20,
             cz = player:getZ(),
-            sound = "DOSiren",
+            sound = "DOSiren2",
         }
         dprint("[SERVER_EVENT][INFO][Siren] REQUEST CLIENT LOGIC FOR: " .. tostring(paramsClient.pid), 3)
         sendServerCommand("Events", "WorldSound", paramsClient)
