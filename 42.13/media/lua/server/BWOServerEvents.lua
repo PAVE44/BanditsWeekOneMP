@@ -169,7 +169,7 @@ BWOServerEvents.SpawnGroupVehicle = function(params)
         local res = BWOUtils.FindVehicleSpawnPoint(px, py, params.d)
 
         if res.valid then
-            local toDirs = {"toNorth", "toSouth", "ToEast", "ToWest"}
+            local toDirs = {"toNorth", "toSouth", "toEast", "toWest"}
             BWOUtils.Shuffle(toDirs)
 
             local spawn

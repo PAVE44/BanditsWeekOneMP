@@ -4,6 +4,8 @@ require "BWOUtils"
 
 BWOPopControl = BWOPopControl or {}
 
+BWOPopControl.zombiePercent = 30
+
 local function zombieController(targetCnt)
     if targetCnt > 400 then return end
     local gmd = GetBanditModData()
@@ -118,158 +120,171 @@ local function everyOneMinute()
     dprint ("[POP CONTROL][INFO] ZOMBIES: " .. zombieListSize, 3)
     for i = 0, zombieListSize - 1 do
         local zombie = zombieList:get(i)
-        -- local id = zombie:getPersistentOutfitID()
-        local id = BanditUtils.GetCharacterID(zombie)
-        local gmd = GetBanditClusterData(id)
-        local c = GetBanditCluster(id)
-        if not gmd[id] then
-            
-            -- this forces the reclothing so that server knows the outfit
-            zombie:dressInPersistentOutfitID(id)
+        
+        local rnd = ZombRand(100)
+        if rnd > BWOPopControl.zombiePercent and not zombie:getModData().skip then
 
-            zombie:getModData().brainId = id
+            local id = BanditUtils.GetCharacterID(zombie)
+            local gmd = GetBanditClusterData(id)
+            local c = GetBanditCluster(id)
+            if not gmd[id] then
+                
+                -- this forces the reclothing so that server knows the outfit
+                zombie:dressInPersistentOutfitID(id)
 
-            local outfitName = zombie:getOutfitName()
-            if not outfitName then
-                dprint ("[POPCONTROL][ERR] MISSING OUTFIT!", 1)
-                outfitName = "Generic01"
-            end
-            
-            local outfitData = Bandit.outfit2clan[outfitName]
-            if not outfitData then
-                dprint ("[POPCONTROL][WARN] MISSING OUTFIT MAPPING: " .. tostring(outfitName), 2)
-                outfitData = {cid = Bandit.clanMap.Walker}
-            end
+                zombie:getModData().brainId = id
 
-            local bandit = BanditUtils.Choice(loadBanditOptions(outfitData.cid))
-            local brain = {}
-
-            dprint ("[POPCONTROL][INFO] CONVERTING, OUTFIT: " .. tostring(outfitName) .. ", CID: " .. outfitData.cid, 1)
-
-            -- auto-generated properties 
-            brain.id = id
-            brain.inVehicle = false
-            brain.fullname = BanditNames.GenerateName(zombie:isFemale())
-
-            brain.born = getGameTime():getWorldAgeHours()
-            brain.bornCoords = {}
-            brain.bornCoords.x = zombie:getX()
-            brain.bornCoords.y = zombie:getY()
-            brain.bornCoords.z = zombie:getZ()
-
-            brain.stationary = false
-            brain.sleeping = false
-            brain.aiming = false
-            brain.moving = false
-            brain.endurance = 1.00
-            brain.speech = 0.00
-            brain.sound = 0.00
-            brain.infection = 0
-
-            -- properties taken from bandit custom profile
-            local general = bandit.general
-            brain.clan = general.cid
-            brain.cid = general.cid
-            brain.bid = general.bid
-            brain.female = general.female or false
-            zombie:setFemaleEtc(general.female)
-            brain.skin = general.skin or 1
-            brain.hairType = general.hairType or 1
-            brain.hairColor = general.hairColor or 1
-            brain.beardType = general.beardType or 1
-            brain.eatBody = false
-
-            local health = general.health or 5
-            brain.health = BanditUtils.Lerp(health, 1, 9, 1, 2.6)
-
-            local accuracyBoost = general.sight or 5
-            brain.accuracyBoost = BanditUtils.Lerp(accuracyBoost, 1, 9, -8, 8)
-
-            local enduranceBoost = general.endurance or 5
-            brain.enduranceBoost = BanditUtils.Lerp(enduranceBoost, 1, 9, 0.25, 1.75)
-
-            local strengthBoost = general.strength or 5
-            brain.strengthBoost = BanditUtils.Lerp(strengthBoost, 1, 9, 0.25, 1.75)
-
-            brain.exp = {0, 0, 0}
-            if general.exp1 and general.exp2 and general.exp3 then
-                brain.exp = {general.exp1, general.exp2, general.exp3}
-            end
-
-            brain.weapons = {}
-            brain.weapons.melee = "Base.BareHands"
-            brain.weapons.primary = {["bulletsLeft"] = 0, ["magCount"] = 0}
-            brain.weapons.secondary = {["bulletsLeft"] = 0, ["magCount"] = 0}
-
-            if bandit.weapons then
-                if bandit.weapons.melee then
-                    brain.weapons.melee = BanditCompatibility.GetLegacyItem(bandit.weapons.melee)
+                local outfitName = zombie:getOutfitName()
+                if not outfitName then
+                    dprint ("[POPCONTROL][ERR] MISSING OUTFIT!", 1)
+                    outfitName = "Generic01"
                 end
-                for _, slot in pairs({"primary", "secondary"}) do
-                    brain.weapons[slot].bulletsLeft = 0
-                    brain.weapons[slot].magCount = 0
-                    if bandit.weapons[slot] and bandit.ammo[slot] then
-                        brain.weapons[slot] = BanditWeapons.Make(bandit.weapons[slot], bandit.ammo[slot])
+                
+                local outfitData = Bandit.outfit2clan[outfitName]
+                if not outfitData then
+                    dprint ("[POPCONTROL][WARN] MISSING OUTFIT MAPPING: " .. tostring(outfitName), 2)
+                    outfitData = {cid = Bandit.clanMap.Walker}
+                end
+
+                if outfitData.cid then
+
+                    local bandit = BanditUtils.Choice(loadBanditOptions(outfitData.cid))
+                    local brain = {}
+
+                    dprint ("[POPCONTROL][INFO] CONVERTING, OUTFIT: " .. tostring(outfitName) .. ", CID: " .. outfitData.cid, 1)
+
+                    -- auto-generated properties 
+                    brain.id = id
+                    brain.inVehicle = false
+                    brain.fullname = BanditNames.GenerateName(zombie:isFemale())
+
+                    brain.born = getGameTime():getWorldAgeHours()
+                    brain.bornCoords = {}
+                    brain.bornCoords.x = zombie:getX()
+                    brain.bornCoords.y = zombie:getY()
+                    brain.bornCoords.z = zombie:getZ()
+
+                    brain.stationary = false
+                    brain.sleeping = false
+                    brain.aiming = false
+                    brain.moving = false
+                    brain.endurance = 1.00
+                    brain.speech = 0.00
+                    brain.sound = 0.00
+                    brain.infection = 0
+
+                    -- properties taken from bandit custom profile
+                    local general = bandit.general
+                    brain.clan = general.cid
+                    brain.cid = general.cid
+                    brain.bid = general.bid
+                    brain.female = general.female or false
+                    zombie:setFemaleEtc(general.female)
+                    brain.skin = general.skin or 1
+                    brain.hairType = general.hairType or 1
+                    brain.hairColor = general.hairColor or 1
+                    brain.beardType = general.beardType or 1
+                    brain.eatBody = false
+
+                    local health = general.health or 5
+                    brain.health = BanditUtils.Lerp(health, 1, 9, 1, 2.6)
+
+                    local accuracyBoost = general.sight or 5
+                    brain.accuracyBoost = BanditUtils.Lerp(accuracyBoost, 1, 9, -8, 8)
+
+                    local enduranceBoost = general.endurance or 5
+                    brain.enduranceBoost = BanditUtils.Lerp(enduranceBoost, 1, 9, 0.25, 1.75)
+
+                    local strengthBoost = general.strength or 5
+                    brain.strengthBoost = BanditUtils.Lerp(strengthBoost, 1, 9, 0.25, 1.75)
+
+                    brain.exp = {0, 0, 0}
+                    if general.exp1 and general.exp2 and general.exp3 then
+                        brain.exp = {general.exp1, general.exp2, general.exp3}
                     end
+
+                    brain.weapons = {}
+                    brain.weapons.melee = "Base.BareHands"
+                    brain.weapons.primary = {["bulletsLeft"] = 0, ["magCount"] = 0}
+                    brain.weapons.secondary = {["bulletsLeft"] = 0, ["magCount"] = 0}
+
+                    if bandit.weapons then
+                        if bandit.weapons.melee then
+                            brain.weapons.melee = BanditCompatibility.GetLegacyItem(bandit.weapons.melee)
+                        end
+                        for _, slot in pairs({"primary", "secondary"}) do
+                            brain.weapons[slot].bulletsLeft = 0
+                            brain.weapons[slot].magCount = 0
+                            if bandit.weapons[slot] and bandit.ammo[slot] then
+                                brain.weapons[slot] = BanditWeapons.Make(bandit.weapons[slot], bandit.ammo[slot])
+                            end
+                        end
+                    end
+
+                    brain.clothing = bandit.clothing or {}
+                    brain.tint = bandit.tint or {}
+                    brain.bag = bandit.bag
+
+                    brain.loot = {}
+                    brain.inventory = {}
+                    brain.tasks = {}
+
+                    -- bandit differentiators
+                    -- 1 - symptoms [0 - no, 1 - yes]
+                    -- 2 - character [0,1 - panic, 2 - cry, 3,4 - hide, 5,6 - courage]
+                    brain.rnd = {ZombRand(2), ZombRand(10), ZombRand(100), ZombRand(1000), ZombRand(10000)}
+
+                    brain.personality = {}
+
+                    -- addiction and sickness
+                    brain.personality.alcoholic = (ZombRand(50) == 0)
+                    brain.personality.smoker = (ZombRand(4) == 0)
+                    brain.personality.compulsiveCleaner = (ZombRand(90) == 0)
+
+                    -- collectors
+                    brain.personality.comicsCollector = (ZombRand(80) == 0)
+                    brain.personality.gameCollector = (ZombRand(220) == 0)
+                    brain.personality.hottieCollector = (ZombRand(100) == 0)
+                    brain.personality.toyCollector = (ZombRand(220) == 0)
+                    brain.personality.videoCollector = (ZombRand(220) == 0)
+                    brain.personality.underwearCollector = (ZombRand(150) == 0)
+
+                    -- heritage
+                    brain.personality.fromPoland = (ZombRand(120) == 0) -- ku chwale ojczyzny!
+
+                    brain.hostile = false
+                    brain.hostileP = false
+
+                    brain.program = {}
+                    brain.program.name = "Civilian"
+                    brain.program.stage = "Prepare"
+                    brain.programFallback = brain.program
+
+                    -- bwo uses it
+                    brain.occupation = ""
+                    brain.loyal = false
+
+                    brain.master = 0
+                    brain.permanent = false
+                    brain.key = nil
+
+                    brain.voice = Bandit.PickVoice(zombie)
+
+                    Bandit.ApplyVisuals(zombie, brain)
+
+                    -- ready!
+                    gmd[id] = brain
+                    clusters[c] = true
+                    
+                    dprint ("[POP CONTROL][INFO] ZOMBIE " .. id .. " BANDITIZED.", 3)
+                else
+                    dprint ("[POP CONTROL][ERR] WRONG CID MAPPING FOR OUTFIT " .. outfitName, 1)
                 end
+            else
+                -- dprint ("[POP CONTROL][INFO] ZOMBIE" .. id .. " IS ALREADY A BANDIT.", 3)
             end
-
-            brain.clothing = bandit.clothing or {}
-            brain.tint = bandit.tint or {}
-            brain.bag = bandit.bag
-
-            brain.loot = {}
-            brain.inventory = {}
-            brain.tasks = {}
-
-            -- bandit differentiators
-            brain.rnd = {ZombRand(2), ZombRand(10), ZombRand(100), ZombRand(1000), ZombRand(10000)}
-
-            brain.personality = {}
-
-            -- addiction and sickness
-            brain.personality.alcoholic = (ZombRand(50) == 0)
-            brain.personality.smoker = (ZombRand(4) == 0)
-            brain.personality.compulsiveCleaner = (ZombRand(90) == 0)
-
-            -- collectors
-            brain.personality.comicsCollector = (ZombRand(80) == 0)
-            brain.personality.gameCollector = (ZombRand(220) == 0)
-            brain.personality.hottieCollector = (ZombRand(100) == 0)
-            brain.personality.toyCollector = (ZombRand(220) == 0)
-            brain.personality.videoCollector = (ZombRand(220) == 0)
-            brain.personality.underwearCollector = (ZombRand(150) == 0)
-
-            -- heritage
-            brain.personality.fromPoland = (ZombRand(120) == 0) -- ku chwale ojczyzny!
-
-            brain.hostile = false
-            brain.hostileP = false
-
-            brain.program = {}
-            brain.program.name = "Walker"
-            brain.program.stage = "Prepare"
-            brain.programFallback = brain.program
-
-            -- bwo uses it
-            brain.occupation = ""
-            brain.loyal = false
-
-            brain.master = 0
-            brain.permanent = false
-            brain.key = nil
-
-            brain.voice = Bandit.PickVoice(zombie)
-
-            Bandit.ApplyVisuals(zombie, brain)
-
-            -- ready!
-            gmd[id] = brain
-            clusters[c] = true
-            
-            dprint ("[POP CONTROL][INFO] ZOMBIE " .. id .. " BANDITIZED.", 3)
         else
-            -- dprint ("[POP CONTROL][INFO] ZOMBIE" .. id .. " IS ALREADY A BANDIT.", 3)
+            zombie:getModData().skip = true
         end
     end
 

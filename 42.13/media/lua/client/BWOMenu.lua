@@ -396,8 +396,8 @@ function BWOMenu.WorldContextMenuPre(playerID, context, worldobjects, test)
 
         local res = BWOUtils.FindVehicleSpawnPoint(player:getX(), player:getY(), 30)
         if res.valid then
-            local toDirs = {"toNorth", "toSouth", "ToEast", "ToWest"}
-            BWOUtils.Shuffle(toDirs)
+            local toDirs = {"toNorth", "toSouth", "toEast", "toWest"}
+            --BWOUtils.Shuffle(toDirs)
             for _, toDir in pairs(toDirs) do
                 local spawn = res[toDir]
                 if spawn then

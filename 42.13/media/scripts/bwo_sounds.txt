@@ -1260,81 +1260,26 @@ module Bandits{
          } 
     }
 
-    sound BWOInstrumentPiano1 {
+    sound FemaleCry {
         category = Object, 
         loop = false,
         is3D = true,
         clip { 
-            file = media/sound/instrument_piano_1.ogg,
-            distanceMin = 1, 
-            distanceMax = 28,
-            reverbFactor = 0.1, 
-            volume = 0.6, 
+            file = media/sound/female_cry.ogg,
+            distanceMin = 1,
+            distanceMax = 6,
+            reverbFactor = 0.6, 
         } 
     }
-
-    sound BWOInstrumentViolinPaganini {
+    sound MaleCry {
         category = Object, 
         loop = false,
         is3D = true,
         clip { 
-            file = media/sound/instrument_violin_paganini.ogg,
-            distanceMin = 1, 
-            distanceMax = 14,
-            reverbFactor = 0.1, 
-            volume = 0.4, 
-        } 
-    }
-
-    sound BWOInstrumentSax1 {
-        category = Object, 
-        loop = false,
-        is3D = true,
-        clip { 
-            file = media/sound/instrument_sax_1.ogg,
-            distanceMin = 1, 
-            distanceMax = 15,
-            reverbFactor = 0.1, 
-            volume = 0.4, 
-        } 
-    }
-
-    sound BWOInstrumentSax2 {
-        category = Object, 
-        loop = false,
-        is3D = true,
-        clip { 
-            file = media/sound/instrument_sax_2.ogg,
-            distanceMin = 1, 
-            distanceMax = 28,
-            reverbFactor = 0.1, 
-            volume = 0.4, 
-        } 
-    }
-
-    sound BWOInstrumentSax3 {
-        category = Object, 
-        loop = false,
-        is3D = true,
-        clip { 
-            file = media/sound/instrument_sax_3.ogg,
-            distanceMin = 1, 
-            distanceMax = 28,
-            reverbFactor = 0.1, 
-            volume = 0.4, 
-        } 
-    }
-
-    sound BWOInstrumentBassGuitar1 {
-        category = Object, 
-        loop = false,
-        is3D = true,
-        clip { 
-            file = media/sound/instrument_bassguitar_1.ogg,
-            distanceMin = 1, 
-            distanceMax = 28,
-            reverbFactor = 0.1, 
-            volume = 0.5, 
+            file = media/sound/male_cry.ogg,
+            distanceMin = 1,
+            distanceMax = 6,
+            reverbFactor = 0.6, 
         } 
     }
 }
