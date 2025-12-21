@@ -47,7 +47,7 @@ ZombiePrograms.Civilian.Main = function(bandit)
     end
 
 
-    if brain.rnd[2] == 1 or brain.rnd[2] == 2 then
+    if brain.rnd[2] <= 1 then
         -- panic
         local subTasks = BanditPrograms.FollowRoad(bandit, walkType)
         if #subTasks > 0 then
@@ -65,16 +65,25 @@ ZombiePrograms.Civilian.Main = function(bandit)
             end
             return {status=true, next="Main", tasks=tasks}
         end
-    elseif brain.rnd[2] == 3 then
+    elseif brain.rnd[2] <= 2 then
         -- despair
-        local subTasks = BanditPrograms.Cry(bandit, walkType)
+        local subTasks = BanditPrograms.Cry(bandit)
         if #subTasks > 0 then
             for _, subTask in pairs(subTasks) do
                 table.insert(tasks, subTask)
             end
             return {status=true, next="Main", tasks=tasks}
         end
-    elseif brain.rnd[2] >= 4 then 
+    elseif brain.rnd[2] <= 4 then
+        -- hide
+        local subTasks = BanditPrograms.Hide(bandit)
+        if #subTasks > 0 then
+            for _, subTask in pairs(subTasks) do
+                table.insert(tasks, subTask)
+            end
+            return {status=true, next="Main", tasks=tasks}
+        end
+    elseif brain.rnd[2] <= 10 then 
         -- courage
         local target, enemy = BanditUtils.GetTarget(bandit, config)
 

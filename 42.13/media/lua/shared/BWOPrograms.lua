@@ -262,6 +262,43 @@ BanditPrograms.GoSomewhere = function(bandit, walkType)
     return tasks
 end
 
+BanditPrograms.Hide = function(bandit)
+    local tasks = {}
+
+    if not bandit:getSquare():isOutside() then return tasks end
+
+    local rooms = getCell():getRoomList()
+    local bx, by = bandit:getX(), bandit:getY()
+    local distBest = math.huge
+    local tx, ty
+
+    for i = 0, rooms:size() - 1 do
+        local room = rooms:get(i)
+        if room then
+            local roomDef = room:getRoomDef()
+            if roomDef then
+                local x1, y1, x2, y2 = roomDef:getX(), roomDef:getY(), roomDef:getX2(), roomDef:getY2()
+
+                local cx = (x1 + x2) / 2
+                local cy = (y1 + y2) / 2
+                local dist = math.abs(bx - cx) + math.abs(by - cy)
+
+                if dist <= distBest then
+                    tx, ty = cx, cy
+                    distBest = dist
+                end
+            end
+        end
+    end
+
+    if tx and ty then
+        table.insert(tasks, BanditUtils.GetMoveTask(0, tx, ty, 0, "SneakWalk", distBest, false))
+        return tasks
+    end
+
+    return tasks
+end
+
 BanditPrograms.Cry = function(bandit)
     local tasks = {}
 
