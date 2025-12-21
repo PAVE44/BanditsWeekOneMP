@@ -3,10 +3,15 @@ require "BWOUtils"
 
 BWOServerEvents = BWOServerEvents or {}
 
+-- params: none
 BWOServerEvents.Arson = function(params)
     dprint("[SERVER_EVENT][INFO][Arson] INIT", 3)
-    local distMin = 45
-    local distMax = 85
+
+    -- sanitize
+    local distMin = params.dmin and params.dmin or 45
+    local distMax = params.dmax and params.dmax or 85
+
+    -- const
     local densityMin = 0.5
 
     local groups = BWOUtils.GetPlayerGroups()
@@ -18,7 +23,7 @@ BWOServerEvents.Arson = function(params)
 
         local density = BWOUtils.GetDensityScore(px, py)
         if density > densityMin then
-            local room = BWOUtils.FindRoomDist(px, py, distMin, distMax)
+            local room = BWOUtils.FindRoomDist(px, py, params.distMin, params.distMax)
 
             if room then
                 local square = BWOUtils.GetRandomRoomSquare(room)
@@ -57,6 +62,12 @@ end
 BWOServerEvents.ChopperAlert = function(params)
     dprint("[SERVER_EVENT][INFO][ChopperAlert] INIT", 3)
 
+    -- sanitize
+    local speed = params.speed and params.speed or 1.8
+    local name = params.name and params.name or "heli"
+    local dir = params.dir and params.dir or 0
+    local sound = params.sound and params.sound or nil
+
     local groups = BWOUtils.GetPlayerGroups()
     for i = 1, #groups do
         -- pick a random player from the group
@@ -89,9 +100,16 @@ end
 
 -- params: cid, program, hostile, name]
 BWOServerEvents.SpawnGroup = function(params)
-
     dprint("[SERVER_EVENT][INFO][SpawnGroup] INIT", 3)
 
+    -- sanitize
+    local cid = params.cid and params.cid or Bandit.clanMap.PoliceBlue
+    local program = params.program and params.program or "Bandit"
+    local hostile = params.hostile and params.hostile or false
+    local size = params.size and params.size or 2
+    local dist = params.dist and params.dist or 40
+
+    -- const
     local multiplierMin = 0.5
     local multiplierMax = 2
 
@@ -103,7 +121,7 @@ BWOServerEvents.SpawnGroup = function(params)
         local px, py, pz = playerSelected:getX(), playerSelected:getY(), playerSelected:getZ()
 
         -- spawn point selection
-        local distance = params.d + ZombRand(10)
+        local distance = params.dist + ZombRand(10)
         local spawnPoints = BWOUtils.GenerateSpawnPoints(px, py, pz, distance, 1)
         if #spawnPoints == 1 then
             local spawn = spawnPoints[1]
@@ -112,17 +130,15 @@ BWOServerEvents.SpawnGroup = function(params)
             local density = BWOUtils.GetDensityScore(px, py)
             if density > multiplierMax then density = multiplierMax end
             if density < multiplierMin then density = multiplierMin end
-            local size = params.size
             size = math.floor(size * #players * density)
-            dprint("[SERVER_EVENT][INFO][SpawnGroup] SIZE: " .. size .. " = " .. params.size .. " * " .. #players .. " * " .. density, 3)
+            dprint("[SERVER_EVENT][INFO][SpawnGroup] SIZE: " .. size, 3)
 
             -- spawn
             if size > 0 then
                 local args = {
-                    cid = params.cid,
-                    program = params.program,
-                    voice = params.voice,
-                    hostile = params.hostile,
+                    cid = cid,
+                    program = program,
+                    hostile = hostile,
                     x = spawn.x,
                     y = spawn.y,
                     z = spawn.z,
@@ -142,6 +158,7 @@ BWOServerEvents.SpawnGroup = function(params)
                         hostile = params.hostile,
                         cx = spawn.x,
                         cy = spawn.y,
+                        cz = spawn.z
                     }
                     dprint("[SERVER_EVENT][INFO][SpawnGroup] REQUEST CLIENT LOGIC FOR: " .. tostring(paramsClient.pid), 3)
                     sendServerCommand("Events", "SpawnGroup", paramsClient)
@@ -156,8 +173,22 @@ BWOServerEvents.SpawnGroup = function(params)
     end
 end
 
+-- params: cid, program, hostile, name, dmin, dmax, vtype, lightbar, siren, headlights
 BWOServerEvents.SpawnGroupVehicle = function(params)
     dprint("[SERVER_EVENT][INFO][SpawnGroupVehicle] INIT", 3)
+
+    -- sanitize
+    local distMin = params.dmin and params.dmin or 45
+    local distMax = params.dmax and params.dmax or 85
+    local vtype = params.vtype and params.vtype or "Base.CarNormal"
+    local headlights = params.healights and params.healights or false
+    local lightbar = params.lightbar and params.lightbar or nil
+    local siren = params.siren and params.siren or nil
+    local cid = params.cid and params.cid or Bandit.clanMap.Police
+    local program = params.program and params.program or "Bandit"
+    local hostile = params.hostile and params.hostile or false
+    local size = params.size and params.size or 2
+
     local groups = BWOUtils.GetPlayerGroups()
     for i = 1, #groups do
         -- pick a random player from the group
@@ -166,28 +197,28 @@ BWOServerEvents.SpawnGroupVehicle = function(params)
         local px, py, pz = playerSelected:getX(), playerSelected:getY(), playerSelected:getZ()
 
         -- spawn point selection
-        local res = BWOUtils.FindVehicleSpawnPoint(px, py, params.dmin, params.dmax)
+        local res = BWOUtils.FindVehicleSpawnPoint(px, py, distMin, distMax)
 
         if res.valid then
             dprint("[SERVER_EVENT][INFO][SpawnGroupVehicle] VEHICLE SPOTS SELECTED X: " .. res.x .. " Y:" .. res.y, 3)
             
             -- vehicle spawn
             -- local vehicle = addVehicle("Base.CarLightsPolice", spawn.x, spawn.y, 0)
-            local vehicle = addVehicleDebug(params.vtype, IsoDirections.S, nil, getCell():getGridSquare(res.x, res.y, 0))
+            local vehicle = addVehicleDebug(vtype, IsoDirections.S, nil, getCell():getGridSquare(res.x, res.y, 0))
             if vehicle then
                 dprint("[SERVER_EVENT][INFO][SpawnGroupVehicle] VEHICLE SPAWN SUCCESSFUL", 3)
                 vehicle:repair()
 
-                if params.healights then
-                    vehicle:setHeadlightsOn(true)
+                if headlights then
+                    vehicle:setHeadlightsOn(headlights)
                 end
 
                 if vehicle:hasLightbar() then 
-                    if params.lightbar then
-                        vehicle:setLightbarLightsMode(params.lightbar)
+                    if lightbar then
+                        vehicle:setLightbarLightsMode(lightbar)
                     end
-                    if params.siren then
-                        vehicle:setLightbarSirenMode(params.siren)
+                    if siren then
+                        vehicle:setLightbarSirenMode(siren)
                     end
                 end
             else
@@ -196,14 +227,13 @@ BWOServerEvents.SpawnGroupVehicle = function(params)
 
             -- npc spawn
             local args = {
-                cid = params.cid,
-                program = params.program,
-                voice = params.voice,
-                hostile = params.hostile,
+                cid = cid,
+                program = program,
+                hostile = hostile,
                 x = res.x + 2,
                 y = res.y + 2,
                 z = 0,
-                size = params.size
+                size = size
             }
             BanditServer.Spawner.Clan(playerSelected, args)
             dprint("[SERVER_EVENT][INFO][SpawnGroupVehicle] GROUP SPAWN SUCCESSFUL", 3)
@@ -219,6 +249,7 @@ BWOServerEvents.SpawnGroupVehicle = function(params)
                     hostile = params.hostile,
                     cx = res.x,
                     cy = res.y,
+                    cz = 0
                 }
                 dprint("[SERVER_EVENT][INFO][SpawnGroupVehicle] REQUEST CLIENT LOGIC FOR: " .. tostring(paramsClient.pid), 3)
                 sendServerCommand("Events", "SpawnGroupVehicle", paramsClient)
@@ -230,6 +261,8 @@ end
 -- params: none
 BWOServerEvents.MetaSound = function(params)
     dprint("[SERVER_EVENT][INFO][MetaSound] INIT", 3)
+
+    -- const
     local densityMin = 0.4
 
     local metaSounds = {
@@ -306,6 +339,7 @@ BWOServerEvents.PlaneCrash = function(params)
     end
 end
 
+-- params: none
 BWOServerEvents.Siren = function(params)
     dprint("[SERVER_EVENT][INFO][Siren] INIT", 3)
 
@@ -324,15 +358,19 @@ BWOServerEvents.Siren = function(params)
     end
 end
 
+-- params: day
 BWOServerEvents.StartDay = function(params)
     dprint("[SERVER_EVENT][INFO][StartDay] INIT", 3)
+
+    -- sanitize
+    local day = params.day and params.day or "monday"
 
     local players = BWOUtils.GetAllPlayers()
     for i = 1, #players do
         local player = players[i]
         local paramsClient = {
             pid = player:getOnlineID(),
-            day = params.day,
+            day = day,
         }
         dprint("[SERVER_EVENT][INFO][StartDay] REQUEST CLIENT LOGIC FOR: " .. tostring(paramsClient.pid), 3)
         sendServerCommand("Events", "StartDay", paramsClient)

@@ -15,26 +15,34 @@ local schedule = {
             {{"Siren", {}}, 1},
         },
         [3] = {
-            {{"SpawnGroupVehicle", {cid = Bandit.clanMap.PoliceBlue, vtype = "Base.CarLightsPolice", lightbar = 2, siren = 2, size = 2, dmin = 20, dmax = 50, program = "Bandit", hostile = false}}, 1},
+            {{"SpawnGroupVehicle", {desc = "Cops", cid = Bandit.clanMap.PoliceBlue, vtype = "Base.CarLightsPolice", lightbar = 2, siren = 2, size = 2, dmin = 20, dmax = 50, program = "Bandit", hostile = false}}, 1},
         },
         [4] = {
             {{"ChopperAlert", {name="heli", sound="BWOChopperPolice1", dir = 90, speed=1.8}}, 1},
         },
         [10] = {
-            {{"SpawnGroupVehicle", {cid = Bandit.clanMap.PoliceBlue, vtype = "Base.CarLightsPolice", lightbar = 1, siren = 1, size = 2, dmin = 30, dmax = 60, program = "Bandit", hostile = false}}, 1},
+            {{"SpawnGroupVehicle", {desc = "Cops", cid = Bandit.clanMap.PoliceBlue, vtype = "Base.CarLightsPolice", lightbar = 1, siren = 1, size = 2, dmin = 30, dmax = 60, program = "Bandit", hostile = false}}, 1},
         },
         [14] = {
             {{"ChopperAlert", {name="heli", sound="BWOChopperPolice1", dir = -90, speed=1.8}}, 1},
         },
         [20] = {
-            {{"SpawnGroupVehicle", {cid = Bandit.clanMap.PoliceBlue, vtype = "Base.CarLightsPolice", lightbar = 1, siren = 1, size = 2, min = 40, dmax = 70, program = "Bandit", hostile = false}}, 1},
+            {{"SpawnGroupVehicle", {desc = "Cops", cid = Bandit.clanMap.PoliceBlue, vtype = "Base.CarLightsPolice", lightbar = 1, siren = 1, size = 2, dmin = 40, dmax = 70, program = "Bandit", hostile = false}}, 1},
+        },
+        [25] = {
+            {{"Arson", {dmin = 25, dmax = 40}}, 1},
         },
         [30] = {
-            {{"SpawnGroupVehicle", {cid = Bandit.clanMap.SWAT, vtype = "Base.StepVan_LouisvilleSWAT", lightbar = 3, siren = 2, size = 5, min = 40, dmax = 80, program = "Bandit", hostile = false}}, 1},
+            {{"SpawnGroupVehicle", {desc = "SWAT", cid = Bandit.clanMap.SWAT, vtype = "Base.StepVan_LouisvilleSWAT", lightbar = 3, siren = 2, size = 5, dmin = 40, dmax = 80, program = "Bandit", hostile = false}}, 1},
         },
         [31] = {
             {{"ChopperAlert", {name="heli2", sound="BWOChopperGeneric", dir = 0, speed=2.4}}, 1},
         },
+        [52] = {
+            {{"Arson", {dmin = 35, dmax = 55}}, 1},
+            {{"Arson", {dmin = 56, dmax = 80}}, 200},
+        },
+        
     }
 }
 

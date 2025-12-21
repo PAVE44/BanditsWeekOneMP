@@ -110,7 +110,7 @@ BWOMenu.EventArmy = function(player)
     local params = {
         cid = Bandit.clanMap.ArmyGreen,
         size = 4,
-        d = 30,
+        dist = 30,
         program = "Bandit",
         hostile = false
     }
