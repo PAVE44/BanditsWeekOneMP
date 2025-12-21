@@ -1260,26 +1260,144 @@ module Bandits{
          } 
     }
 
-    sound FemaleCry {
+    sound FemaleDespair {
         category = Object, 
         loop = false,
         is3D = true,
         clip { 
-            file = media/sound/female_cry.ogg,
+            file = media/sound/female_despair_1.ogg,
             distanceMin = 1,
             distanceMax = 6,
             reverbFactor = 0.6, 
-        } 
+        }
+        clip { 
+            file = media/sound/female_despair_2.ogg,
+            distanceMin = 1,
+            distanceMax = 6,
+            reverbFactor = 0.6, 
+        }
     }
-    sound MaleCry {
+    sound MaleDespair {
         category = Object, 
         loop = false,
         is3D = true,
         clip { 
-            file = media/sound/male_cry.ogg,
+            file = media/sound/male_despair_1.ogg,
             distanceMin = 1,
             distanceMax = 6,
             reverbFactor = 0.6, 
-        } 
+        }
+        clip { 
+            file = media/sound/male_despair_2.ogg,
+            distanceMin = 1,
+            distanceMax = 6,
+            reverbFactor = 0.6, 
+        }
+    }
+
+    sound BWOMetaScream
+    {
+        category = Meta,
+        is3D = true,
+        clip
+        {
+            file = media/sound/distant_1.ogg,
+            distanceMax = 1000,
+        }
+        clip
+        {
+            file = media/sound/distant_2.ogg,
+            distanceMax = 1000,
+        }
+        clip
+        {
+            file = media/sound/distant_3.ogg,
+            distanceMax = 1000,
+        }
+        clip
+        {
+            file = media/sound/distant_4.ogg,
+            distanceMax = 1000,
+        }
+        clip
+        {
+            file = media/sound/distant_5.ogg,
+            distanceMax = 1000,
+        }
+        clip
+        {
+            file = media/sound/distant_6.ogg,
+            distanceMax = 1000,
+        }
+        clip
+        {
+            file = media/sound/distant_7.ogg,
+            distanceMax = 1000,
+        }
+        clip
+        {
+            file = media/sound/distant_8.ogg,
+            distanceMax = 1000,
+        }
+        clip
+        {
+            file = media/sound/distant_9.ogg,
+            distanceMax = 1000,
+        }
+        clip
+        {
+            file = media/sound/distant_10.ogg,
+            distanceMax = 1000,
+        }
+        clip
+        {
+            file = media/sound/distant_11.ogg,
+            distanceMax = 1000,
+        }
+        clip
+        {
+            file = media/sound/distant_12.ogg,
+            distanceMax = 1000,
+        }
+        clip
+        {
+            file = media/sound/distant_13.ogg,
+            distanceMax = 1000,
+        }
+        clip
+        {
+            file = media/sound/distant_14.ogg,
+            distanceMax = 1000,
+        }
+        clip
+        {
+            file = media/sound/distant_15.ogg,
+            distanceMax = 1000,
+        }
+        clip
+        {
+            file = media/sound/distant_16.ogg,
+            distanceMax = 1000,
+        }
+        clip
+        {
+            file = media/sound/distant_17.ogg,
+            distanceMax = 1000,
+        }
+        clip
+        {
+            file = media/sound/distant_18.ogg,
+            distanceMax = 1000,
+        }
+        clip
+        {
+            file = media/sound/distant_19.ogg,
+            distanceMax = 1000,
+        }
+        clip
+        {
+            file = media/sound/distant_20.ogg,
+            distanceMax = 1000,
+        }
     }
 }

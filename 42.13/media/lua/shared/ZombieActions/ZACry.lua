@@ -6,12 +6,12 @@ ZombieActions.Cry.onStart = function(zombie, task)
     zombie:setBumpType(task.anim)
     local emitter = zombie:getEmitter()
     if zombie:isFemale() then
-        if not emitter:isPlaying("FemaleCry") then
-            emitter:playSound("FemaleCry")
+        if not emitter:isPlaying("FemaleDespair") then
+            emitter:playSound("FemaleDespair")
         end
     else
-        if not emitter:isPlaying("MaleCry") then
-            emitter:playSound("MaleCry")
+        if not emitter:isPlaying("MaleDespair") then
+            emitter:playSound("MaleDespair")
         end
     end
 

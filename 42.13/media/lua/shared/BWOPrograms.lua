@@ -265,7 +265,12 @@ end
 BanditPrograms.Hide = function(bandit)
     local tasks = {}
 
-    if not bandit:getSquare():isOutside() then return tasks end
+    if bandit:getSquare():getRoom() then 
+        local anim = BanditUtils.Choice({"Spooked1", "Spooked2"})
+        local task = {action="Time", anim=anim, time=200}
+        table.insert(tasks, task)
+        return tasks 
+    end
 
     local rooms = getCell():getRoomList()
     local bx, by = bandit:getX(), bandit:getY()
@@ -302,7 +307,7 @@ end
 BanditPrograms.Cry = function(bandit)
     local tasks = {}
 
-    local task = {action="Cry", time=200}
+    local task = {action="Cry", time=500}
     table.insert(tasks, task)
 
     return tasks

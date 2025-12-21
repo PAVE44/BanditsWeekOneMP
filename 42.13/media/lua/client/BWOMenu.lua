@@ -111,7 +111,7 @@ BWOMenu.EventArmy = function(player)
         cid = Bandit.clanMap.ArmyGreen,
         size = 4,
         d = 30,
-        program = "Walker",
+        program = "Bandit",
         hostile = false
     }
     local args = {"SpawnGroup", params}
@@ -127,7 +127,7 @@ BWOMenu.EventPoliceVehicle = function(player)
         siren = 2,
         size = 2,
         d = 30,
-        program = "Walker",
+        program = "Bandit",
         hostile = false
     }
     local args = {"SpawnGroupVehicle", params}

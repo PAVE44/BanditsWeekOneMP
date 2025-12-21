@@ -74,7 +74,7 @@ ZombiePrograms.Civilian.Main = function(bandit)
             end
             return {status=true, next="Main", tasks=tasks}
         end
-    elseif brain.rnd[2] <= 4 then
+    elseif brain.rnd[2] <= 6 then
         -- hide
         local subTasks = BanditPrograms.Hide(bandit)
         if #subTasks > 0 then

@@ -239,6 +239,70 @@ BWOServerEvents.SpawnGroupVehicle = function(params)
     end
 end
 
+-- params: none
+BWOServerEvents.MetaSound = function(params)
+    dprint("[SERVER_EVENT][INFO][MetaSound] INIT", 3)
+    local densityMin = 0.4
+
+    local metaSounds = {
+        -- "MetaAssaultRifle1",
+        -- "MetaPistol1",
+        -- "MetaShotgun1",
+        -- "MetaPistol2",
+        -- "MetaPistol3",
+        -- "MetaShotgun1",
+        "MetaScream",
+        "BWOMetaScream",
+        -- "VoiceFemaleDeathFall",
+        -- "VoiceFemaleDeathEaten",
+        -- "VoiceFemalePainFromFallHigh",
+        -- "VoiceMalePainFromFallHigh",
+        -- "VoiceMaleDeathAlone",
+        -- "VoiceMaleDeathEaten",
+    }
+
+    local cell = getCell()
+    local zombieList = cell:getZombieList()
+    local zombieListSize = zombieList:size() / 2
+
+    if zombieListSize > 100 then zombieListSize = 100 end
+    local rnd = ZombRand(100)
+    if rnd > zombieListSize then return end
+
+    local proportion = 2 * (50 - math.abs(50 - BWOPopControl.zombiePercent))
+    local rnd2 = ZombRand(100)
+    if rnd2 > proportion then return end
+    
+    local groups = BWOUtils.GetPlayerGroups()
+    for i = 1, #groups do
+        -- pick a random player from the group
+        local players = groups[i]
+        local playerSelected = BanditUtils.Choice(players)
+        local px, py, pz = playerSelected:getX(), playerSelected:getY(), playerSelected:getZ()
+
+        local density = BWOUtils.GetDensityScore(px, py)
+        if density > densityMin then
+            local rx, ry = 50, 50
+            if ZombRand(2) == 0 then rx = -rx end
+            if ZombRand(2) == 0 then ry = -ry end
+
+            -- execute client logic for event
+            for j = 1, #players do
+                local player = players[j]
+                local paramsClient = {
+                    pid = player:getOnlineID(),
+                    cx = px - rx,
+                    cy = py - ry,
+                    cz = 0,
+                    sound = BanditUtils.Choice(metaSounds),
+                    volume = 0.6
+                }
+                dprint("[SERVER_EVENT][INFO][MetaSound] REQUEST CLIENT LOGIC FOR: " .. tostring(paramsClient.pid), 3)
+                sendServerCommand("Events", "WorldSound", paramsClient)
+            end
+        end
+    end
+end
 
 BWOServerEvents.PlaneCrash = function(params)
     dprint("[SERVER_EVENT][INFO][PlaneCrash] INIT", 3)
@@ -254,6 +318,23 @@ BWOServerEvents.PlaneCrash = function(params)
     end
 end
 
+BWOServerEvents.Siren = function(params)
+    dprint("[SERVER_EVENT][INFO][Siren] INIT", 3)
+
+    local players = BWOUtils.GetAllPlayers()
+    for i = 1, #players do
+        local player = players[i]
+        local paramsClient = {
+            pid = player:getOnlineID(),
+            cx = player:getX() + 10,
+            cy = player:getY() - 20,
+            cz = player:getZ(),
+            sound = "DOSiren",
+        }
+        dprint("[SERVER_EVENT][INFO][Siren] REQUEST CLIENT LOGIC FOR: " .. tostring(paramsClient.pid), 3)
+        sendServerCommand("Events", "WorldSound", paramsClient)
+    end
+end
 
 BWOServerEvents.StartDay = function(params)
     dprint("[SERVER_EVENT][INFO][StartDay] INIT", 3)

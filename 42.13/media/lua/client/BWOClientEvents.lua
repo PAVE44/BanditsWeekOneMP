@@ -65,6 +65,17 @@ BWOClientEvents.SpawnGroupVehicle = function(params)
     end
 end
 
+-- params: cx, cy, cz, sound
+BWOClientEvents.WorldSound = function(params)
+    local emitter = getWorld():getFreeEmitter(params.cx, params.cy, params.cz)
+    if emitter then
+        local volume = getSoundManager():getSoundVolume()
+        local id = emitter:playSound(params.sound, true)
+        if not params.volume then params.volume = 1 end
+        emitter:setVolume(id, volume * params.volume)
+    end
+end
+
 -- params: day
 BWOClientEvents.StartDay = function(params)
     local player = getSpecificPlayer(0)
@@ -78,6 +89,8 @@ BWOClientEvents.StartDay = function(params)
     BWOTex.mode = "center"
     BWOTex.alpha = 2.4
 end
+
+
 
 local onServerCommand = function(module, command, args)
     if module == "Events" and BWOClientEvents[command] then

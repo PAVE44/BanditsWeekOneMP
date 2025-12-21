@@ -6,7 +6,17 @@ BWOEventGenerator = BWOEventGenerator or {}
 -- the main architecture of week one multiplayer events
 
 -- schedule stores sequences of events
-local schedule = {}
+local schedule = {
+    [0] = {
+        [2] = {
+            {{"Siren", {}}, 1},
+        },
+        [4] = {
+            {{"ChopperAlert", {name="heli2", sound="BWOChopperGeneric", dir = 90, speed=1.8}}, 1},
+            {{"ChopperAlert", {name="heli", sound="BWOChopperGeneric", dir = 0, speed=1.6}}, 1000},
+        }
+    }
+}
 
 -- a queue of single events to be fired
 local events = {}
@@ -40,6 +50,8 @@ local function sequenceProcessor()
         local sequence = schedule[worldAge][minute]
         addSequence(sequence)
     end
+
+    BWOServerEvents.MetaSound()
 end
 
 -- fires single event server-side
@@ -68,6 +80,7 @@ local function eventProcessor()
             break -- deliberately consuming only one event at a time to avoid spikes
         end
     end
+
 end
 
 --[[
