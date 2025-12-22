@@ -1278,12 +1278,60 @@ module Bandits{
         }
     }
 
+    sound JetFlyby_1_L {
+        category = Object, 
+        loop = false,
+        is3D = true,
+        clip { 
+            file = media/sound/jet_1_l.ogg,
+	        distanceMin = 1,
+            distanceMax = 200,
+            reverbFactor = 0.6, 
+        }
+    }
+
+    sound JetFlyby_1_R {
+        category = Object, 
+        loop = false,
+        is3D = true,
+        clip { 
+            file = media/sound/jet_1_r.ogg,
+	        distanceMin = 1,
+            distanceMax = 200,
+            reverbFactor = 0.6, 
+        }
+    }
+
+    sound JetFlyby_2_L {
+        category = Object, 
+        loop = false,
+        is3D = true,
+        clip { 
+            file = media/sound/jet_2_l.ogg,
+	        distanceMin = 1,
+            distanceMax = 200,
+            reverbFactor = 0.6, 
+        }
+    }
+
+    sound JetFlyby_2_R {
+        category = Object, 
+        loop = false,
+        is3D = true,
+        clip { 
+            file = media/sound/jet_2_r.ogg,
+	        distanceMin = 1,
+            distanceMax = 200,
+            reverbFactor = 0.6, 
+        }
+    }
+
     sound JetFlybyMG_1_L {
         category = Object, 
         loop = false,
         is3D = true,
         clip { 
-            file = media/sound/jet_flyby_mg_1_l.ogg,
+            file = media/sound/jet_mg_1_l.ogg,
 	        distanceMin = 1,
             distanceMax = 200,
             reverbFactor = 0.6, 
@@ -1295,7 +1343,7 @@ module Bandits{
         loop = false,
         is3D = true,
         clip { 
-            file = media/sound/jet_flyby_mg_1_r.ogg,
+            file = media/sound/jet_mg_1_r.ogg,
 	        distanceMin = 1,
             distanceMax = 200,
             reverbFactor = 0.6, 
@@ -1307,7 +1355,7 @@ module Bandits{
         loop = false,
         is3D = true,
         clip { 
-            file = media/sound/jet_flyby_mg_2_l.ogg,
+            file = media/sound/jet_mg_2_l.ogg,
 	        distanceMin = 1,
             distanceMax = 200,
             reverbFactor = 0.6, 
@@ -1319,7 +1367,7 @@ module Bandits{
         loop = false,
         is3D = true,
         clip { 
-            file = media/sound/jet_flyby_mg_2_r.ogg,
+            file = media/sound/jet_mg_2_r.ogg,
 	        distanceMin = 1,
             distanceMax = 200,
             reverbFactor = 0.6, 
