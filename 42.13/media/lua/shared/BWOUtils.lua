@@ -451,12 +451,14 @@ BWOUtils.FindRoomDist = function(px, py, min, max)
 
     for _, room in ipairs(roomList) do
         local def = room:getRoomDef()
-        local mx = (def:getX() + def:getX2()) / 2
-        local my = (def:getY() + def:getY2()) / 2
-        local dist = BanditUtils.DistTo(px, py, mx, my)
+        if def then
+            local mx = (def:getX() + def:getX2()) / 2
+            local my = (def:getY() + def:getY2()) / 2
+            local dist = BanditUtils.DistTo(px, py, mx, my)
 
-        if dist > min and dist < max then
-            return room
+            if dist > min and dist < max then
+                return room
+            end
         end
     end
 end

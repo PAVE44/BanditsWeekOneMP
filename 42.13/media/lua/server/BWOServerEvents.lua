@@ -23,7 +23,7 @@ BWOServerEvents.Arson = function(params)
 
         local density = BWOUtils.GetDensityScore(px, py)
         if density > densityMin then
-            local room = BWOUtils.FindRoomDist(px, py, params.distMin, params.distMax)
+            local room = BWOUtils.FindRoomDist(px, py, distMin, distMax)
 
             if room then
                 local square = BWOUtils.GetRandomRoomSquare(room)
@@ -42,7 +42,7 @@ BWOServerEvents.Arson = function(params)
                             pid = player:getOnlineID(),
                             cx = cx,
                             cy = cy,
-                            cz = cz
+                            cz = cz,
                         }
                         dprint("[SERVER_EVENT][INFO][Arson] REQUEST CLIENT LOGIC FOR: " .. tostring(paramsClient.pid), 3)
                         sendServerCommand("Events", "Arson", paramsClient)
@@ -108,6 +108,7 @@ BWOServerEvents.SpawnGroup = function(params)
     local hostile = params.hostile and params.hostile or false
     local size = params.size and params.size or 2
     local dist = params.dist and params.dist or 40
+    local desc = params.desc and params.desc or "Unknown"
 
     -- const
     local multiplierMin = 0.5
@@ -153,6 +154,7 @@ BWOServerEvents.SpawnGroup = function(params)
 
                     local paramsClient = {
                         pid = player:getOnlineID(),
+                        desc = desc,
                         cid = params.cid,
                         name = params.name,
                         hostile = params.hostile,
@@ -180,6 +182,7 @@ BWOServerEvents.SpawnGroupVehicle = function(params)
     -- sanitize
     local distMin = params.dmin and params.dmin or 45
     local distMax = params.dmax and params.dmax or 85
+    local desc = params.desc and params.desc or "Unknown"
     local vtype = params.vtype and params.vtype or "Base.CarNormal"
     local headlights = params.healights and params.healights or false
     local lightbar = params.lightbar and params.lightbar or nil
@@ -244,6 +247,7 @@ BWOServerEvents.SpawnGroupVehicle = function(params)
 
                 local paramsClient = {
                     pid = player:getOnlineID(),
+                    desc = desc,
                     cid = params.cid,
                     name = params.name,
                     hostile = params.hostile,
