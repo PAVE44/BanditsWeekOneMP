@@ -56,6 +56,7 @@ BWOFlyingObject.Process = function()
         -- Initialize on first frame
         if not effect.frame then 
             effect.frame = 1
+            effect.tick = 1
             local odir = oppositeAngle(effect.dir)
             local theta = odir * DEG_TO_RAD
             effect.x = effect.cx + (effect.initDist * math.cos(theta))
@@ -78,25 +79,30 @@ BWOFlyingObject.Process = function()
 
                     local sx1
                     local sx2
-                    local sy = py
+                    local sy1
+                    local sy2
                     -- -90 = north, pan to right
                     -- 90 = south, pan to left
                     -- 0 == east, pan to right
                     -- 180 = west, pan to left
 
                     if effect.dir == 90 or effect.dir == 0 then
-                        sx1 = px + 16
-                        sx2 = px - 16
-                    else
                         sx1 = px - 16
+                        sy1 = py + 16
                         sx2 = px + 16
+                        sy2 = py - 16
+                    else
+                        sx1 = px + 16
+                        sy1 = py - 16
+                        sx2 = px - 16
+                        sy2 = py + 16
                     end
 
-                    local emitter1 = getWorld():getFreeEmitter(sx1, sy, effect.z)
+                    local emitter1 = getWorld():getFreeEmitter(sx1, sy1, effect.z)
                     local sid1 = emitter1:playSound(effect.sound .. "_L")
                     emitter1:setVolume(sid1, volumeSystem)
 
-                    local emitter2 = getWorld():getFreeEmitter(sx2, sy, effect.z)
+                    local emitter2 = getWorld():getFreeEmitter(sx2, sy2, effect.z)
                     local sid2 = emitter2:playSound(effect.sound .. "_R")
                     emitter2:setVolume(sid2, volumeSystem)
 
@@ -198,6 +204,35 @@ BWOFlyingObject.Process = function()
                         end
                     end
                 end
+
+                -- projectile effect
+                if effect.projectiles and effect.tick % 6 == 0 then
+                    local bx, by
+                    local bdir = effect.dir
+                    if bdir == -90 then -- to_north
+                        bx = effect.x
+                        by = effect.y - 2
+                        bdir = bdir + 4 + ZombRandFloat(-2, 2)
+                    elseif bdir == 90 then-- to_south
+                        bx = effect.x
+                        by = effect.y + 2
+                        bdir = bdir - 4 + ZombRandFloat(-2, 2)
+                    elseif bdir == 0 then -- to_east
+                        bx = effect.x - 2
+                        by = effect.y
+                        bdir = bdir + 4 + ZombRandFloat(-2, 2)
+                    elseif bdir == 180 then-- to_west
+                        bx = effect.x + 2
+                        by = effect.y
+                        bdir = bdir - 4 + ZombRandFloat(-2, 2)
+                    end
+
+                    if bdir > 180 then bdir = bdir - 360 end
+                    if bdir < -180 then bdir = bdir + 360 end
+
+                    local oid = ZombRand(100000)
+                    BanditProjectile.Add(oid, bx, by, 0, bdir, 1)
+                end
             end
 
             -- Update position
@@ -205,6 +240,7 @@ BWOFlyingObject.Process = function()
             effect.x = effect.x + (effect.speed * fr * math.cos(theta))
             effect.y = effect.y + (effect.speed * fr * math.sin(theta))
             effect.frame = effect.frame + 1
+            effect.tick = effect.tick + 1
         end
     end
 end

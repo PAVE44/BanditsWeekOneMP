@@ -117,7 +117,7 @@ BWOEffects2.Process = function()
                     for _, actor in pairs(actors) do
                         local dx, dy = actor.x - effect.x, actor.y - effect.y
                         local distSq = dx * dx + dy * dy
-                        if distSq < 9 then  -- 3^2
+                        if distSq < 25 then  -- 3^2
                             local character = BanditZombie.GetInstanceById(actor.id)
                             local immune = false
                             local brain = BanditBrain.Get(character)
@@ -153,14 +153,16 @@ BWOEffects2.Process = function()
                     end
                     if not immune then
                         local dist = math.sqrt(math.pow(player:getX() - effect.x, 2) + math.pow(player:getY() - effect.y, 2))
-                        if dist < 3 then
+                        if dist < 5 then
+
                             local stats = player:getStats()
-
                             local intoxication = stats:get(CharacterStat.INTOXICATION)
-                            stats:set(CharacterStat.INTOXICATION, intoxication + 2)
-
                             local sickness = stats:get(CharacterStat.FOOD_SICKNESS)
-                            stats:set(CharacterStat.FOOD_SICKNESS, sickness + 1)
+                            local args = {
+                                intoxication = intoxication + 2,
+                                sickness = sickness + 1
+                            }
+                            sendClientCommand(player, "Commands", "PlayerDamage", args)
 
                             local sound = player:getDescriptor():getVoicePrefix() .. "Cough"
                             if not player:getEmitter():isPlaying(sound) then

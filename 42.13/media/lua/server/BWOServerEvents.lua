@@ -143,31 +143,31 @@ BWOServerEvents.JetfighterSequence = function(params)
     dprint("[SERVER_EVENT][INFO][JetfighterSequence] INIT", 3)
 
     -- sanitize
-    local speed = params.speed and params.speed or 7
+    local speed = params.speed and params.speed or 4.8
     local name = params.name and params.name or "a10"
     local weapon = params.weapon and params.weapon or nil
     local sound = params.sound and params.sound or BanditUtils.Choice({"JetFlyby_1", "JetFlyby_2"})
 
     -- const
-    local jetDelay = 2000
+    local jetDelay = 1500
     local halfLength = 80
     local halfWidth = 5
     local flybySound
     local armaments = {
         ["mg"] = {
             boxSize = 5,
-            delayInital = 700,
-            delayStep = 20,
+            delayInital = 550,
+            delayStep = 1,
         },
         ["bomb"] = {
             boxSize = 8,
-            delayInital = 1300,
-            delayStep = 160,
+            delayInital = 1000,
+            delayStep = 110,
         },
         ["gas"] = {
             boxSize = 10,
-            delayInital = 1300,
-            delayStep = 160,
+            delayInital = 1000,
+            delayStep = 110,
         },
     }
 
@@ -272,25 +272,25 @@ BWOServerEvents.JetfighterSequence = function(params)
                     delay = delay + armament.delayInital
                     if dir == 0 then
                         for x = cx - halfLength, cx + halfLength, armament.boxSize do
-                            local event = {"JetfighterWeapon", {cx = x, cy = cy, weapon = weapon, boxSize = armament.boxSize}}
+                            local event = {"JetfighterWeapon", {cx = x, cy = cy, dir = dir, weapon = weapon, boxSize = armament.boxSize}}
                             table.insert(sequence, {event, delay})
                             delay = delay + armament.delayStep
                         end
                     elseif dir == 180 then
                         for x = cx + halfLength, cx - halfLength, -armament.boxSize do
-                            local event = {"JetfighterWeapon", {cx = x, cy = cy, weapon = weapon, boxSize = armament.boxSize}}
+                            local event = {"JetfighterWeapon", {cx = x, cy = cy, dir = dir, weapon = weapon, boxSize = armament.boxSize}}
                             table.insert(sequence, {event, delay})
                             delay = delay + armament.delayStep
                         end
                     elseif dir == 90 then
                         for y = cy - halfLength, cy + halfLength, armament.boxSize do
-                            local event = {"JetfighterWeapon", {cx = cx, cy = y, weapon = weapon, boxSize = armament.boxSize}}
+                            local event = {"JetfighterWeapon", {cx = cx, cy = y, dir = dir, weapon = weapon, boxSize = armament.boxSize}}
                             table.insert(sequence, {event, delay})
                             delay = delay + armament.delayStep
                         end
                     elseif dir == -90 then
                         for y = cy + halfLength, cy - halfLength, -armament.boxSize do
-                            local event = {"JetfighterWeapon", {cx = cx, cy = y, weapon = weapon, boxSize = armament.boxSize}}
+                            local event = {"JetfighterWeapon", {cx = cx, cy = y, dir = dir, weapon = weapon, boxSize = armament.boxSize}}
                             table.insert(sequence, {event, delay})
                             delay = delay + armament.delayStep
                         end
@@ -319,7 +319,7 @@ BWOServerEvents.JetfighterFlyby = function(params)
     -- sanitize
     local cx = params.cx
     local cy = params.cy
-    local speed = params.speed and params.speed or 7
+    local speed = params.speed and params.speed or 4.8
     local name = params.name and params.name or "a10"
     local dir = params.dir and params.dir or 0
     local sound = params.sound and params.sound or BanditUtils.Choice({"JetFlyby_1", "JetFlyby_2"})
@@ -330,6 +330,7 @@ BWOServerEvents.JetfighterFlyby = function(params)
     local height = 586
     local rotors = false
     local lights = true -- not sure if jets have them but its cool
+    local projectiles = true
 
     local groups = BWOUtils.GetPlayerGroups()
     for i = 1, #groups do
@@ -353,6 +354,7 @@ BWOServerEvents.JetfighterFlyby = function(params)
                 soundMode = soundMode,
                 rotors = rotors,
                 lights = lights,
+                projectiles = projectiles,
                 width = width,
                 height = height,
             }
@@ -368,10 +370,12 @@ BWOServerEvents.JetfighterWeapon = function(params)
     -- check
     if not params.cx then return end
     if not params.cy then return end
+    if not params.dir then return end
 
     -- sanitize
     local cx = params.cx
     local cy = params.cy
+    local dir = params.dir
     local weapon = params.weapon and params.weapon or "mg"
     local boxSize = params.boxSize and params.boxSize or 5
 
@@ -399,7 +403,8 @@ BWOServerEvents.JetfighterWeapon = function(params)
                     pid = player:getOnlineID(),
                     cx = cx,
                     cy = cy,
-                    weapon = weeapon,
+                    dir = dir,
+                    weapon = weapon,
                     boxSize = boxSize,
                 }
                 dprint("[SERVER_EVENT][INFO][JetfighterWeapon] REQUEST CLIENT LOGIC FOR: " .. tostring(paramsClient.pid), 3)

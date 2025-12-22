@@ -42,7 +42,7 @@ BWOClientEvents.FlyingObject = function(params)
     if not params.cy then return end
 
     -- const
-    local initDist = 200
+    local initDist = 350
     local frameCnt = 3
     local cycles = 400
     local alpha = 1
@@ -59,6 +59,7 @@ BWOClientEvents.FlyingObject = function(params)
     local soundMode = params.soundMode and params.soundMode or "exact"
     local rotors = params.rotors and params.rotors or true
     local lights = params.lights and params.lights or true
+    local projectiles = params.projectiles and params.ligprojectileshts or false
 
     getCore():setOptionUIRenderFPS(60)
 
@@ -76,6 +77,7 @@ BWOClientEvents.FlyingObject = function(params)
     effect.soundMode = soundMode
     effect.rotors = rotors
     effect.lights = lights
+    effect.projectiles = projectiles
     effect.frameCnt = frameCnt
     effect.cycles = cycles
     table.insert(BWOFlyingObject.tab, effect)
@@ -86,24 +88,26 @@ BWOClientEvents.JetfighterWeapon = function(params)
     -- check
     if not params.cx then return end
     if not params.cy then return end
+    if not params.dir then return end
 
     -- sanitize
     local cx = params.cx
     local cy = params.cy
+    local dir = params.dir
     local weapon = params.weapon and params.weapon or "mg"
     local boxSize = params.boxSize and params.boxSize or 5
 
     local armaments = {
-        ["mg"] = function(x, y, boxSize)
-            local x1, y1, x2, y2, z = x, y, x + boxSize, y + boxSize, 0
-            BWOUtils.Strafe(x1, y1, x2, y2, z)
+        ["mg"] = function(x, y, boxSize, dir)
+            local x1, y1, x2, y2, z = x - 1, y - 1, x + boxSize + 1, y + boxSize + 1, 0
+            BWOUtils.Strafe(x1, y1, x2, y2, z, dir)
             return true
         end,
-        ["bomb"] = function(x, y, boxSize)
+        ["bomb"] = function(x, y, boxSize, dir)
             BWOUtils.Explode(x, y, 0)
             return true
         end,
-        ["gas"] = function(x, y, boxSize)
+        ["gas"] = function(x, y, boxSize, dir)
             BWOUtils.DeployGas(x, y, 0)
             return true
         end
@@ -111,7 +115,7 @@ BWOClientEvents.JetfighterWeapon = function(params)
 
     if armaments[weapon] then
         local armament = armaments[weapon]
-        armament(cx, cy, boxSize)
+        armament(cx, cy, boxSize, dir)
     end
 end
 

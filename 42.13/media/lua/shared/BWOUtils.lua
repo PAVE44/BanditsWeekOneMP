@@ -409,7 +409,7 @@ BWOUtils.DeployGas = function(x, y, z)
     effect.x = x
     effect.y = y
     effect.z = z
-    effect.size = 600 + ZombRand(600)
+    effect.size = 1800 + ZombRand(200)
     effect.poison = true
     effect.colors = {r=0.1, g=0.7, b=0.2, a=0.2}
     effect.name = "gas"
@@ -419,7 +419,7 @@ BWOUtils.DeployGas = function(x, y, z)
     table.insert(BWOEffects2.tab, effect)
 end
 
-BWOUtils.Strafe = function(x1, y1, x2, y2, z)
+BWOUtils.Strafe = function(x1, y1, x2, y2, z, dir)
     local fakeItem = BanditCompatibility.InstanceItem("Base.AssaultRifle")
     local fakeZombie = getCell():getFakeZombieForHit()
     local player = getSpecificPlayer(0)
@@ -447,6 +447,21 @@ BWOUtils.Strafe = function(x1, y1, x2, y2, z)
         if px >= x1 and px < x2 and py >= y1 and py < y2 and player:isOutside() then
             player:Hit(fakeItem, fakeZombie, 0.8, false, 1, false)
         end
+    end
+
+    -- smoke effect
+    for i = 1, 2 do
+        local effect2 = {}
+        effect2.x = ZombRandFloat(x1, x2)
+        effect2.y = ZombRandFloat(y1, y2)
+        effect2.z = 0
+        effect2.size = 300
+        effect2.poison = false
+        effect2.name = "smoke"
+        effect2.frameCnt = 60
+        effect2.frameRnd = true
+        effect2.repCnt = 2
+        table.insert(BWOEffects2.tab, effect2)
     end
 end
 

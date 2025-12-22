@@ -148,18 +148,6 @@ BWOMenu.EventArson = function(player)
     sendClientCommand(player, "EventManager", "AddEvent", args)
 end
 
-BWOMenu.EventGasRun = function(player)
-    local params = {}
-    params.arm = "gas"
-    BWOScheduler.Add("JetFighterRun", params, 100)
-end
-
-BWOMenu.EventBombRun = function(player)
-    local params = {}
-    params.arm = "bomb"
-    BWOScheduler.Add("JetFighterRun", params, 100)
-end
-
 BWOMenu.EventChopperAlert = function(player)
     local player = getPlayer()
     if not player then return end
@@ -242,6 +230,20 @@ end
 
 BWOMenu.EventJetFighterRun = function (player)
     local params = {weapon = "mg"}
+    local args = {"JetfighterSequence", params}
+
+    sendClientCommand(player, "EventManager", "AddEvent", args)
+end
+
+BWOMenu.EventGasRun = function(player)
+    local params = {weapon = "gas"}
+    local args = {"JetfighterSequence", params}
+
+    sendClientCommand(player, "EventManager", "AddEvent", args)
+end
+
+BWOMenu.EventBombRun = function(player)
+    local params = {weapon = "bomb"}
     local args = {"JetfighterSequence", params}
 
     sendClientCommand(player, "EventManager", "AddEvent", args)
@@ -439,8 +441,8 @@ function BWOMenu.WorldContextMenuPre(playerID, context, worldobjects, test)
         -- eventsMenu:addOption("House Party", player, BWOMenu.EventParty)
         -- eventsMenu:addOption("Jetengine", player, BWOMenu.EventJetEngine)
         eventsMenu:addOption("Jetfighter + MG", player, BWOMenu.EventJetFighterRun)
-        -- eventsMenu:addOption("Jetfighter + Bomb", player, BWOMenu.EventBombRun)
-        -- eventsMenu:addOption("Jetfighter + Gas", player, BWOMenu.EventGasRun)
+        eventsMenu:addOption("Jetfighter + Bomb", player, BWOMenu.EventBombRun)
+        eventsMenu:addOption("Jetfighter + Gas", player, BWOMenu.EventGasRun)
         -- eventsMenu:addOption("Nuke", player, BWOMenu.EventNuke)
         -- eventsMenu:addOption("Open Doors", player, BWOMenu.EventOpenDoors)
         -- eventsMenu:addOption("Rolice Riot", player, BWOMenu.EventPoliceRiot)
