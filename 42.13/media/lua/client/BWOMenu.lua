@@ -108,6 +108,7 @@ end
 
 BWOMenu.EventArmy = function(player)
     local params = {
+        desc = "Army",
         cid = Bandit.clanMap.ArmyGreen,
         size = 4,
         dist = 30,
@@ -121,6 +122,7 @@ end
 
 BWOMenu.EventPoliceVehicle = function(player)
     local params = {
+        desc = "Cops",
         cid = Bandit.clanMap.PoliceBlue,
         vtype = "Base.CarLightsPolice",
         lightbar = 2,
