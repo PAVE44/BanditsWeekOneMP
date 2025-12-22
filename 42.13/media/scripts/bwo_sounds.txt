@@ -1260,50 +1260,68 @@ module Bandits{
          } 
     }
 
-    sound JetFlyby_LR {
+    sound JetFlyby {
         category = Object, 
         loop = false,
         is3D = true,
         clip { 
-            file = media/sound/jet_flyby_1_lr.ogg,
+            file = media/sound/jet_flyby_1.ogg,
 	        distanceMin = 1,
             distanceMax = 200,
             reverbFactor = 0.6, 
         }
         clip { 
-            file = media/sound/jet_flyby_2_lr.ogg,
+            file = media/sound/jet_flyby_2.ogg,
 	        distanceMin = 1,
             distanceMax = 200,
             reverbFactor = 0.6, 
         }
     }
 
-    sound JetFlyby_RL {
+    sound JetFlybyMG_1_L {
         category = Object, 
         loop = false,
         is3D = true,
         clip { 
-            file = media/sound/jet_flyby_1_rl.ogg,
-	        distanceMin = 1,
-            distanceMax = 200,
-            reverbFactor = 0.6, 
-        }
-        clip { 
-            file = media/sound/jet_flyby_2_rl.ogg,
+            file = media/sound/jet_flyby_mg_1_l.ogg,
 	        distanceMin = 1,
             distanceMax = 200,
             reverbFactor = 0.6, 
         }
     }
 
-    sound JetMG {
+    sound JetFlybyMG_1_R {
         category = Object, 
         loop = false,
         is3D = true,
         clip { 
-            file = media/sound/jet_mg.ogg,
+            file = media/sound/jet_flyby_mg_1_r.ogg,
 	        distanceMin = 1,
-            distanceMax = 80,
+            distanceMax = 200,
+            reverbFactor = 0.6, 
+        }
+    }
+
+    sound JetFlybyMG_2_L {
+        category = Object, 
+        loop = false,
+        is3D = true,
+        clip { 
+            file = media/sound/jet_flyby_mg_2_l.ogg,
+	        distanceMin = 1,
+            distanceMax = 200,
+            reverbFactor = 0.6, 
+        }
+    }
+
+    sound JetFlybyMG_2_R {
+        category = Object, 
+        loop = false,
+        is3D = true,
+        clip { 
+            file = media/sound/jet_flyby_mg_2_r.ogg,
+	        distanceMin = 1,
+            distanceMax = 200,
             reverbFactor = 0.6, 
         }
     }

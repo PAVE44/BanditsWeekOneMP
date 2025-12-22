@@ -56,6 +56,7 @@ BWOClientEvents.FlyingObject = function(params)
     local name = params.name and params.name or "heli"
     local dir = params.dir and params.dir or 0
     local sound = params.sound and params.sound or nil
+    local soundMode = params.soundMode and params.soundMode or "exact"
     local rotors = params.rotors and params.rotors or true
     local lights = params.lights and params.lights or true
 
@@ -72,6 +73,7 @@ BWOClientEvents.FlyingObject = function(params)
     effect.name = name
     effect.dir = dir
     effect.sound = sound
+    effect.soundMode = soundMode
     effect.rotors = rotors
     effect.lights = lights
     effect.frameCnt = frameCnt

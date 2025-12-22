@@ -35,6 +35,7 @@ BWOFlyingObject.Process = function()
     local world = getWorld()
     local cm = world:getClimateManager()
     local dls = cm:getDayLightStrength()
+    local volumeSystem = getSoundManager():getSoundVolume()
 
     local player = getSpecificPlayer(0)
     if player == nil then return end
@@ -63,15 +64,43 @@ BWOFlyingObject.Process = function()
             effect.dist = math.sqrt((effect.x - px)^2 + (effect.y - py)^2)
 
             -- Init sound emitter if applicable
-            if effect.sound then
-                local emitter = getWorld():getFreeEmitter(effect.x, effect.y, effect.z)
-                local sid = emitter:playSound(effect.sound)
-                local sdiff = effect.speed / BWOFlyingObject.dopplerCoeff
-                local pitch = 1 + sdiff
-                emitter:setPitch(sid, pitch)
-                emitter:setVolumeAll(1)
-                effect.emitter = emitter
-                effect.sid = sid
+            if effect.soundMode and effect.sound then
+                if effect.soundMode == "exact" then
+                    local emitter = getWorld():getFreeEmitter(effect.x, effect.y, effect.z)
+                    local sid = emitter:playSound(effect.sound)
+                    local sdiff = effect.speed / BWOFlyingObject.dopplerCoeff
+                    local pitch = 1 + sdiff
+                    emitter:setPitch(sid, pitch)
+                    emitter:setVolume(sid, volumeSystem)
+                    effect.emitter = emitter
+                    effect.sid = sid
+                elseif effect.soundMode == "binary" then
+
+                    local sx1
+                    local sx2
+                    local sy = py
+                    -- -90 = north, pan to right
+                    -- 90 = south, pan to left
+                    -- 0 == east, pan to right
+                    -- 180 = west, pan to left
+
+                    if effect.dir == 90 or effect.dir == 0 then
+                        sx1 = px + 16
+                        sx2 = px - 16
+                    else
+                        sx1 = px - 16
+                        sx2 = px + 16
+                    end
+
+                    local emitter1 = getWorld():getFreeEmitter(sx1, sy, effect.z)
+                    local sid1 = emitter1:playSound(effect.sound .. "_L")
+                    emitter1:setVolume(sid1, volumeSystem)
+
+                    local emitter2 = getWorld():getFreeEmitter(sx2, sy, effect.z)
+                    local sid2 = emitter2:playSound(effect.sound .. "_R")
+                    emitter2:setVolume(sid2, volumeSystem)
+
+                end
             end
         end
 
@@ -86,18 +115,20 @@ BWOFlyingObject.Process = function()
                 effect.frame = 1
             end
 
-            if effect.sound and effect.emitter then
-                -- Doppler pitch adjustment
-                local dist = math.sqrt((effect.x - px)^2 + (effect.y - py)^2)
-                if dist > effect.dist and not effect.passed then
-                    local sdiff = effect.speed / BWOFlyingObject.dopplerCoeff
-                    local pitch = 1 - sdiff
-                    effect.emitter:setPitch(effect.sid, pitch)
-                    effect.passed = true
+            if effect.soundMode and effect.sound and effect.emitter then
+                if effect.soundMode == "exact" then
+                    -- Doppler pitch adjustment
+                    local dist = math.sqrt((effect.x - px)^2 + (effect.y - py)^2)
+                    if dist > effect.dist and not effect.passed then
+                        local sdiff = effect.speed / BWOFlyingObject.dopplerCoeff
+                        local pitch = 1 - sdiff
+                        effect.emitter:setPitch(effect.sid, pitch)
+                        effect.passed = true
+                    end
+                    effect.dist = dist
+                    effect.emitter:setPos(effect.x, effect.y, effect.z)
+                    -- print ("x: "..effect.x.." y:"..effect.y)
                 end
-                effect.dist = dist
-                effect.emitter:setPos(effect.x, effect.y, effect.z)
-                -- print ("x: "..effect.x.." y:"..effect.y)
             end
 
             -- Visual rendering only if player outside

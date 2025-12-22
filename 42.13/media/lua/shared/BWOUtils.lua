@@ -424,11 +424,13 @@ BWOUtils.Strafe = function(x1, y1, x2, y2, z)
     local fakeZombie = getCell():getFakeZombieForHit()
     local player = getSpecificPlayer(0)
     local volumeSystem = getSoundManager():getSoundVolume()
+
+    --[[
     local sound = "JetMG"
 
     local emitter = getWorld():getFreeEmitter((x1 + x2) / 2, (y1 + y2) / 2, z)
     local id = emitter:playSound(sound, true)
-    emitter:setVolume(id, volumeSystem)
+    emitter:setVolume(id, volumeSystem)]]
 
     local zombieList = BanditZombie.CacheLight
     for id, zombie in pairs(zombieList) do

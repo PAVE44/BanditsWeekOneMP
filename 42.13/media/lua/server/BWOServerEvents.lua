@@ -143,20 +143,16 @@ BWOServerEvents.JetfighterSequence = function(params)
     dprint("[SERVER_EVENT][INFO][JetfighterSequence] INIT", 3)
 
     -- sanitize
-    local speed = params.speed and params.speed or 11
+    local speed = params.speed and params.speed or 7
     local name = params.name and params.name or "a10"
     local weapon = params.weapon and params.weapon or nil
+    local sound = params.sound and params.sound or BanditUtils.Choice({"JetFlyby_1", "JetFlyby_2"})
 
     -- const
     local jetDelay = 2000
     local halfLength = 80
     local halfWidth = 5
-    local flybySound = {
-        ["-90"] = "JetFlyby_LR",
-        ["90"] = "JetFlyby_RL",
-        ["0"] = "JetFlyby_LR",
-        ["180"] = "JetFlyby_RL",
-    }
+    local flybySound
     local armaments = {
         ["mg"] = {
             boxSize = 5,
@@ -256,10 +252,13 @@ BWOServerEvents.JetfighterSequence = function(params)
             -- prepare aggregate event
             local sequence = {}
 
+            if weapon and weapon == "mg" then
+                sound = BanditUtils.Choice({"JetFlybyMG_1", "JetFlybyMG_2"})
+            end
+
             local delay = jetDelay
-            local sound  = flybySound[tostring(dir)]
-            local flyingObjectEvent = {"JetfighterFlyby", {cx = cx, cy = cy, name = name, sound = sound, dir = dir, speed = speed}}
-            table.insert(sequence, {flyingObjectEvent, delay})
+            local flybyEvent = {"JetfighterFlyby", {cx = cx, cy = cy, name = name, sound = sound, dir = dir, speed = speed}}
+            table.insert(sequence, {flybyEvent, delay})
 
             if weapon then
                 if weapon == "random" then
@@ -320,10 +319,11 @@ BWOServerEvents.JetfighterFlyby = function(params)
     -- sanitize
     local cx = params.cx
     local cy = params.cy
-    local speed = params.speed and params.speed or 12
+    local speed = params.speed and params.speed or 7
     local name = params.name and params.name or "a10"
     local dir = params.dir and params.dir or 0
-    local sound = params.sound and params.sound or "DOJet"
+    local sound = params.sound and params.sound or BanditUtils.Choice({"JetFlyby_1", "JetFlyby_2"})
+    local soundMode = "binary"
 
     -- const
     local width = 1024
@@ -350,6 +350,7 @@ BWOServerEvents.JetfighterFlyby = function(params)
                 name = name,
                 dir = dir,
                 sound = sound,
+                soundMode = soundMode,
                 rotors = rotors,
                 lights = lights,
                 width = width,
