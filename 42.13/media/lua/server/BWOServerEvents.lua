@@ -1,6 +1,35 @@
 require "BWODebug"
 require "BWOUtils"
 
+--[[ 
+
+    SERVER EVENTS:
+    This code is called from Event Manager by the server. Everything here runs 
+    serverside. 
+    
+    The first type of server events are events where server executes
+    its logic, and then makes a call to all or selected clients so they
+    can continue with their client-side logic in neccessary. Fo example
+    the server spawns NPCs and the client adds the spawn marker.
+
+    Second type are the aggregate events. Their purpose is to prepare a sequence
+    of events of the first type and throw it back to the Event Manager.
+    The example here is a JetfighterSequence event which builds a sequence
+    with plane flyby event, and weapon strike events as consecutive events.
+
+    IMPORTANT:
+    If a function fails, its excecution will get retried and repeated inifitely
+    by the Event manager. For this reason it is crucial to properly handle all 
+    possible errors.
+    So each function:
+        1. Must check for required params and return if anything is missing
+        2. Must sanitize the params so their types will not invoke errors
+        3. May introduce local constants
+        4. And only then execute the logic
+        5. Alao must adhere to the logging standard.
+
+]]
+
 BWOServerEvents = BWOServerEvents or {}
 
 -- params: none
@@ -59,6 +88,7 @@ BWOServerEvents.Arson = function(params)
     end
 end
 
+-- params: speed, name, dir, sound
 BWOServerEvents.ChopperAlert = function(params)
     dprint("[SERVER_EVENT][INFO][ChopperAlert] INIT", 3)
 
@@ -66,7 +96,13 @@ BWOServerEvents.ChopperAlert = function(params)
     local speed = params.speed and params.speed or 1.8
     local name = params.name and params.name or "heli"
     local dir = params.dir and params.dir or 0
-    local sound = params.sound and params.sound or nil
+    local sound = params.sound and params.sound or "BWOChopperGeneric"
+
+    -- const
+    local width = 1243
+    local height = 760
+    local rotors = true
+    local lights = true
 
     local groups = BWOUtils.GetPlayerGroups()
     for i = 1, #groups do
@@ -87,14 +123,290 @@ BWOServerEvents.ChopperAlert = function(params)
                 pid = player:getOnlineID(),
                 cx = cx,
                 cy = cy,
-                speed = params.speed,
-                name = params.name,
-                dir = params.dir,
-                sound = params.sound
+                speed = speed,
+                name = name,
+                dir = dir,
+                sound = sound,
+                width = width,
+                height = height,
+                rotors = rotors,
+                lights = lights,
             }
             dprint("[SERVER_EVENT][INFO][ChopperAlert] REQUEST CLIENT LOGIC FOR: " .. tostring(paramsClient.pid), 3)
-            sendServerCommand("Events", "ChopperAlert", paramsClient)
+            sendServerCommand("Events", "FlyingObject", paramsClient)
         end
+    end
+end
+
+-- params: speed, name, dir, sound, weapon
+BWOServerEvents.JetfighterSequence = function(params)
+    dprint("[SERVER_EVENT][INFO][JetfighterSequence] INIT", 3)
+
+    -- sanitize
+    local speed = params.speed and params.speed or 11
+    local name = params.name and params.name or "a10"
+    local weapon = params.weapon and params.weapon or nil
+
+    -- const
+    local jetDelay = 2000
+    local halfLength = 80
+    local halfWidth = 5
+    local flybySound = {
+        ["-90"] = "JetFlyby_LR",
+        ["90"] = "JetFlyby_RL",
+        ["0"] = "JetFlyby_LR",
+        ["180"] = "JetFlyby_RL",
+    }
+    local armaments = {
+        ["mg"] = {
+            boxSize = 5,
+            delayInital = 700,
+            delayStep = 20,
+        },
+        ["bomb"] = {
+            boxSize = 8,
+            delayInital = 1300,
+            delayStep = 160,
+        },
+        ["gas"] = {
+            boxSize = 10,
+            delayInital = 1300,
+            delayStep = 160,
+        },
+    }
+
+    local zombieList = getCell():getZombieList()
+    local zombieListSize = zombieList:size()
+    dprint("[SERVER_EVENT][INFO][JetfighterSequence] ZOMBIES:" .. zombieListSize, 3)
+
+    local groups = BWOUtils.GetPlayerGroups()
+    for i = 1, #groups do
+        -- pick a random player from the group
+        local players = groups[i]
+        local playerSelected = BanditUtils.Choice(players)
+
+        local px = math.floor(playerSelected:getX() + 0.5)
+        local py = math.floor(playerSelected:getY() + 0.5)
+
+        -- find optimal strafing rectangle 160x10
+        local best = 0
+        local cx, cy, dir
+
+        -- NS rectangles
+        for bx=-4, 4 do
+            local y1 = py - halfLength
+            local y2 = py + halfLength
+            local x1 = px + bx * (halfWidth * 2) - halfWidth
+            local x2 = px + bx * (halfWidth * 2) + halfWidth
+
+            local cnt = 0
+            for i = 0, zombieListSize - 1 do
+                local zombie = zombieList:get(i)
+                if zombie then
+                    local zx, zy = zombie:getX(), zombie:getY()
+                    if zx >= x1 and zx < x2 and zy >= y1 and zy < y2 then
+                        cnt = cnt + 1
+                        -- dprint("[SERVER_EVENT][INFO][JetfighterSequence] FOUND ZOMBIE NS RECT: X: " .. zx .. " Y: " .. zy, 3)
+                    end
+                end
+            end
+
+            if cnt > best then
+                dir = BanditUtils.Choice({-90, 90})
+                cx = (x1 + x2) / 2
+                cy = py
+                best = cnt
+                -- dprint("[SERVER_EVENT][INFO][JetfighterSequence] BEST IS: X: " .. cx .. " Y: " .. cy .. " DIR: " .. dir .. " CNT: " .. cnt, 3)
+            end
+        end
+
+        -- EW rectangles
+        for by=-4, 4 do
+            local y1 = py + by * (halfWidth * 2) - halfWidth
+            local y2 = py + by * (halfWidth * 2) + halfWidth
+            local x1 = px - halfLength
+            local x2 = px + halfLength
+
+            local cnt = 0
+            for i = 0, zombieListSize - 1 do
+                local zombie = zombieList:get(i)
+                if zombie then
+                    local zx, zy = zombie:getX(), zombie:getY()
+                    if zx >= x1 and zx < x2 and zy >= y1 and zy < y2 then
+                        cnt = cnt + 1
+                        -- dprint("[SERVER_EVENT][INFO][JetfighterSequence] FOUND ZOMBIE EW RECT: X: " .. zx .. " Y: " .. zy, 3)
+                    end
+                end
+            end
+
+            if cnt > best then
+                dir = BanditUtils.Choice({0, 180})
+                cx = px
+                cy = (y1 + y2) / 2
+                best = cnt
+                -- dprint("[SERVER_EVENT][INFO][JetfighterSequence] BEST IS: X: " .. cx .. " Y: " .. cy .. " DIR: " .. dir .. " CNT: " .. cnt, 3)
+            end
+        end
+
+        -- build sequence
+        if cx and cy and dir then
+            dprint("[SERVER_EVENT][INFO][JetfighterSequence] COORDS LOCKED: X:" .. cx .. " Y:" .. cy .. " DIR: " .. dir, 3)
+            
+
+            -- prepare aggregate event
+            local sequence = {}
+
+            local delay = jetDelay
+            local sound  = flybySound[tostring(dir)]
+            local flyingObjectEvent = {"JetfighterFlyby", {cx = cx, cy = cy, name = name, sound = sound, dir = dir, speed = speed}}
+            table.insert(sequence, {flyingObjectEvent, delay})
+
+            if weapon then
+                if weapon == "random" then
+                    weapon = BanditUtils.Choice({"mg", "bomb", "gas"})
+                end
+
+                if armaments[weapon] then
+                    dprint("[SERVER_EVENT][INFO][JetfighterSequence] BUILDING WEAPON SEQUENCE FOR: " .. weapon, 3)
+                    local armament = armaments[weapon]
+
+                    delay = delay + armament.delayInital
+                    if dir == 0 then
+                        for x = cx - halfLength, cx + halfLength, armament.boxSize do
+                            local event = {"JetfighterWeapon", {cx = x, cy = cy, weapon = weapon, boxSize = armament.boxSize}}
+                            table.insert(sequence, {event, delay})
+                            delay = delay + armament.delayStep
+                        end
+                    elseif dir == 180 then
+                        for x = cx + halfLength, cx - halfLength, -armament.boxSize do
+                            local event = {"JetfighterWeapon", {cx = x, cy = cy, weapon = weapon, boxSize = armament.boxSize}}
+                            table.insert(sequence, {event, delay})
+                            delay = delay + armament.delayStep
+                        end
+                    elseif dir == 90 then
+                        for y = cy - halfLength, cy + halfLength, armament.boxSize do
+                            local event = {"JetfighterWeapon", {cx = cx, cy = y, weapon = weapon, boxSize = armament.boxSize}}
+                            table.insert(sequence, {event, delay})
+                            delay = delay + armament.delayStep
+                        end
+                    elseif dir == -90 then
+                        for y = cy + halfLength, cy - halfLength, -armament.boxSize do
+                            local event = {"JetfighterWeapon", {cx = cx, cy = y, weapon = weapon, boxSize = armament.boxSize}}
+                            table.insert(sequence, {event, delay})
+                            delay = delay + armament.delayStep
+                        end
+                    end
+                else
+                    dprint("[SERVER_EVENT][ERR][JetfighterSequence] UNKNOWN WEAPON: " .. weapon, 1)
+                end
+            end
+
+            dprint("[SERVER_EVENT][INFO][JetfighterSequence] SEQUENCE READY, STEPS: " .. #sequence, 3)
+            BWOEventGenerator.AddSequence(sequence)
+        else
+            dprint("[SERVER_EVENT][WARN][JetfighterSequence] NO COORD FOUND", 2)
+        end
+    end
+end
+
+-- params: speed, name, dir, sound
+BWOServerEvents.JetfighterFlyby = function(params)
+    dprint("[SERVER_EVENT][INFO][JetfighterFlyby] INIT", 3)
+
+    -- check
+    if not params.cx then return end
+    if not params.cy then return end
+
+    -- sanitize
+    local cx = params.cx
+    local cy = params.cy
+    local speed = params.speed and params.speed or 12
+    local name = params.name and params.name or "a10"
+    local dir = params.dir and params.dir or 0
+    local sound = params.sound and params.sound or "DOJet"
+
+    -- const
+    local width = 1024
+    local height = 586
+    local rotors = false
+    local lights = true -- not sure if jets have them but its cool
+
+    local groups = BWOUtils.GetPlayerGroups()
+    for i = 1, #groups do
+        -- pick a random player from the group
+        local players = groups[i]
+
+        dprint("[SERVER_EVENT][INFO][JetfighterFlyby] cx: " .. cx .. " cy: " .. cy, 3)
+
+        -- execute client logic for event
+        for j = 1, #players do
+            local player = players[j]
+
+            local paramsClient = {
+                pid = player:getOnlineID(),
+                cx = cx,
+                cy = cy,
+                speed = speed,
+                name = name,
+                dir = dir,
+                sound = sound,
+                rotors = rotors,
+                lights = lights,
+                width = width,
+                height = height,
+            }
+            dprint("[SERVER_EVENT][INFO][JetfighterFlyby] REQUEST CLIENT LOGIC FOR: " .. tostring(paramsClient.pid), 3)
+            sendServerCommand("Events", "FlyingObject", paramsClient)
+        end
+    end
+end
+
+BWOServerEvents.JetfighterWeapon = function(params)
+    dprint("[SERVER_EVENT][INFO][JetfighterWeapon] INIT", 3)
+
+    -- check
+    if not params.cx then return end
+    if not params.cy then return end
+
+    -- sanitize
+    local cx = params.cx
+    local cy = params.cy
+    local weapon = params.weapon and params.weapon or "mg"
+    local boxSize = params.boxSize and params.boxSize or 5
+
+    local armaments = {
+        ["mg"] = function(x, y, boxSize)
+            return true
+        end,
+        ["bomb"] = function(x, y, boxSize)
+            BWOUtils.Explode(x, y, 0)
+            return true
+        end,
+        ["gas"] = function(x, y, boxSize)
+            return true
+        end
+    }
+
+    if armaments[weapon] then
+        local armament = armaments[weapon]
+        if armament(cx, cy, boxSize) then
+            dprint("[SERVER_EVENT][INFO][JetfighterWeapon] ATTACK X: " .. cx .. " Y: " .. cy .. " BOX: " .. boxSize .. " WEAPON: " .. weapon , 3)
+            local players = BWOUtils.GetAllPlayers()
+            for i = 1, #players do
+                local player = players[i]
+                local paramsClient = {
+                    pid = player:getOnlineID(),
+                    cx = cx,
+                    cy = cy,
+                    weapon = weeapon,
+                    boxSize = boxSize,
+                }
+                dprint("[SERVER_EVENT][INFO][JetfighterWeapon] REQUEST CLIENT LOGIC FOR: " .. tostring(paramsClient.pid), 3)
+                sendServerCommand("Events", "JetfighterWeapon", paramsClient)
+            end
+        end
+    else
+        dprint("[SERVER_EVENT][ERR][JetfighterWeapon] UNKNOWN WEAPON: " .. weapon, 1)
     end
 end
 
@@ -204,59 +516,64 @@ BWOServerEvents.SpawnGroupVehicle = function(params)
 
         if res.valid then
             dprint("[SERVER_EVENT][INFO][SpawnGroupVehicle] VEHICLE SPOTS SELECTED X: " .. res.x .. " Y:" .. res.y, 3)
-            
+
             -- vehicle spawn
             -- local vehicle = addVehicle("Base.CarLightsPolice", spawn.x, spawn.y, 0)
-            local vehicle = addVehicleDebug(vtype, IsoDirections.S, nil, getCell():getGridSquare(res.x, res.y, 0))
-            if vehicle then
-                dprint("[SERVER_EVENT][INFO][SpawnGroupVehicle] VEHICLE SPAWN SUCCESSFUL", 3)
-                vehicle:repair()
+            local square = getCell():getGridSquare(res.x, res.y, 0)
+            if square then
+                local vehicle = addVehicleDebug(vtype, IsoDirections.S, nil, square)
+                if vehicle then
+                    dprint("[SERVER_EVENT][INFO][SpawnGroupVehicle] VEHICLE SPAWN SUCCESSFUL", 3)
+                    vehicle:repair()
 
-                if headlights then
-                    vehicle:setHeadlightsOn(headlights)
+                    if headlights then
+                        vehicle:setHeadlightsOn(headlights)
+                    end
+
+                    if vehicle:hasLightbar() then 
+                        if lightbar then
+                            vehicle:setLightbarLightsMode(lightbar)
+                        end
+                        if siren then
+                            vehicle:setLightbarSirenMode(siren)
+                        end
+                    end
+                else
+                    dprint("[SERVER_EVENT][ERR][SpawnGroupVehicle] VEHICLE SPAWN ERROR!", 1)
                 end
 
-                if vehicle:hasLightbar() then 
-                    if lightbar then
-                        vehicle:setLightbarLightsMode(lightbar)
-                    end
-                    if siren then
-                        vehicle:setLightbarSirenMode(siren)
-                    end
+                -- npc spawn
+                local args = {
+                    cid = cid,
+                    program = program,
+                    hostile = hostile,
+                    x = res.x + 2,
+                    y = res.y + 2,
+                    z = 0,
+                    size = size
+                }
+                BanditServer.Spawner.Clan(playerSelected, args)
+                dprint("[SERVER_EVENT][INFO][SpawnGroupVehicle] GROUP SPAWN SUCCESSFUL", 3)
+
+                -- execute client logic for event
+                for j = 1, #players do
+                    local player = players[j]
+
+                    local paramsClient = {
+                        pid = player:getOnlineID(),
+                        desc = desc,
+                        cid = params.cid,
+                        name = params.name,
+                        hostile = params.hostile,
+                        cx = res.x,
+                        cy = res.y,
+                        cz = 0
+                    }
+                    dprint("[SERVER_EVENT][INFO][SpawnGroupVehicle] REQUEST CLIENT LOGIC FOR: " .. tostring(paramsClient.pid), 3)
+                    sendServerCommand("Events", "SpawnGroupVehicle", paramsClient)
                 end
             else
-                dprint("[SERVER_EVENT][ERR][SpawnGroupVehicle] VEHICLE SPAWN ERROR!", 1)
-            end
-
-            -- npc spawn
-            local args = {
-                cid = cid,
-                program = program,
-                hostile = hostile,
-                x = res.x + 2,
-                y = res.y + 2,
-                z = 0,
-                size = size
-            }
-            BanditServer.Spawner.Clan(playerSelected, args)
-            dprint("[SERVER_EVENT][INFO][SpawnGroupVehicle] GROUP SPAWN SUCCESSFUL", 3)
-            
-            -- execute client logic for event
-            for j = 1, #players do
-                local player = players[j]
-
-                local paramsClient = {
-                    pid = player:getOnlineID(),
-                    desc = desc,
-                    cid = params.cid,
-                    name = params.name,
-                    hostile = params.hostile,
-                    cx = res.x,
-                    cy = res.y,
-                    cz = 0
-                }
-                dprint("[SERVER_EVENT][INFO][SpawnGroupVehicle] REQUEST CLIENT LOGIC FOR: " .. tostring(paramsClient.pid), 3)
-                sendServerCommand("Events", "SpawnGroupVehicle", paramsClient)
+                dprint("[SERVER_EVENT][WARN][SpawnGroupVehicle] SQUARE UNAVAILABLE", 2)
             end
         end
     end
@@ -297,7 +614,7 @@ BWOServerEvents.MetaSound = function(params)
     local proportion = 2 * (50 - math.abs(50 - BWOPopControl.zombiePercent))
     local rnd2 = ZombRand(100)
     if rnd2 > proportion then return end
-    
+
     local groups = BWOUtils.GetPlayerGroups()
     for i = 1, #groups do
         -- pick a random player from the group

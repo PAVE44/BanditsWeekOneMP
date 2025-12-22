@@ -7,7 +7,7 @@
 VERBOSE_LVL = 3
 
 function dprint (txt, lvl)
-    if lvl >= VERBOSE_LVL then
+    if lvl <= VERBOSE_LVL then
         print (txt)
     end
 end

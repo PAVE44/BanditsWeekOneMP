@@ -51,7 +51,7 @@ local events = {}
 
 -- adds a set of individual events to the queue from the sequence
 local function addSequence(sequence)
-    dprint("[EVENT_MANAGER] ADDING SEQUENCE, EVENT NUMBER: " .. #sequence, 3)
+    dprint("[EVENT_MANAGER][INFO] ADDING SEQUENCE, EVENT NUMBER: " .. #sequence, 3)
     for _, eventConf in ipairs(sequence) do
         local event = eventConf[1]
         local eventDelay = eventConf[2]
@@ -135,6 +135,10 @@ local function addToSchedule(args)
 end
 ]]
 
+-- direct API to allow chaining events from other events
+BWOEventGenerator.AddSequence = function(sequence)
+    addSequence(sequence)
+end
 
 local onClientCommand = function(module, command, player, args)
     if module == "EventManager" then

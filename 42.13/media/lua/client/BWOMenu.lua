@@ -164,7 +164,6 @@ BWOMenu.EventChopperAlert = function(player)
     local player = getPlayer()
     if not player then return end
 
-    local params = {name="heli2", sound="BWOChopperGeneric", dir = 90, speed=1.8}
     local args = {
         {{"ChopperAlert", {name="heli2", sound="BWOChopperGeneric", dir = 90, speed=1.8}}, 1},
         {{"ChopperAlert", {name="heli", sound="BWOChopperGeneric", dir = 0, speed=1.8}}, 500},
@@ -242,9 +241,10 @@ BWOMenu.EventJetEngine = function (player)
 end
 
 BWOMenu.EventJetFighterRun = function (player)
-    local params = {}
-    params.arm = "mg"
-    BWOScheduler.Add("JetFighterRun", params, 100)
+    local params = {weapon = "mg"}
+    local args = {"JetfighterSequence", params}
+
+    sendClientCommand(player, "EventManager", "AddEvent", args)
 end
 
 BWOMenu.EventProtest = function(player)
@@ -275,7 +275,7 @@ BWOMenu.EventStartDay = function(player)
     local params = {day="wednesday"}
     local args = {"StartDay", params}
 
-    sendClientCommand(player, "EventGenerator", "AddEventDebug", args)
+    sendClientCommand(player, "EventManager", "AddEvent", args)
 end
 
 BWOMenu.EventPoliceRiot = function(player)
@@ -438,9 +438,9 @@ function BWOMenu.WorldContextMenuPre(playerID, context, worldobjects, test)
         -- eventsMenu:addOption("House Register", player, BWOMenu.EventHome)
         -- eventsMenu:addOption("House Party", player, BWOMenu.EventParty)
         -- eventsMenu:addOption("Jetengine", player, BWOMenu.EventJetEngine)
-        -- eventsMenu:addOption("Jetfighter MG", player, BWOMenu.EventJetFighterRun)
-        -- eventsMenu:addOption("Jetfighter Bomb", player, BWOMenu.EventBombRun)
-        -- eventsMenu:addOption("Jetfighter Gas", player, BWOMenu.EventGasRun)
+        eventsMenu:addOption("Jetfighter + MG", player, BWOMenu.EventJetFighterRun)
+        -- eventsMenu:addOption("Jetfighter + Bomb", player, BWOMenu.EventBombRun)
+        -- eventsMenu:addOption("Jetfighter + Gas", player, BWOMenu.EventGasRun)
         -- eventsMenu:addOption("Nuke", player, BWOMenu.EventNuke)
         -- eventsMenu:addOption("Open Doors", player, BWOMenu.EventOpenDoors)
         -- eventsMenu:addOption("Rolice Riot", player, BWOMenu.EventPoliceRiot)
@@ -452,7 +452,7 @@ function BWOMenu.WorldContextMenuPre(playerID, context, worldobjects, test)
         -- eventsMenu:addOption("Reanimate", player, BWOMenu.EventReanimate)
         -- eventsMenu:addOption("Shahid", player, BWOMenu.EventShahids)
         -- eventsMenu:addOption("Start", player, BWOMenu.EventStart)
-        -- eventsMenu:addOption("Start Day", player, BWOMenu.EventStartDay)
+        eventsMenu:addOption("Start Day", player, BWOMenu.EventStartDay)
         -- eventsMenu:addOption("Storm", player, BWOMenu.EventStorm)
         -- eventsMenu:addOption("Thieves", player, BWOMenu.EventThieves)
         

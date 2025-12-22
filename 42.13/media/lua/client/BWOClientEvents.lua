@@ -2,6 +2,12 @@ require "BWOUtils"
 
 BWOClientEvents = BWOClientEvents or {}
 
+-- Each function:
+-- 1. must check for required params
+-- 2. must sanitize the params
+-- 3. may introduce local constants
+-- 4. and only then execute the logic
+
 BWOClientEvents.Arson = function(params)
 
     -- check
@@ -9,51 +15,102 @@ BWOClientEvents.Arson = function(params)
     if not params.cy then return end
     if not params.cz then return end
 
+    -- sanitize
+    local cx = params.cx
+    local cy = params.cy
+    local cz = params.cz
+
     -- const
     local time = 3600
     local icon = "media/ui/arson.png"
     local desc = "Arson"
     local color = {r=1, g=0, b=0} -- red
 
-    BWOUtils.Explode(params.cx, params.cy, params.cz)
-    BWOUtils.VehiclesAlarm(params.cx, params.cy, 0, 60)
+    BWOUtils.Explode(cx, cy, cz)
+    BWOUtils.VehiclesAlarm(cx, cy, 0, 60)
 
     if SandboxVars.Bandits.General_ArrivalIcon then
-        BanditEventMarkerHandler.set(getRandomUUID(), icon, time, params.cx, params.cy, color, desc)
+        BanditEventMarkerHandler.set(getRandomUUID(), icon, time, cx, cy, color, desc)
     end
 end
 
 -- params: cx, cy, spped, name, dir, sound
-BWOClientEvents.ChopperAlert = function(params)
+BWOClientEvents.FlyingObject = function(params)
 
     -- check
     if not params.cx then return end
     if not params.cy then return end
 
+    -- const
+    local initDist = 200
+    local frameCnt = 3
+    local cycles = 400
+    local alpha = 1
+
     -- sanitize
+    local cx = params.cx
+    local cy = params.cy
+    local width = params.width and params.width or 1243
+    local height = params.height and params.height or 760
     local speed = params.speed and params.speed or 1.8
     local name = params.name and params.name or "heli"
     local dir = params.dir and params.dir or 0
     local sound = params.sound and params.sound or nil
+    local rotors = params.rotors and params.rotors or true
+    local lights = params.lights and params.lights or true
 
     getCore():setOptionUIRenderFPS(60)
 
     local effect = {}
-    effect.cx = params.cx
-    effect.cy = params.cy
-    effect.initDist = 200
-    effect.width = 1243
-    effect.height = 760
-    effect.alpha = 1
+    effect.cx = cx
+    effect.cy = cy
+    effect.initDist = initDist
+    effect.width = width
+    effect.height = height
+    effect.alpha = alpha
     effect.speed = speed
     effect.name = name
     effect.dir = dir
     effect.sound = sound
-    effect.rotors = true
-    effect.lights = true
-    effect.frameCnt = 3
-    effect.cycles = 400
+    effect.rotors = rotors
+    effect.lights = lights
+    effect.frameCnt = frameCnt
+    effect.cycles = cycles
     table.insert(BWOFlyingObject.tab, effect)
+end
+
+-- params, cx, cy, weapon, boxSize
+BWOClientEvents.JetfighterWeapon = function(params)
+    -- check
+    if not params.cx then return end
+    if not params.cy then return end
+
+    -- sanitize
+    local cx = params.cx
+    local cy = params.cy
+    local weapon = params.weapon and params.weapon or "mg"
+    local boxSize = params.boxSize and params.boxSize or 5
+
+    local armaments = {
+        ["mg"] = function(x, y, boxSize)
+            local x1, y1, x2, y2, z = x, y, x + boxSize, y + boxSize, 0
+            BWOUtils.Strafe(x1, y1, x2, y2, z)
+            return true
+        end,
+        ["bomb"] = function(x, y, boxSize)
+            BWOUtils.Explode(x, y, 0)
+            return true
+        end,
+        ["gas"] = function(x, y, boxSize)
+            BWOUtils.DeployGas(x, y, 0)
+            return true
+        end
+    }
+
+    if armaments[weapon] then
+        local armament = armaments[weapon]
+        armament(cx, cy, boxSize)
+    end
 end
 
 -- params: cid, x, y, hostile, desc
@@ -63,11 +120,14 @@ BWOClientEvents.SpawnGroup = function(params)
     if not params.cx then return end
     if not params.cy then return end
     if not params.cz then return end
+    if not params.cid then return end
 
     -- sanitize
+    local cx = params.cx
+    local cy = params.cy
+    local cz = params.cz
     local desc = params.desc and params.desc or "Unknown"
-    local cid = params.cid and params.cid or Bandit.clanMap.PoliceBlue
-    local icon = Bandit.cidNotification[params.cid] and Bandit.cidNotification[params.cid] or "media/ui/raid.png"
+    local icon = Bandit.cidNotification[cid] and Bandit.cidNotification[cid] or "media/ui/raid.png"
     local hostile = params.hostile and params.hostile or false
 
     -- const
@@ -79,22 +139,26 @@ BWOClientEvents.SpawnGroup = function(params)
             color = {r=1, g=0, b=0} -- red
         end
 
-        BanditEventMarkerHandler.set(getRandomUUID(), icon, time, params.cx, params.cy, color, params.desc)
+        BanditEventMarkerHandler.set(getRandomUUID(), icon, time, cx, cy, color, desc)
     end
 end
 
 -- params: cid, x, y, hostile, desc
 BWOClientEvents.SpawnGroupVehicle = function(params)
-    
+
     -- check
     if not params.cx then return end
     if not params.cy then return end
     if not params.cz then return end
+    if not params.cid then return end
 
     -- sanitize
+    local cx = params.cx
+    local cy = params.cy
+    local cz = params.cz
+    local cid = params.cid
     local desc = params.desc and params.desc or "Unknown"
-    local cid = params.cid and params.cid or Bandit.clanMap.PoliceBlue
-    local icon = Bandit.cidNotification[params.cid] and Bandit.cidNotification[params.cid] or "media/ui/raid.png"
+    local icon = Bandit.cidNotification[cid] and Bandit.cidNotification[cid] or "media/ui/raid.png"
     local hostile = params.hostile and params.hostile or false
 
     -- const
@@ -106,7 +170,7 @@ BWOClientEvents.SpawnGroupVehicle = function(params)
             color = {r=1, g=0, b=0} -- red
         end
 
-        BanditEventMarkerHandler.set(getRandomUUID(), icon, time, params.cx, params.cy, color, desc)
+        BanditEventMarkerHandler.set(getRandomUUID(), icon, time, cx, cy, color, desc)
     end
 end
 
@@ -120,34 +184,40 @@ BWOClientEvents.WorldSound = function(params)
     if not params.sound then return end
 
     -- sanitize
+    local cx = params.cx
+    local cy = params.cy
+    local cz = params.cz
+    local sound = params.sound
     local volume = params.volume and params.volume or 1
 
-    local emitter = getWorld():getFreeEmitter(params.cx, params.cy, params.cz)
+    local emitter = getWorld():getFreeEmitter(cx, cy, cz)
     if emitter then
-        local volume = getSoundManager():getSoundVolume()
-        local id = emitter:playSound(params.sound, true)
+        local volumeSystem = getSoundManager():getSoundVolume()
+        local id = emitter:playSound(sound, true)
         
-        emitter:setVolume(id, volume * volume)
+        emitter:setVolume(id, volume * volumeSystem)
     end
 end
 
 -- params: day
 BWOClientEvents.StartDay = function(params)
 
+    -- check
     if not params.day then return end
 
-    local player = getSpecificPlayer(0)
+    -- sanitize
+    local day = params.day
 
+    local player = getSpecificPlayer(0)
     if player then
         player:playSound("ZSDayStart")
     end
 
-    BWOTex.tex = getTexture("media/textures/day_" .. params.day .. ".png")
+    BWOTex.tex = getTexture("media/textures/day_" .. day .. ".png")
     BWOTex.speed = 0.011
     BWOTex.mode = "center"
     BWOTex.alpha = 2.4
 end
-
 
 local onServerCommand = function(module, command, args)
     if module == "Events" and BWOClientEvents[command] then

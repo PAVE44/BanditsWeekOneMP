@@ -404,6 +404,50 @@ BWOUtils.Explode = function(x, y, z)
     end
 end
 
+BWOUtils.DeployGas = function(x, y, z)
+    local effect = {}
+    effect.x = x
+    effect.y = y
+    effect.z = z
+    effect.size = 600 + ZombRand(600)
+    effect.poison = true
+    effect.colors = {r=0.1, g=0.7, b=0.2, a=0.2}
+    effect.name = "gas"
+    effect.frameCnt = 60
+    effect.frameRnd = true
+    effect.repCnt = 24
+    table.insert(BWOEffects2.tab, effect)
+end
+
+BWOUtils.Strafe = function(x1, y1, x2, y2, z)
+    local fakeItem = BanditCompatibility.InstanceItem("Base.AssaultRifle")
+    local fakeZombie = getCell():getFakeZombieForHit()
+    local player = getSpecificPlayer(0)
+    local volumeSystem = getSoundManager():getSoundVolume()
+    local sound = "JetMG"
+
+    local emitter = getWorld():getFreeEmitter((x1 + x2) / 2, (y1 + y2) / 2, z)
+    local id = emitter:playSound(sound, true)
+    emitter:setVolume(id, volumeSystem)
+
+    local zombieList = BanditZombie.CacheLight
+    for id, zombie in pairs(zombieList) do
+        if zombie.x >= x1 and zombie.x < x2 and zombie.y >= y1 and zombie.y < y2 then
+            local character = BanditZombie.GetInstanceById(id)
+            if character and character:isOutside() then
+                character:Hit(fakeItem, fakeZombie, 20, false, 1, false)
+            end
+        end
+    end
+
+    if player then
+        local px, py = player:getX(), player:getY()
+        if px >= x1 and px < x2 and py >= y1 and py < y2 and player:isOutside() then
+            player:Hit(fakeItem, fakeZombie, 0.8, false, 1, false)
+        end
+    end
+end
+
 BWOUtils.FindBuildingDist = function(px, py, min, max)
     local cell = getCell()
     local rooms = cell:getRoomList()

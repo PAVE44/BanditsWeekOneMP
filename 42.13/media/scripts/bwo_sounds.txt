@@ -1260,6 +1260,54 @@ module Bandits{
          } 
     }
 
+    sound JetFlyby_LR {
+        category = Object, 
+        loop = false,
+        is3D = true,
+        clip { 
+            file = media/sound/jet_flyby_1_lr.ogg,
+	        distanceMin = 1,
+            distanceMax = 200,
+            reverbFactor = 0.6, 
+        }
+        clip { 
+            file = media/sound/jet_flyby_2_lr.ogg,
+	        distanceMin = 1,
+            distanceMax = 200,
+            reverbFactor = 0.6, 
+        }
+    }
+
+    sound JetFlyby_RL {
+        category = Object, 
+        loop = false,
+        is3D = true,
+        clip { 
+            file = media/sound/jet_flyby_1_rl.ogg,
+	        distanceMin = 1,
+            distanceMax = 200,
+            reverbFactor = 0.6, 
+        }
+        clip { 
+            file = media/sound/jet_flyby_2_rl.ogg,
+	        distanceMin = 1,
+            distanceMax = 200,
+            reverbFactor = 0.6, 
+        }
+    }
+
+    sound JetMG {
+        category = Object, 
+        loop = false,
+        is3D = true,
+        clip { 
+            file = media/sound/jet_mg.ogg,
+	        distanceMin = 1,
+            distanceMax = 80,
+            reverbFactor = 0.6, 
+        }
+    }
+
     sound FemaleDespair {
         category = Object, 
         loop = false,
