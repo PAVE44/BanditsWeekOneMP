@@ -33,10 +33,13 @@ local schedule = {
             {{"Arson", {dmin = 25, dmax = 40}}, 1},
         },
         [30] = {
-            {{"SpawnGroupVehicle", {desc = "SWAT", cid = Bandit.clanMap.SWAT, vtype = "Base.StepVan_LouisvilleSWAT", lightbar = 3, siren = 2, size = 5, dmin = 40, dmax = 80, program = "Bandit", hostile = false}}, 1},
+            {{"SpawnGroup", {desc = "Neighborhood Watch", cid = Bandit.clanMap.KentuckianFinest, dist = 33, size = 7, program = "Bandit", hostile = false}}, 1},
         },
         [31] = {
             {{"ChopperAlert", {name="heli2", sound="BWOChopperGeneric", dir = 0, speed=2.4}}, 1},
+        },
+        [49] = {
+            {{"SpawnGroupVehicle", {desc = "SWAT", cid = Bandit.clanMap.SWAT, vtype = "Base.StepVan_LouisvilleSWAT", lightbar = 3, siren = 2, size = 5, dmin = 40, dmax = 80, program = "Bandit", hostile = false}}, 1},
         },
         [52] = {
             {{"Arson", {dmin = 35, dmax = 55}}, 1},

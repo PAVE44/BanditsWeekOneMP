@@ -766,3 +766,19 @@
 	spawn: groupMax = 12
 	spawn: zone = 0
 
+[6e10d15d-1dd3-4169-8eb7-2d9747812bfe]
+	general: name = KentuckyFinest
+	spawn: friendly = true
+	spawn: companion = false
+	spawn: defenders = false
+	spawn: campers = false
+	spawn: assault = false
+	spawn: wanderer = false
+	spawn: roadblock = false
+	spawn: dayStart = 0
+	spawn: dayEnd = 10000
+	spawn: spawnChance = 0
+	spawn: groupMin = 1
+	spawn: groupMax = 10
+	spawn: zone = 0
+

@@ -62,6 +62,9 @@ Bandit.clanMap.Medic = "f8c5c06b-2fd7-482d-8150-2be03d446927"
 Bandit.clanMap.MedicHazmat = "cfccfa27-f256-47a0-bd7c-b2d12b369c6d"
 Bandit.clanMap.Fireman = "989f4faf-53f2-4f8f-9603-496fb3efcb6a"
 
+-- organized civs
+Bandit.clanMap.KentuckianFinest = "6e10d15d-1dd3-4169-8eb7-2d9747812bfe"
+
 -- bandits
 Bandit.clanMap.Biker = "f3ad89be-9368-4df7-a63b-0c315a96f23b"
 Bandit.clanMap.CriminalWhite = "8736f2bd-3b08-4ae3-b5f2-1d6a3225e892"
