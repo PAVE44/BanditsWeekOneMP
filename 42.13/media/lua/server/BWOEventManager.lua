@@ -1,53 +1,15 @@
 require "BWOUtils"
 require "BWOServerEvents"
+require "Scenarios/SDayOne"
 
 BWOEventGenerator = BWOEventGenerator or {}
 
 -- the main architecture of week one multiplayer events
 
--- schedule stores sequences of events
-local schedule = {
-    [0] = {
-        [1] = {
-            {{"StartDay", {day="friday"}}, 1},
-        },
-        [2] = {
-            {{"Siren", {}}, 1},
-        },
-        [3] = {
-            {{"SpawnGroupVehicle", {desc = "Cops", cid = Bandit.clanMap.PoliceBlue, vtype = "Base.CarLightsPolice", lightbar = 2, siren = 2, size = 2, dmin = 20, dmax = 50, program = "Bandit", hostile = false}}, 1},
-        },
-        [4] = {
-            {{"ChopperAlert", {name="heli", sound="BWOChopperPolice1", dir = 90, speed=1.8}}, 1},
-        },
-        [10] = {
-            {{"SpawnGroupVehicle", {desc = "Cops", cid = Bandit.clanMap.PoliceBlue, vtype = "Base.CarLightsPolice", lightbar = 1, siren = 1, size = 2, dmin = 30, dmax = 60, program = "Bandit", hostile = false}}, 1},
-        },
-        [14] = {
-            {{"ChopperAlert", {name="heli", sound="BWOChopperPolice1", dir = -90, speed=1.8}}, 1},
-        },
-        [20] = {
-            {{"SpawnGroupVehicle", {desc = "Cops", cid = Bandit.clanMap.PoliceBlue, vtype = "Base.CarLightsPolice", lightbar = 1, siren = 1, size = 2, dmin = 40, dmax = 70, program = "Bandit", hostile = false}}, 1},
-        },
-        [25] = {
-            {{"Arson", {dmin = 25, dmax = 40}}, 1},
-        },
-        [30] = {
-            {{"SpawnGroup", {desc = "Neighborhood Watch", cid = Bandit.clanMap.KentuckianFinest, dist = 33, size = 7, program = "Bandit", hostile = false}}, 1},
-        },
-        [31] = {
-            {{"ChopperAlert", {name="heli2", sound="BWOChopperGeneric", dir = 0, speed=2.4}}, 1},
-        },
-        [49] = {
-            {{"SpawnGroupVehicle", {desc = "SWAT", cid = Bandit.clanMap.SWAT, vtype = "Base.StepVan_LouisvilleSWAT", lightbar = 3, siren = 2, size = 5, dmin = 40, dmax = 80, program = "Bandit", hostile = false}}, 1},
-        },
-        [52] = {
-            {{"Arson", {dmin = 35, dmax = 55}}, 1},
-            {{"Arson", {dmin = 56, dmax = 80}}, 200},
-        },
-        
-    }
-}
+-- hardcoded for now
+local scenarioName = "DayOne"
+
+local scenario = BWOScenarios[scenarioName]:new()
 
 -- a queue of single events to be fired
 local events = {}
@@ -70,19 +32,16 @@ end
 
 -- reads the schedule to see if it's the right moment to manage a sequence
 local function sequenceProcessor()
-    if not isServer() then return end
-
     local gametime = getGameTime()
     local minute = gametime:getMinutes()
     local worldAge = BWOUtils.GetWorldAge()
-    dprint("[EVENT GENERATOR][INFO] SCHEDULE LOOKUP FOR: [" .. worldAge .. "][" .. minute .. "]", 3)
+    local schedule = scenario:getSchedule()
+    dprint("[EVENT_MANAGER][INFO] SCHEDULE LOOKUP FOR: [" .. worldAge .. "][" .. minute .. "]", 3)
 
     if schedule[worldAge] and schedule[worldAge][minute] then
         local sequence = schedule[worldAge][minute]
         addSequence(sequence)
     end
-
-    BWOServerEvents.MetaSound()
 end
 
 -- fires single event server-side
@@ -114,29 +73,62 @@ local function eventProcessor()
 
 end
 
---[[
-local function addToSchedule(args)
+-- extra spawn for specific room types
+local function roomSpawner()
+    local roomSpawns = scenario:getRoomSpawns()
+
     local worldAge = BWOUtils.GetWorldAge()
-    local gametime = getGameTime()
-    local minute = gametime:getMinutes()
 
-    minute = minute + 1
-    if minute == 60 then
-        minute = 0
-        worldAge = worldAge + 1
-    end
-    print("[EVENT GENERATOR] ADDING EVENT " .. args[1] .. " [" .. worldAge .. "][" .. minute .. "]")
-
-    for k, v in pairs(args[2]) do
-        print("    " .. tostring(k) .. "=" .. tostring(v))
+    local cache = BWORooms.cache
+    if #cache == 0 then
+        dprint("[EVENT_MANAGER][INFO] REBUILDING ROOM CACHE", 3)
+        BWORooms.UpdateCache()
     end
 
-    if not schedule[worldAge] then
-        schedule[worldAge] = {}
+    dprint("[EVENT_MANAGER][INFO] ROOM CACHE IS: " .. #cache, 3)
+
+    local players = BWOUtils.GetAllPlayers()
+
+    for _, rdata in ipairs(cache) do
+        if roomSpawns[rdata.name] then
+            for i = 1, #players do
+                local player = players[i]
+                local px, py = player:getX(), player:getY()
+                local distSq = ((px - rdata.x) * (px - rdata.x)) + ((py - rdata.y) * (py - rdata.y))
+                if distSq > 900 and distSq < 3600 then -- > 30 and < 60
+                    for _, sdata in ipairs(roomSpawns[rdata.name]) do
+                        if not rdata.spawned and worldAge >= sdata.waMin and worldAge < sdata.waMax then
+                            dprint("[EVENT_MANAGER][INFO] ROOM SPAWN: " .. rdata.name, 3)
+                            local args = {
+                                cid = sdata.cid,
+                                program = "Bandit",
+                                hostile = sdata.hostile,
+                                size = sdata.size,
+                                x = rdata.x,
+                                y = rdata.y,
+                                z = rdata.z,
+                            }
+                            BanditServer.Spawner.Clan(player, args)
+
+                            rdata.spawned = true
+                        end
+                    end
+                end
+            end
+        end
     end
-    schedule[worldAge][minute] = {args[1], args[2]} -- eventName, eventParams
 end
-]]
+
+-- main processor
+local function mainProcessor()
+    if not isServer() then return end
+
+    sequenceProcessor()
+
+    roomSpawner()
+
+    -- BWOServerEvents.MetaSound()
+end
 
 -- direct API to allow chaining events from other events
 BWOEventGenerator.AddSequence = function(sequence)
@@ -154,8 +146,8 @@ local onClientCommand = function(module, command, player, args)
 end
 
 
-Events.EveryOneMinute.Remove(sequenceProcessor)
-Events.EveryOneMinute.Add(sequenceProcessor)
+Events.EveryOneMinute.Remove(mainProcessor)
+Events.EveryOneMinute.Add(mainProcessor)
 
 Events.OnTick.Remove(eventProcessor)
 Events.OnTick.Add(eventProcessor)

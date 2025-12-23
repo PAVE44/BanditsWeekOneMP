@@ -215,7 +215,7 @@ Bandit.outfit2clan["Resident"] =                {occupation = "Resident", cid=Ba
 -- Bandit.outfit2clan["Retiree"] =                 {occupation = "Resident", cid=Bandit.clanMap.Resident}
 Bandit.outfit2clan["Retiree"] =                 {occupation = "Resident", cid=Bandit.clanMap.Resident}
 Bandit.outfit2clan["Rocker"] =                  {occupation = "Bar", cid=Bandit.clanMap.Biker}
-Bandit.outfit2clan["Sanitation"] =              {occupation = "Sanitation", cid=Bandit.clanMap.Sanitation}
+Bandit.outfit2clan["Sanitation"] =              {occupation = "Sanitation", cid=Bandit.clanMap.Janitor}
 Bandit.outfit2clan["ShellSuit_Black"] =         {occupation = "Sport", cid=Bandit.clanMap.Polish}
 Bandit.outfit2clan["ShellSuit_Blue"] =          {occupation = "Sport", cid=Bandit.clanMap.Polish}
 Bandit.outfit2clan["ShellSuit_Green"] =         {occupation = "Sport", cid=Bandit.clanMap.Polish}
