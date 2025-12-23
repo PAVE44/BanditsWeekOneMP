@@ -288,11 +288,13 @@ BWOUtils.Explode = function(x, y, z)
                 local squareF = cell:getGridSquare(x + dx, y + dy, z)
                 if squareF then
                     square:BurnWalls(false)
-                    IsoFireManager.StartFire(cell, squareF, true, 1000, 100)
                 end
             end
         end
     end
+
+    local squareF = cell:getGridSquare(x, y, z)
+    IsoFireManager.StartFire(cell, squareF, true, 1000, 100)
     
     if not isServer() then
 
@@ -319,7 +321,7 @@ BWOUtils.Explode = function(x, y, z)
         effect.x = square:getX()
         effect.y = square:getY()
         effect.z = square:getZ()
-        effect.size = 800
+        effect.size = 1000
         effect.name = "explobig"
         effect.frameCnt = 17
         table.insert(BWOEffects2.tab, effect)

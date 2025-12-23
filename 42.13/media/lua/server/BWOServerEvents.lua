@@ -153,6 +153,8 @@ BWOServerEvents.JetfighterSequence = function(params)
     local halfLength = 80
     local halfWidth = 5
     local flybySound
+    local projectiles = false
+
     local armaments = {
         ["mg"] = {
             boxSize = 5,
@@ -254,10 +256,11 @@ BWOServerEvents.JetfighterSequence = function(params)
 
             if weapon and weapon == "mg" then
                 sound = BanditUtils.Choice({"JetFlybyMG_1", "JetFlybyMG_2"})
+                projectiles = true
             end
 
             local delay = jetDelay
-            local flybyEvent = {"JetfighterFlyby", {cx = cx, cy = cy, name = name, sound = sound, dir = dir, speed = speed}}
+            local flybyEvent = {"JetfighterFlyby", {cx = cx, cy = cy, name = name, sound = sound, projectiles = projectiles, dir = dir, speed = speed}}
             table.insert(sequence, {flybyEvent, delay})
 
             if weapon then
@@ -323,6 +326,7 @@ BWOServerEvents.JetfighterFlyby = function(params)
     local name = params.name and params.name or "a10"
     local dir = params.dir and params.dir or 0
     local sound = params.sound and params.sound or BanditUtils.Choice({"JetFlyby_1", "JetFlyby_2"})
+    local projectiles = params.projectiles and params.projectiles or false
     local soundMode = "binary"
 
     -- const
@@ -330,7 +334,6 @@ BWOServerEvents.JetfighterFlyby = function(params)
     local height = 586
     local rotors = false
     local lights = true -- not sure if jets have them but its cool
-    local projectiles = true
 
     local groups = BWOUtils.GetPlayerGroups()
     for i = 1, #groups do
