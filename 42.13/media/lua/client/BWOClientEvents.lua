@@ -59,7 +59,7 @@ BWOClientEvents.FlyingObject = function(params)
     local soundMode = params.soundMode and params.soundMode or "exact"
     local rotors = params.rotors and params.rotors or true
     local lights = params.lights and params.lights or true
-    local projectiles = params.projectiles and params.ligprojectileshts or false
+    local projectiles = params.projectiles and params.projectiles or false
 
     getCore():setOptionUIRenderFPS(60)
 
