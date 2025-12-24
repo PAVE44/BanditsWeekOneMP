@@ -1,4 +1,5 @@
 require "BWOUtils"
+require "BWOGMD"
 require "BWOServerEvents"
 require "Scenarios/SDayOne"
 
@@ -119,9 +120,75 @@ local function roomSpawner()
     end
 end
 
+local function waitingRoomManager()
+    local gmd = BWOGMD.Get()
+
+    if gmd.general.gameStarted then return end
+    dprint("[EVENT_MANAGER][INFO] GAME STARTED: NO", 3)
+
+    -- const
+    local testCoords = {
+        x = 11782,
+        y = 947,
+        z = 0
+    }
+    
+    local gt = getGameTime()
+    gt:setTimeOfDay(9)
+
+    --[[
+    local players = BWOUtils.GetAllPlayers()
+     for i = 1, #players do
+        local player = players[i]
+        local px, py = player:getX(), player:getY()
+        ]]
+    
+    if not gmd.general.waitingRoomBuilt then
+        local square = getCell():getGridSquare(testCoords.x, testCoords.y, testCoords.z)
+        if square then
+            dprint("[EVENT_MANAGER][INFO] BUILDING THE WAITING ROOM NOW", 3)
+            scenario:waitingRoom()
+            gmd.general.waitingRoomBuilt = true
+            BWOGMD.Transmit()
+        else
+            dprint("[EVENT_MANAGER][WARN] CANNOT REACH SQUARE TO BUILD WAITING ROOM", 2)
+        end
+    end
+
+end
+
+local function newPlayerManager(playerNum, player)
+    dprint("[EVENT_MANAGER][INFO] NEW PLAYER JOINED IN", 3)
+
+    local teleportCoords = {
+        x1 = 11782,
+        y1 = 947,
+        x2 = 11792,
+        y2 = 957,
+        z = 0
+    }
+    local px, py = player:getX(), player:getY()
+
+    if py > 1100 then
+        local x = teleportCoords.x1 + ZombRand(teleportCoords.x2 - teleportCoords.x1)
+        local y = teleportCoords.y1 + ZombRand(teleportCoords.y2 - teleportCoords.y1)
+        local z = 0
+        dprint("[EVENT_MANAGER][INFO] TELEPORTING TO X: " .. x .. " Y: " .. y, 3)
+
+        player:setX(x)
+        player:setY(y)
+        player:setZ(z)
+        player:setLastX(x)
+        player:setLastY(y)
+        player:setLastZ(z)
+    end
+end
+
 -- main processor
 local function mainProcessor()
     if not isServer() then return end
+
+    waitingRoomManager()
 
     sequenceProcessor()
 
@@ -145,6 +212,8 @@ local onClientCommand = function(module, command, player, args)
     end
 end
 
+Events.OnCreatePlayer.Remove(newPlayerManager)
+Events.OnCreatePlayer.Add(newPlayerManager)
 
 Events.EveryOneMinute.Remove(mainProcessor)
 Events.EveryOneMinute.Add(mainProcessor)

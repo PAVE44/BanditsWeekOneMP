@@ -399,6 +399,11 @@ function BWOMenu.WorldContextMenuPre(playerID, context, worldobjects, test)
         local density = BWOUtils.GetDensityScore(player:getX(), player:getY())
         print (density)
 
+        local room = square:getRoom()
+        if room then
+            print (room:getName())
+        end
+
         local res = BWOUtils.FindVehicleSpawnPoint(player:getX(), player:getY(), 35, 80)
         if res.valid then
             dprint("[SERVER_EVENT][INFO][SpawnGroupVehicle] VEHICLE SPOTS SELECTED X: " .. res.x .. " Y:" .. res.y, 3)
