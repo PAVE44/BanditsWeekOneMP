@@ -223,12 +223,15 @@ local function waitingRoomManager()
             local player = players[i]
             local id = player:getUsername()
             dprint("[EVENT_MANAGER][INFO] TELEPORTING " .. id .. " TO X: " .. spawn.x .. " Y: " .. spawn.y .. " Z: " .. spawn.z, 3)
-            player:setX(spawn.x)
-            player:setY(spawn.y)
-            player:setZ(spawn.z)
-            player:setLastX(spawn.x)
-            player:setLastY(spawn.y)
-            player:setLastZ(spawn.z)
+
+
+            local paramsClient = {
+                pid = player:getOnlineID(),
+                x = spawn.x,
+                y = spawn.y,
+                z = spawn.z,
+            }
+            sendServerCommand("Events", "Teleport", paramsClient)
         end
 
         gmd.general.gameStarted = true
@@ -282,6 +285,40 @@ local onClientCommand = function(module, command, player, args)
         end
     end
 end
+
+-- this works only when a new character is created for a joing player
+-- while it seems redundant it allows server-side teleport which works better
+
+local function newPlayerManager(playerNum, player)
+    dprint("[EVENT_MANAGER][INFO] NEW PLAYER JOINED IN", 3)
+
+    local gmd = BWOGMD.Get()
+    if gmd.general.gameStarted then return end
+
+    local teleportCoords = {
+        x1 = 11788,
+        y1 = 955,
+        x2 = 11795,
+        y2 = 958,
+        z = 0
+    }
+    
+    local x = teleportCoords.x1 + ZombRand(teleportCoords.x2 - teleportCoords.x1)
+    local y = teleportCoords.y1 + ZombRand(teleportCoords.y2 - teleportCoords.y1)
+    local z = 0
+    dprint("[EVENT_MANAGER][INFO] SERVER TELEPORTING TO X: " .. x .. " Y: " .. y, 3)
+
+    player:setX(x)
+    player:setY(y)
+    player:setZ(z)
+    player:setLastX(x)
+    player:setLastY(y)
+    player:setLastZ(z)
+
+end
+
+Events.OnCreatePlayer.Remove(newPlayerManager)
+Events.OnCreatePlayer.Add(newPlayerManager)
 
 Events.EveryOneMinute.Remove(mainProcessor)
 Events.EveryOneMinute.Add(mainProcessor)
