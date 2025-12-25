@@ -149,6 +149,26 @@ local function waitingRoomManager()
                 online = true,
             }
             gmd.players[id] = pdata
+
+            local teleportCoords = {
+                x1 = 11782,
+                y1 = 947,
+                x2 = 11792,
+                y2 = 957,
+                z = 0
+            }
+
+            local x = teleportCoords.x1 + ZombRand(teleportCoords.x2 - teleportCoords.x1)
+            local y = teleportCoords.y1 + ZombRand(teleportCoords.y2 - teleportCoords.y1)
+            local z = 0
+            dprint("[EVENT_MANAGER][INFO] TELEPORTING TO X: " .. x .. " Y: " .. y, 3)
+
+            player:setX(x)
+            player:setY(y)
+            player:setZ(z)
+            player:setLastX(x)
+            player:setLastY(y)
+            player:setLastZ(z)
         else
             gmd.players[id].online = true
         end

@@ -10,7 +10,7 @@ function UIWaitingRoom:initialise()
     ISPanel.initialise(self)
 
     local top = PADDING + FONT_HGT_MEDIUM + PADDING 
-    self.playerListBox = ISScrollingListBox:new(PADDING, top, self:getWidth() - (2 * PADDING), self:getHeight())
+    self.playerListBox = ISScrollingListBox:new(PADDING, top, self:getWidth() - (2 * PADDING), 800)
     self.playerListBox.itemheight = FONT_HGT_MEDIUM + PADDING
     self.playerListBox.backgroundColor.a = 0
     self.playerListBox.borderColor = {r=1, g=0, b=0, a=1}
@@ -39,6 +39,9 @@ function UIWaitingRoom:update()
 
         if (list.mouseoverselected == item.index) and list:isMouseOver() and not list:isMouseOverScrollBar() then
             list:drawMouseOverHighlight(0, y, list:getWidth(), item.height-1);
+            list.realSelected = item.item.id
+            list.realStatus = item.item.status
+            list.realOnline = item.item.online
         end
         
         local width = getTextManager():MeasureStringX(UIFont.Medium, item.item.id)
@@ -62,9 +65,21 @@ function UIWaitingRoom:update()
     end
 
     self.playerListBox.onMouseUp = function(listBox, x, y)
-        local itemText = listBox.items[listBox.selected].item.id
-        BWOAChat.Say(itemText)
-        self:destroy()
+        local id = listBox.realSelected
+        local status = listBox.realStatus
+        local online = listBox.realOnline
+        local isMe = getSpecificPlayer(0):getUsername() == id
+
+        if online then
+            if isDebugEnabled() or isAdmin() or isMe then
+                local args = {
+                    id = id,
+                    status = not status
+                }
+                sendClientCommand(getSpecificPlayer(0), "EventManager", "SetPlayerStatus", args)
+            end
+        end
+
     end
 end
 
