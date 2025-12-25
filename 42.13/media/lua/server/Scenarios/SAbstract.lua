@@ -15,6 +15,10 @@ function BWOScenarios.Abstract:getWaitingRoom()
     return self.waitingRoom
 end
 
+function BWOScenarios.Abstract:getRandomPlayerSpawn()
+    return BanditUtils.Choice(self.playerSpawns)
+end
+
 function BWOScenarios.Abstract:derive(type)
     local derived = {}
     setmetatable(derived, { __index = self })

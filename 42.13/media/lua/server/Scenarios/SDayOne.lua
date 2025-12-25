@@ -244,6 +244,10 @@ BWOScenarios.DayOne.roomSpawns = {
     },
 }
 
+BWOScenarios.DayOne.playerSpawns = {
+	[1] = {x = 11857, y = 6910, z = 0}
+}
+
 function BWOScenarios.DayOne:waitingRoom()
     print ("waiting room build executed")
     local sx, sy, sz = 11782, 947, 0

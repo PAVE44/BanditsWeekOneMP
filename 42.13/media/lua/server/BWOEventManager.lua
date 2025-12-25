@@ -127,8 +127,10 @@ local function waitingRoomManager()
     dprint("[EVENT_MANAGER][INFO] GAME STARTED: NO", 3)
 
     local gt = getGameTime()
-    gt:setTimeOfDay(9)
+    local startHour = gt:getStartTimeOfDay()
+    gt:setTimeOfDay(startHour)
 
+    -- update player status
     for id, player in pairs(gmd.players) do
         player.online = false
     end
@@ -149,7 +151,17 @@ local function waitingRoomManager()
                 online = true,
             }
             gmd.players[id] = pdata
+        else
+            gmd.players[id].online = true
+        end
+    end
+    BWOGMD.Transmit()
 
+    -- teleport to waiting room
+    
+    for i = 1, #players do
+        local player = players[i]
+        if player:getY() > 970 then
             local teleportCoords = {
                 x1 = 11782,
                 y1 = 947,
@@ -169,11 +181,8 @@ local function waitingRoomManager()
             player:setLastX(x)
             player:setLastY(y)
             player:setLastZ(z)
-        else
-            gmd.players[id].online = true
         end
     end
-    BWOGMD.Transmit()
 
     if not gmd.general.waitingRoomBuilt then
         local testCoords = {
@@ -193,6 +202,35 @@ local function waitingRoomManager()
         end
     end
 
+
+    -- check if everyone is ready
+    local allReady = true
+    local playerCnt = 0
+    for id, player in pairs(gmd.players) do
+        playerCnt = playerCnt + 1
+        if player.online and not player.status then
+            allReady = false
+        end
+    end
+
+    if allReady and playerCnt > 0 then
+        dprint("[EVENT_MANAGER][INFO] ALL PLAYERS READY!", 3)
+        local spawn = scenario:getRandomPlayerSpawn()
+        for i = 1, #players do
+            local player = players[i]
+            local id = player:getUsername()
+            dprint("[EVENT_MANAGER][INFO] TELEPORTING " .. id .. " TO X: " .. spawn.x .. " Y: " .. spawn.y .. " Z: " .. spawn.z, 3)
+            player:setX(spawn.x)
+            player:setY(spawn.y)
+            player:setZ(spawn.z)
+            player:setLastX(spawn.x)
+            player:setLastY(spawn.y)
+            player:setLastZ(spawn.z)
+        end
+
+        gmd.general.gameStarted = true
+        BWOGMD.Transmit()
+    end
 end
 
 -- sets player ready/not ready status for the waiting room
@@ -209,49 +247,6 @@ local function setPlayerStatus(args)
         else
             dprint("[EVENT_MANAGER][INFO] PLAYER " .. id .. " IS NOW NOT READY", 3)
         end
-    end
-end
-
--- manages the waiting room
-local function newPlayerManager(playerNum, player)
-    dprint("[EVENT_MANAGER][INFO] NEW PLAYER JOINED IN", 3)
-
-    local gmd = BWOGMD.Get()
-    if gmd.general.gameStarted then return end
-
-    local teleportCoords = {
-        x1 = 11782,
-        y1 = 947,
-        x2 = 11792,
-        y2 = 957,
-        z = 0
-    }
-    
-    local id = player:getUsername()
-
-    if not gmd.players[id] then
-        dprint("[EVENT_MANAGER][INFO] REGISTERING PLAYER" .. id, 3)
-        local pdata = {
-            sx = player:getX(),
-            sy = player:getY(),
-            sz = player:getZ(),
-            id = id,
-            status = false,
-        }
-        gmd.players[id] = pdata
-        BWOGMD.Transmit()
-
-        local x = teleportCoords.x1 + ZombRand(teleportCoords.x2 - teleportCoords.x1)
-        local y = teleportCoords.y1 + ZombRand(teleportCoords.y2 - teleportCoords.y1)
-        local z = 0
-        dprint("[EVENT_MANAGER][INFO] TELEPORTING TO X: " .. x .. " Y: " .. y, 3)
-
-        player:setX(x)
-        player:setY(y)
-        player:setZ(z)
-        player:setLastX(x)
-        player:setLastY(y)
-        player:setLastZ(z)
     end
 end
 
@@ -284,9 +279,6 @@ local onClientCommand = function(module, command, player, args)
         end
     end
 end
-
-Events.OnCreatePlayer.Remove(newPlayerManager)
-Events.OnCreatePlayer.Add(newPlayerManager)
 
 Events.EveryOneMinute.Remove(mainProcessor)
 Events.EveryOneMinute.Add(mainProcessor)
