@@ -239,6 +239,10 @@ local function waitingRoomManager()
     end
 end
 
+local function scenarioController()
+    scenario:controller()
+end
+
 -- sets player ready/not ready status for the waiting room
 local function setPlayerStatus(args)
     local gmd = BWOGMD.Get()
@@ -261,6 +265,8 @@ local function mainProcessor()
     if not isServer() then return end
 
     waitingRoomManager()
+
+    scenarioController()
 
     sequenceProcessor()
 
@@ -311,9 +317,9 @@ local function newPlayerManager(playerNum, player)
     player:setX(x)
     player:setY(y)
     player:setZ(z)
-    player:setLastX(x)
-    player:setLastY(y)
-    player:setLastZ(z)
+    -- player:setLastX(x)
+    -- player:setLastY(y)
+    -- player:setLastZ(z)
 
 end
 

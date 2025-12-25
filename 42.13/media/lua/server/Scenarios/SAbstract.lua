@@ -30,6 +30,9 @@ end
 function BWOScenarios.Abstract:waitingRoom()
 end
 
+function BWOScenarios.Abstract:controller()
+end
+
 function BWOScenarios.Abstract:new()
     local o = setmetatable({}, self)
     return o

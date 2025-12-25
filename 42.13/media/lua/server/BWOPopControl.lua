@@ -4,7 +4,7 @@ require "BWOUtils"
 
 BWOPopControl = BWOPopControl or {}
 
-BWOPopControl.zombiePercent = 50
+BWOPopControl.zombiePercent = 55
 
 local function zombieController(targetCnt)
     if targetCnt > 400 then return end

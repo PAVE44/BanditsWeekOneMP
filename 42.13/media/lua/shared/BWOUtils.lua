@@ -324,8 +324,8 @@ BWOUtils.Explode = function(x, y, z)
         item:setAttackTargetSquare(square)
 
         if square:getChunk() then
-            local player = getSpecificPlayer(0)
-            local trap = IsoTrap.new(player, item, cell, square)
+            -- local player = getSpecificPlayer(0)
+            local trap = IsoTrap.new(nil, item, cell, square)
             trap:triggerExplosion(false)
         end
 

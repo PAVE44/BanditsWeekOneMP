@@ -613,6 +613,10 @@ BWOServerEvents.MetaSound = function(params)
         -- "VoiceMaleDeathEaten",
     }
 
+    local gametime = getGameTime()
+    local hour = gametime:getHour()
+    if hour > 4 then return end
+
     local cell = getCell()
     local zombieList = cell:getZombieList()
     local zombieListSize = zombieList:size() / 2
@@ -621,9 +625,6 @@ BWOServerEvents.MetaSound = function(params)
     local rnd = ZombRand(100)
     if rnd > zombieListSize then return end
 
-    local proportion = 2 * (50 - math.abs(50 - BWOPopControl.zombiePercent))
-    local rnd2 = ZombRand(100)
-    if rnd2 > proportion then return end
 
     local groups = BWOUtils.GetPlayerGroups()
     for i = 1, #groups do
@@ -656,6 +657,7 @@ BWOServerEvents.MetaSound = function(params)
     end
 end
 
+-- params: none
 BWOServerEvents.PlaneCrashSequence = function(params)
     dprint("[SERVER_EVENT][INFO][PlaneCrashSequence] INIT", 3)
 
