@@ -15,13 +15,22 @@ function UIWaitingRoom:initialise()
     self.playerListBox.backgroundColor.a = 0
     self.playerListBox.borderColor = {r=1, g=0, b=0, a=1}
     self:addChild(self.playerListBox)
+    
+end
+
+function UIWaitingRoom:onRightClick(button)
+end
+
+function UIWaitingRoom:update()
+    ISPanel.update(self)
+
     self.playerListBox:clear()
 
     local gmd = BWOGMD.Get()
     local players = gmd.players
 
     for id, player in pairs(players) do
-        self.playerListBox:addItem(id, { index = id, id = id, status = player.status})
+        self.playerListBox:addItem(id, { index = id, id = id, status = player.status, online = player.online})
     end
 
     self.maxWidth = 0
@@ -35,7 +44,18 @@ function UIWaitingRoom:initialise()
         local width = getTextManager():MeasureStringX(UIFont.Medium, item.item.id)
         self.maxWidth = math.max(width, self.maxWidth)
 
-        list:drawText(item.item.id, 4, y + 6, 1, 1, 1, 1, UIFont.Medium)
+        local c
+        if item.item.online then
+            if item.item.status then
+                c = {r=0, g=1, b=0}
+            else
+                c = {r=1, g=0, b=0}
+            end
+        else
+            c = {r=0.3, g=0.3, b=0.3}
+        end
+
+        list:drawText(item.item.id, 4, y + 6, c.r, c.g, c.b, 1, UIFont.Medium)
         list:drawRect(0, y + h - 1, list:getWidth(), 1, 1, 0.4, 0.4, 0.4)
         
         return y + h
@@ -46,13 +66,6 @@ function UIWaitingRoom:initialise()
         BWOAChat.Say(itemText)
         self:destroy()
     end
-end
-
-function UIWaitingRoom:onRightClick(button)
-end
-
-function UIWaitingRoom:update()
-    ISPanel.update(self)
 end
 
 function UIWaitingRoom:prerender()
