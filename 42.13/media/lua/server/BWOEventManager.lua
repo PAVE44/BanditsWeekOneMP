@@ -158,15 +158,14 @@ local function waitingRoomManager()
     BWOGMD.Transmit()
 
     -- teleport to waiting room
-    
     for i = 1, #players do
         local player = players[i]
         if player:getY() > 970 then
             local teleportCoords = {
-                x1 = 11782,
-                y1 = 947,
-                x2 = 11792,
-                y2 = 957,
+                x1 = 11788,
+                y1 = 955,
+                x2 = 11795,
+                y2 = 958,
                 z = 0
             }
 
@@ -175,12 +174,14 @@ local function waitingRoomManager()
             local z = 0
             dprint("[EVENT_MANAGER][INFO] TELEPORTING TO X: " .. x .. " Y: " .. y, 3)
 
-            player:setX(x)
-            player:setY(y)
-            player:setZ(z)
-            player:setLastX(x)
-            player:setLastY(y)
-            player:setLastZ(z)
+            local paramsClient = {
+                pid = player:getOnlineID(),
+                x = x,
+                y = y,
+                z = z,
+            }
+            sendServerCommand("Events", "Teleport", paramsClient)
+
         end
     end
 
@@ -207,9 +208,11 @@ local function waitingRoomManager()
     local allReady = true
     local playerCnt = 0
     for id, player in pairs(gmd.players) do
-        playerCnt = playerCnt + 1
-        if player.online and not player.status then
-            allReady = false
+        if player.online then
+            playerCnt = playerCnt + 1
+            if not player.status then
+                allReady = false
+            end
         end
     end
 

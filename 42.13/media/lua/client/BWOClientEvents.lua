@@ -225,6 +225,17 @@ BWOClientEvents.StartDay = function(params)
     BWOTex.alpha = 2.4
 end
 
+BWOClientEvents.Teleport = function(params)
+    local player = getSpecificPlayer(0)
+    if not player then return end
+    player:setX(params.x)
+    player:setY(params.y)
+    player:setZ(params.z)
+    player:setLastX(params.x)
+    player:setLastY(params.y)
+    player:setLastZ(params.z)
+end
+
 local onServerCommand = function(module, command, args)
     if module == "Events" and BWOClientEvents[command] then
         local player = getPlayer()
