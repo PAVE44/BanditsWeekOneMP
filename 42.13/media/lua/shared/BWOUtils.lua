@@ -26,6 +26,19 @@ BWOUtils.GetAllPlayers = function()
     return allPlayers
 end
 
+-- returns a list of all online players
+BWOUtils.GetPlayerById = function(id)
+    local playerList = getOnlinePlayers()
+    for i = 0, playerList:size() - 1 do
+        local player = playerList:get(i)
+        if player then
+            if player:getOnlineID() == id then
+                return player
+            end
+        end
+    end
+end
+
 -- returns a list of players that are at least minDist apart
 BWOUtils.GetDistantPlayers = function()
     local allPlayers = BWOUtils.GetAllPlayers()
@@ -403,6 +416,52 @@ BWOUtils.Explode = function(x, y, z)
 
         -- wake up players
         -- BanditPlayer.WakeEveryone()
+    end
+end
+
+BWOUtils.ClearSpace = function(x, y, z, w, h)
+    local cell = getCell()
+
+    for cz=0, 2 do
+        for cx=x, x+w do
+            for cy=y, y+h do
+                local square = cell:getGridSquare(cx, cy, cz)
+                if square then
+                    local objects = square:getObjects()
+                    local destroyList = {}
+
+                    for i=0, objects:size()-1 do
+                        local object = objects:get(i)
+                        if object then
+                            local sprite = object:getSprite()
+                            if sprite then 
+                                local spriteName = sprite:getName()
+                                local spriteProps = sprite:getProperties()
+
+                                local isSolidFloor = spriteProps:has(IsoFlagType.solidfloor)
+                                local isAttachedFloor = spriteProps:has(IsoFlagType.attachedFloor)
+
+                                if not isSolidFloor or cz > 0 then
+                                    table.insert(destroyList, object)
+                                end
+
+                                if isSolidFloor and spriteName:embodies("natural") then
+                                    object:clearAttachedAnimSprite()
+                                end
+                            end
+                        end
+                    end
+
+                    for k, obj in pairs(destroyList) do
+                        if isClient() then
+                            sledgeDestroy(obj);
+                        else
+                            square:transmitRemoveItemFromSquare(obj)
+                        end
+                    end
+                end
+            end
+        end
     end
 end
 

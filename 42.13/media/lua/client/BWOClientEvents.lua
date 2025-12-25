@@ -119,6 +119,27 @@ BWOClientEvents.JetfighterWeapon = function(params)
     end
 end
 
+-- params: sound
+BWOClientEvents.PlayerSound = function(params)
+
+    -- check
+    if not params.sound then return end
+    
+    local player = getSpecificPlayer(0)
+    if not player then return end
+
+    -- sanitize
+    local sound = params.sound
+    local volume = params.volume and params.volume or 1
+
+    local emitter = player:getEmitter()
+    if emitter then
+        local volumeSystem = getSoundManager():getSoundVolume()
+        local id = emitter:playSound(sound, true)
+        emitter:setVolume(id, volume * volumeSystem)
+    end
+end
+
 -- params: cid, x, y, hostile, desc
 BWOClientEvents.SpawnGroup = function(params)
 
@@ -203,6 +224,40 @@ BWOClientEvents.WorldSound = function(params)
         
         emitter:setVolume(id, volume * volumeSystem)
     end
+end
+
+-- params: cx, cy, cz
+BWOClientEvents.PlaneCrashPart = function(params)
+
+    -- check
+    if not params.cx then return end
+    if not params.cy then return end
+    if not params.cz then return end
+
+    -- sanitize
+    local cx = params.cx
+    local cy = params.cy
+    local cz = params.cz
+
+    BWOUtils.Explode(cx, cy, cz)
+    --BWOUtils.VehiclesAlarm(cx, cy, 0, 60)
+
+end
+
+BWOClientEvents.PlaneCrashPartEnd = function(params)
+
+    -- check
+    if not params.cx then return end
+    if not params.cy then return end
+    if not params.cz then return end
+
+    -- sanitize
+    local cx = params.cx
+    local cy = params.cy
+    local cz = params.cz
+
+    BWOUtils.VehiclesAlarm(cx, cy, 0, 60)
+
 end
 
 -- params: day

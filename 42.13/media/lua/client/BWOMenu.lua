@@ -294,10 +294,9 @@ end
 
 BWOMenu.EventPlaneCrash = function(player)
     local params = {}
-    params.x = player:getX()
-    params.y = player:getY()
-    params.z = player:getZ()
-    BWOScheduler.Add("PlaneCrashSequence", params, 100)
+    local args = {"PlaneCrashSequence", params}
+
+    sendClientCommand(player, "EventManager", "AddEvent", args)
 end
 
 BWOMenu.EventDrawPlane = function(player)
@@ -460,7 +459,7 @@ function BWOMenu.WorldContextMenuPre(playerID, context, worldobjects, test)
         -- eventsMenu:addOption("Nuke", player, BWOMenu.EventNuke)
         -- eventsMenu:addOption("Open Doors", player, BWOMenu.EventOpenDoors)
         -- eventsMenu:addOption("Rolice Riot", player, BWOMenu.EventPoliceRiot)
-        -- eventsMenu:addOption("Plane Crash", player, BWOMenu.EventPlaneCrash, true)
+        eventsMenu:addOption("Plane Crash", player, BWOMenu.EventPlaneCrash)
         -- eventsMenu:addOption("Plane Draw", player, BWOMenu.EventDrawPlane)
         -- eventsMenu:addOption("Power On", player, BWOMenu.EventPower, true)
         -- eventsMenu:addOption("Power Off", player, BWOMenu.EventPower, false)

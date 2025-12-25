@@ -138,7 +138,7 @@ BWOServerEvents.ChopperAlert = function(params)
     end
 end
 
--- params: speed, name, dir, sound, weapon
+-- params: speed, name, sound, weapon
 BWOServerEvents.JetfighterSequence = function(params)
     dprint("[SERVER_EVENT][INFO][JetfighterSequence] INIT", 3)
 
@@ -311,7 +311,7 @@ BWOServerEvents.JetfighterSequence = function(params)
     end
 end
 
--- params: speed, name, dir, sound
+-- params: cx, cy, speed, name, dir, sound, projectiles
 BWOServerEvents.JetfighterFlyby = function(params)
     dprint("[SERVER_EVENT][INFO][JetfighterFlyby] INIT", 3)
 
@@ -367,6 +367,7 @@ BWOServerEvents.JetfighterFlyby = function(params)
     end
 end
 
+-- params: cx, cy, dir, weapon, boxSize
 BWOServerEvents.JetfighterWeapon = function(params)
     dprint("[SERVER_EVENT][INFO][JetfighterWeapon] INIT", 3)
 
@@ -655,17 +656,377 @@ BWOServerEvents.MetaSound = function(params)
     end
 end
 
-BWOServerEvents.PlaneCrash = function(params)
-    dprint("[SERVER_EVENT][INFO][PlaneCrash] INIT", 3)
+BWOServerEvents.PlaneCrashSequence = function(params)
+    dprint("[SERVER_EVENT][INFO][PlaneCrashSequence] INIT", 3)
 
-    local densityMin = 0.2
+    -- const
+    local arrivalSound = "BWOBoeing"
+    local planeHitSound = "BWOExploPlane"
 
     local groups = BWOUtils.GetPlayerGroups()
     for i = 1, #groups do
-
         local players = groups[i]
         local playerSelected = BanditUtils.Choice(players)
         local px, py, pz = playerSelected:getX(), playerSelected:getY(), playerSelected:getZ()
+
+        -- prepare aggregate event
+        local delay = 1
+        local sequence = {}
+        
+        local arrivalSoundEvent = {"PlayerSound", {sound = arrivalSound}}
+        table.insert(sequence, {arrivalSoundEvent, delay})
+
+        delay = delay + 12800
+        local arrivalSoundEvent = {"PlayerSound", {sound = planeHitSound}}
+        table.insert(sequence, {arrivalSoundEvent, delay})
+
+        delay = delay + 300
+        local arrivalSoundEvent = {"PlayerSound", {sound = planeHitSound}}
+        table.insert(sequence, {arrivalSoundEvent, delay})
+        
+        local partMap = {
+            {
+                vtype = "Base.pzkPlaneSection1",
+                x = px + 30 - ZombRand(5),
+                y = py + 11,
+                z = 0,
+                delay = delay + 2500,
+                civs = 2,
+                bags = 0,
+                seats = 0
+            },
+            {
+                vtype = "Base.pzkPlaneSection2",
+                x = px - 20 + ZombRand(3),
+                y = py - 10 + ZombRand(10),
+                z = 0,
+                delay = delay + 3500,
+                civs = 12,
+                bags = 2,
+                seats = 2
+            },
+            {
+                vtype = "Base.pzkPlaneSection3",
+                x = px - 11,
+                y = py + 4,
+                z = 0,
+                delay = delay + 4500,
+                civs = 25,
+                bags = 22,
+                seats = 3
+            },
+            {
+                vtype = "Base.pzkPlaneSection2",
+                x = px - 25 + ZombRand(6),
+                y = py - 21,
+                z = 0,
+                delay = delay + 4700,
+                civs = 12,
+                bags = 2,
+                seats = 2
+            },
+            {
+                vtype = "Base.pzkPlaneSection4",
+                x = px - 45 + ZombRand(10),
+                y = py + 7,
+                z = 0,
+                delay = delay + 5100,
+                civs = 18,
+                bags = 12,
+                seats = 2
+            },
+            {
+                vtype = "Base.pzkPlaneWingL2",
+                x = px + 12 + ZombRand(5),
+                y = py + 1,
+                z = 0,
+                delay = delay + 5900,
+                civs = 0,
+                bags = 0,
+                seats = 0
+            },
+            {
+                vtype = "Base.pzkPlaneWingL1",
+                x = px - 12 - ZombRand(7),
+                y = py + 11 + ZombRand(4),
+                z = 0,
+                delay = delay + 6600,
+                civs = 0,
+                bags = 0,
+                seats = 0
+            },
+            {
+                vtype = "Base.pzkPlaneEngine",
+                x = px - 8,
+                y = py - 23,
+                z = 0,
+                delay = delay + 7300,
+                civs = 1,
+                bags = 0,
+                seats = 0,
+                engine = 1
+            },
+            {
+                vtype = "Base.pzkPlaneWingR2",
+                x = px + 12,
+                y = py + 32,
+                z = 0,
+                delay = delay + 7800,
+                civs = 0,
+                bags = 0,
+                seats = 0
+            },
+            {
+                vtype = "Base.pzkPlaneWingR1",
+                x = px - 2,
+                y = py + 28,
+                z = 0,
+                delay = delay + 8800,
+                civs = 0,
+                bags = 0,
+                seats = 0
+            },
+            {
+                vtype = "Base.pzkPlaneEngine",
+                x = px - 6,
+                y = py + 0,
+                z = 0,
+                delay = delay + 10000,
+                civs = 0,
+                bags = 0,
+                seats = 0,
+                engine = 1
+            },
+            {
+                vtype = "Base.pzkPlaneSection2",
+                x = px + 6,
+                y = py + 11,
+                z = 0,
+                delay = delay + 10800,
+                civs = 12,
+                bags = 2,
+                seats = 2
+            },
+        }
+
+        for _, part in pairs(partMap) do
+            part.pid = playerSelected:getOnlineID()
+            local crashPartEvent = {"PlaneCrashPartSequence", part}
+            table.insert(sequence, {crashPartEvent, part.delay})
+        end
+
+        BWOEventGenerator.AddSequence(sequence)
+    end
+end
+
+-- params: vtype, x, y, z, delay, civs, bags, seats
+BWOServerEvents.PlaneCrashPartSequence = function(params)
+    dprint("[SERVER_EVENT][INFO][PlaneCrashPartSequence] INIT", 3)
+
+    -- check
+    if not params.x then return end
+    if not params.y then return end
+    if not params.z then return end
+    if not params.pid then return end
+
+    -- sanitize
+    local x = params.x
+    local y = params.y
+    local z = params.z
+    local pid = params.pid
+    local vtype = params.vtype and params.vtype or "Base.pzkPlaneSection1"
+    local delay = params.delay and params.delay or 0
+    local civs = params.civs and params.civs or 0
+    local bags = params.bags and params.bags or 0
+    local seats = params.seats and params.seats or 0
+
+    -- const
+    local steps = 24
+
+    local delay = 1
+    local sequence = {}
+    
+    local px, py
+    for i = -steps, 0 do
+        px, py = x + (i * 2), y
+        local params = {
+            x = px,
+            y = py,
+            z = z,
+            bags = bags,
+            seats = seats,
+            pid = pid
+        }
+        local partEvent = {"PlaneCrashPart", params}
+        table.insert(sequence, {partEvent, delay})
+        delay = delay + 70
+    end
+
+    local params = {
+        x = px,
+        y = py,
+        z = z,
+        vtype = vtype,
+        civs = civs,
+        pid = pid
+    }
+    local partEvent = {"PlaneCrashPartEnd", params}
+    table.insert(sequence, {partEvent, delay})
+
+    BWOEventGenerator.AddSequence(sequence)
+end
+
+-- params: x, y, z, bags, seats
+BWOServerEvents.PlaneCrashPart = function(params)
+    dprint("[SERVER_EVENT][INFO][PlaneCrashPart] INIT", 3)
+
+    -- check
+    if not params.x then return end
+    if not params.y then return end
+    if not params.z then return end
+
+    -- sanitize
+    local x = params.x
+    local y = params.y
+    local z = params.z
+    local bags = params.bags and params.bags or 0
+    local seats = params.seats and params.seats or 0
+
+    -- const
+    local bagTab = {"Base.Suitcase", "Base.Suitcase", "Base.Suitcase", "Base.Suitcase", "Base.Suitcase", "Base.Briefcase", 
+                    "Base.Bag_DuffelBag", "Base.Purse", "Base.RippedSheets", "Base.RippedSheetsDirty", 
+                    "Base.SheetMetal", "Base.SmallSheetMetal", "Base.ScrapMetal", "Base.MetalPipe"}
+
+    local seatsTab = {"Base.NormalCarSeat2"}
+
+    local insideItemsTab = {
+        "Base.Toothbrush", "Base.Toothpaste", "Base.Socks_Ankle", "Base.Socks_Ankle", "Base.Socks_Long",
+        "Base.Briefs", "Base.Shirt_Denim", "Base.Tshirt_WhiteTINT", "Base.Tshirt_WhiteTINT", "Base.Underpants_White",
+        "Base.Trousers", "Base.Trousers", "Base.Dress_Short", "Base.Dress_Long", "Base.Dress_Normal",
+        "Base.Tshirt_WhiteLongSleeveTINT", "Base.Shirt_HawaiianTINT", "Base.Shirt_HawaiianTINT", "Base.Shirt_HawaiianTINT", "Base.Hat_SummerHat",
+        "Base.Brandy", "Base.CigarBox", "Base.Boxers_White", "Base.AntibioticsBox", "Base.Book",
+    }
+
+    local function addItems(cnt, x, y, itemTab)
+        local cell = getCell()
+        for i = 1, cnt do
+            local ix, iy = x, y - 20 + ZombRand(41)
+            local square = cell:getGridSquare(ix, iy, 0)
+            if square then
+                local itemType = BanditUtils.Choice(itemTab)
+                local item = BanditCompatibility.InstanceItem(itemType)
+                if item then
+                    if instanceof(item, "InventoryContainer") then
+                        local container = item:getItemContainer()
+                        if container then
+                            for i=1, 5 + ZombRand(10) do
+                                local itemInside = BanditCompatibility.InstanceItem(BanditUtils.Choice(insideItemsTab))
+                                if itemInside then
+                                    container:AddItem(itemInside)
+                                end
+                            end
+                        end
+                    end
+                    item:setWorldZRotation(ZombRand(360))
+                    square:AddWorldInventoryItem(item, ZombRandFloat(0.1, 0.9), ZombRandFloat(0.1, 0.9), 0)
+                end
+            end    
+        end
+    end
+
+    BWOUtils.ClearSpace(x - 2, y - 2, z, 5, 5)
+    BWOUtils.Explode(x, y, z)
+    addItems(bags, x, y, bagTab)
+    addItems(seats, x, y, seatsTab)
+
+    -- execute client logic for event
+    local players = BWOUtils.GetAllPlayers()
+    for i = 1, #players do
+        local player = players[i]
+        local paramsClient = {
+            pid = player:getOnlineID(),
+            cx = x,
+            cy = y,
+            cz = z,
+        }
+        dprint("[SERVER_EVENT][INFO][PlaneCrashPart] REQUEST CLIENT LOGIC FOR: " .. tostring(paramsClient.pid), 3)
+        sendServerCommand("Events", "PlaneCrashPart", paramsClient)
+    end
+
+end
+
+-- params: x, y, z, vtype, civs
+BWOServerEvents.PlaneCrashPartEnd = function(params)
+    dprint("[SERVER_EVENT][INFO][PlaneCrashPartEnd] INIT", 3)
+
+    -- check
+    if not params.x then return end
+    if not params.y then return end
+    if not params.z then return end
+    if not params.pid then return end
+
+    -- sanitize
+    local x = params.x
+    local y = params.y
+    local z = params.z
+    local pid = params.pid
+    local vtype = params.vtype and params.vtype or "Base.pzkPlaneSection1"
+    local civs = params.civs and params.civs or 0
+
+    local square = getCell():getGridSquare(x, y, z)
+    if square then
+        local vehicle = addVehicleDebug(vtype, IsoDirections.E, nil, square)
+    end
+
+    local players = BWOUtils.GetAllPlayers()
+    local player = players[1]
+    if player then
+        for i=1, civs do
+            local args = {}
+            args.cid = Bandit.clanMap.Resident
+            args.program = "Civilian"
+            args.size = 1
+            args.x = x + ZombRandFloat(-5, 5)
+            args.y = y + ZombRandFloat(-5, 5)
+            args.z = z
+            args.crawler = true
+            BanditServer.Spawner.Clan(player, args)
+        end
+    end
+
+    -- execute client logic for event
+    for i = 1, #players do
+        local player = players[i]
+        local paramsClient = {
+            pid = player:getOnlineID(),
+            cx = x,
+            cy = y,
+            cz = z,
+        }
+        dprint("[SERVER_EVENT][INFO][PlaneCrashPartEnd] REQUEST CLIENT LOGIC FOR: " .. tostring(paramsClient.pid), 3)
+        sendServerCommand("Events", "PlaneCrashPartEnd", paramsClient)
+    end
+end
+
+-- params: sound
+BWOServerEvents.PlayerSound = function(params)
+    dprint("[SERVER_EVENT][INFO][PlayerSound] INIT", 3)
+
+    -- check
+    if not params.sound then return end
+
+    -- sanitize
+    local sound = params.sound
+
+    local players = BWOUtils.GetAllPlayers()
+    for i = 1, #players do
+        local player = players[i]
+        local paramsClient = {
+            pid = player:getOnlineID(),
+            sound = sound,
+        }
+        dprint("[SERVER_EVENT][INFO][PlayerSound] REQUEST CLIENT LOGIC FOR: " .. tostring(paramsClient.pid), 3)
+        sendServerCommand("Events", "PlayerSound", paramsClient)
     end
 end
 
