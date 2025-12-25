@@ -394,7 +394,16 @@ function BWOMenu.WorldContextMenuPre(playerID, context, worldobjects, test)
         end
     end
 
+    local players = BWOUtils.GetAllPlayers()
+    for j = 1, #players do
+        local player = players[j]
+        local name = player:getUsername()
+        print (name)
+    end
+
     if isDebugEnabled() or isAdmin() then
+
+
 
         local density = BWOUtils.GetDensityScore(player:getX(), player:getY())
         print (density)

@@ -126,24 +126,42 @@ local function waitingRoomManager()
     if gmd.general.gameStarted then return end
     dprint("[EVENT_MANAGER][INFO] GAME STARTED: NO", 3)
 
-    -- const
-    local testCoords = {
-        x = 11782,
-        y = 947,
-        z = 0
-    }
-    
     local gt = getGameTime()
     gt:setTimeOfDay(9)
 
-    --[[
+    for id, player in pairs(gmd.players) do
+        player.online = false
+    end
+
     local players = BWOUtils.GetAllPlayers()
-     for i = 1, #players do
+    for i = 1, #players do
         local player = players[i]
-        local px, py = player:getX(), player:getY()
-        ]]
-    
+        local id = player:getUsername()
+
+        if not gmd.players[id] then
+            dprint("[EVENT_MANAGER][INFO] REGISTERING PLAYER " .. id, 3)
+            local pdata = {
+                sx = player:getX(),
+                sy = player:getY(),
+                sz = player:getZ(),
+                id = id,
+                status = false,
+                online = true,
+            }
+            gmd.players[id] = pdata
+        else
+            gmd.players[id].online = true
+        end
+    end
+    BWOGMD.Transmit()
+
     if not gmd.general.waitingRoomBuilt then
+        local testCoords = {
+            x = 11782,
+            y = 947,
+            z = 0
+        }
+
         local square = getCell():getGridSquare(testCoords.x, testCoords.y, testCoords.z)
         if square then
             dprint("[EVENT_MANAGER][INFO] BUILDING THE WAITING ROOM NOW", 3)
@@ -157,8 +175,29 @@ local function waitingRoomManager()
 
 end
 
+-- sets player ready/not ready status for the waiting room
+local function setPlayerStatus(args)
+    local gmd = BWOGMD.Get()
+    local id = args.id
+    local status = args.status
+
+    if gmd.players[id] then
+        gmd.players[id].status = status
+        BWOGMD.Transmit()
+        if status then
+            dprint("[EVENT_MANAGER][INFO] PLAYER " .. id .. " IS NOW READY", 3)
+        else
+            dprint("[EVENT_MANAGER][INFO] PLAYER " .. id .. " IS NOW NOT READY", 3)
+        end
+    end
+end
+
+-- manages the waiting room
 local function newPlayerManager(playerNum, player)
     dprint("[EVENT_MANAGER][INFO] NEW PLAYER JOINED IN", 3)
+
+    local gmd = BWOGMD.Get()
+    if gmd.general.gameStarted then return end
 
     local teleportCoords = {
         x1 = 11782,
@@ -167,9 +206,21 @@ local function newPlayerManager(playerNum, player)
         y2 = 957,
         z = 0
     }
-    local px, py = player:getX(), player:getY()
+    
+    local id = player:getUsername()
 
-    if py > 1100 then
+    if not gmd.players[id] then
+        dprint("[EVENT_MANAGER][INFO] REGISTERING PLAYER" .. id, 3)
+        local pdata = {
+            sx = player:getX(),
+            sy = player:getY(),
+            sz = player:getZ(),
+            id = id,
+            status = false,
+        }
+        gmd.players[id] = pdata
+        BWOGMD.Transmit()
+
         local x = teleportCoords.x1 + ZombRand(teleportCoords.x2 - teleportCoords.x1)
         local y = teleportCoords.y1 + ZombRand(teleportCoords.y2 - teleportCoords.y1)
         local z = 0
@@ -208,6 +259,8 @@ local onClientCommand = function(module, command, player, args)
             addSequence(args)
         elseif command == "AddEvent" then
             addSequence({{args, 1}})
+        elseif command == "SetPlayerStatus" then
+            setPlayerStatus(args)
         end
     end
 end

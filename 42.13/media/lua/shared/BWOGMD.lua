@@ -15,6 +15,11 @@ local function initModData(isNewGame)
             waitingRoomBuilt = false,
         }
     end
+
+    if not globalData.players then 
+        globalData.players = {}
+    end
+
     BWOGMD.data = globalData
 
 end
