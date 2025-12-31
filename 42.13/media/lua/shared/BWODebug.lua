@@ -4,7 +4,7 @@
 -- 2 - warnings
 -- 3 - info
 
-VERBOSE_LVL = 3
+VERBOSE_LVL = 2
 
 function dprint (txt, lvl)
     if lvl <= VERBOSE_LVL then

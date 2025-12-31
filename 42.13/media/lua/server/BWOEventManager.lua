@@ -2,13 +2,14 @@ require "BWOUtils"
 require "BWOGMD"
 require "BWOServerEvents"
 require "Scenarios/SDayOne"
+require "Scenarios/SFull"
 
 BWOEventGenerator = BWOEventGenerator or {}
 
 -- the main architecture of week one multiplayer events
 
 -- hardcoded for now
-local scenarioName = "DayOne"
+local scenarioName = "Full"
 
 local scenario = BWOScenarios[scenarioName]:new()
 

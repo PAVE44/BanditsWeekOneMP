@@ -4,7 +4,7 @@ require "BWOUtils"
 
 BWOPopControl = BWOPopControl or {}
 
-BWOPopControl.zombiePercent = 55
+BWOPopControl.zombiePercent = 66
 
 local function zombieController(targetCnt)
     if targetCnt > 400 then return end
@@ -151,7 +151,7 @@ local function everyOneMinute()
                     local bandit = BanditUtils.Choice(loadBanditOptions(outfitData.cid))
                     local brain = {}
 
-                    dprint ("[POPCONTROL][INFO] CONVERTING, OUTFIT: " .. tostring(outfitName) .. ", CID: " .. outfitData.cid, 1)
+                    dprint ("[POPCONTROL][INFO] CONVERTING, OUTFIT: " .. tostring(outfitName) .. ", CID: " .. outfitData.cid, 3)
 
                     -- auto-generated properties 
                     brain.id = id
@@ -256,7 +256,7 @@ local function everyOneMinute()
                     brain.hostileP = false
 
                     brain.program = {}
-                    brain.program.name = "Civilian"
+                    brain.program.name = "Universal"
                     brain.program.stage = "Prepare"
                     brain.programFallback = brain.program
 
