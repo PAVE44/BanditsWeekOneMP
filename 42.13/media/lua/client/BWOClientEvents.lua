@@ -124,7 +124,7 @@ BWOClientEvents.PlayerSound = function(params)
 
     -- check
     if not params.sound then return end
-    
+
     local player = getSpecificPlayer(0)
     if not player then return end
 
@@ -289,6 +289,22 @@ BWOClientEvents.Teleport = function(params)
     player:setLastX(params.x)
     player:setLastY(params.y)
     player:setLastZ(params.z)
+end
+
+-- params: cx, cy, cz
+BWOClientEvents.VehicleCrash = function(params)
+
+    -- check
+    if not params.cx then return end
+    if not params.cy then return end
+    if not params.cz then return end
+
+    -- sanitize
+    local cx = params.cx
+    local cy = params.cy
+    local cz = params.cz
+
+    BWOUtils.Explode(cx, cy, cz)
 end
 
 local onServerCommand = function(module, command, args)

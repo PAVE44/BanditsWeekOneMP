@@ -1069,3 +1069,76 @@ BWOServerEvents.StartDay = function(params)
         sendServerCommand("Events", "StartDay", paramsClient)
     end
 end
+
+-- params: x, y, vtype, (optional) z
+-- Spawns a wreck vehicle and an explosion near a group-selected player (ported from SP `BWOEvents.VehicleCrash`).
+BWOServerEvents.VehicleCrash = function(params)
+    dprint("[SERVER_EVENT][INFO][VehicleCrash] INIT", 3)
+
+    -- check
+    if not params.x then return end
+    if not params.y then return end
+    if not params.vtype then return end
+
+    -- sanitize
+    local offx = tonumber(params.x) or 0
+    local offy = tonumber(params.y) or 0
+    local vtype = tostring(params.vtype)
+    local z = tonumber(params.z or 0) or 0
+
+    -- const
+    local cell = getCell()
+
+    local groups = BWOUtils.GetPlayerGroups()
+    for gi = 1, #groups do
+        local players = groups[gi]
+        local playerSelected = BanditUtils.Choice(players)
+        if playerSelected then
+            local x = math.floor((playerSelected:getX() + offx) + 0.5)
+            local x = math.floor((playerSelected:getY() + offy) + 0.5)
+
+            local square = cell:getGridSquare(x, y, z)
+            if not square then
+                dprint("[SERVER_EVENT][WARN][VehicleCrash] SQUARE UNAVAILABLE @(" .. tostring(x) .. "," .. tostring(y) .. "," .. tostring(z) .. ")", 2)
+                return
+            end
+
+            BanditBaseGroupPlacements.ClearSpace(x - 4, y - 4, z, 8, 8)
+
+            -- explosion (server-side world effect)
+            BWOUtils.Explode(x, y, z)
+
+            -- vehicle spawn
+            vehicle = addVehicleDebug(vtype, IsoDirections.S, nil, square)
+
+            if vehicle then
+                -- make it look smashed
+                if vehicle.setGeneralPartCondition then
+                    vehicle:setGeneralPartCondition(0.1, 100)
+                end
+                if vehicle.setBloodIntensity then
+                    vehicle:setBloodIntensity("Front", 1)
+                    vehicle:setBloodIntensity("Rear", 1)
+                    vehicle:setBloodIntensity("Left", 1)
+                    vehicle:setBloodIntensity("Right", 1)
+                end
+            else
+                dprint("[SERVER_EVENT][WARN][VehicleCrash] VEHICLE SPAWN FAILED type=" .. tostring(vtype), 2)
+            end
+
+            -- execute client logic for event
+            local players = BWOUtils.GetAllPlayers()
+            for i = 1, #players do
+                local player = players[i]
+                local paramsClient = {
+                    pid = player:getOnlineID(),
+                    cx = x,
+                    cy = y,
+                    cz = z,
+                }
+                dprint("[SERVER_EVENT][INFO][VehicleCrash] REQUEST CLIENT LOGIC FOR: " .. tostring(paramsClient.pid), 3)
+                sendServerCommand("Events", "VehicleCrash", paramsClient)
+            end
+        end
+    end
+end
