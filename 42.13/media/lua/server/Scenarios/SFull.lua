@@ -8,6 +8,37 @@ BWOScenarios.Full = BWOScenarios.Abstract:derive("BWOScenarios.Abstract")
 
 -- schedule stores sequences of events
 BWOScenarios.Full.schedule = {
+    [0] = {
+        [1] = {
+            {{"StartDay", {day="thursday"}}, 1},
+        },
+        [5] = {
+            {{"ChopperAlert", {name="heli2", sound="BWOChopperCDC3", dir = 90, speed=1.5}}, 1},
+        },
+        [15] = {
+            {{"ChopperAlert", {name="heli2", sound="BWOChopperCDC3", dir = -90, speed=1.5}}, 1},
+        },
+        [35] = {
+            {{"ChopperAlert", {name="heli2", sound="BWOChopperCDC3", dir = 0, speed=1.7}}, 1},
+        },
+        [45] = {
+            {{"ChopperAlert", {name="heli2", sound="BWOChopperCDC3", dir = 180, speed=1.7}}, 1},
+        },
+    },
+    [1] = {
+        [5] = {
+            {{"ChopperAlert", {name="heli2", sound="BWOChopperCDC3", dir = 90, speed=1.9}}, 1},
+        },
+        [15] = {
+            {{"ChopperAlert", {name="heli2", sound="BWOChopperCDC3", dir = -90, speed=1.9}}, 1},
+        },
+        [35] = {
+            {{"ChopperAlert", {name="heli2", sound="BWOChopperCDC3", dir = 0, speed=2.1}}, 1},
+        },
+        [45] = {
+            {{"ChopperAlert", {name="heli2", sound="BWOChopperCDC3", dir = 180, speed=2.1}}, 1},
+        },
+    }
 }
 
 BWOScenarios.Full.playerSpawns = {

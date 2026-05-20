@@ -1,6 +1,7 @@
 require "BanditGMD"
 require "BWODebug"
 require "BWOUtils"
+require "BWOBuildings"
 
 BWOPopControl = BWOPopControl or {}
 
@@ -163,6 +164,8 @@ local function everyOneMinute()
                     brain.bornCoords.x = zombie:getX()
                     brain.bornCoords.y = zombie:getY()
                     brain.bornCoords.z = zombie:getZ()
+
+                    brain.residenceId = BWOBuildings.GetRandomResidenceId()
 
                     brain.stationary = false
                     brain.sleeping = false

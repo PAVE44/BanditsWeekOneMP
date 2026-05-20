@@ -148,6 +148,19 @@ module Bandits{
         } 
     }
 
+    sound BWOChopperCDC3 {
+        category = Object, 
+        loop = false,
+        is3D = true,
+        clip { 
+            file = media/sound/bwo_chopper_cdc_3.ogg, 
+	        distanceMin = 1,
+            distanceMax = 200,
+            reverbFactor = 0.1, 
+            volume = 1, 
+        } 
+    }
+
     sound BWOChopperPolice1 {
         category = Object, 
         loop = false,

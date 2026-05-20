@@ -403,6 +403,24 @@ function BWOMenu.WorldContextMenuPre(playerID, context, worldobjects, test)
     if isDebugEnabled() or isAdmin() then
 
 
+        local building = square:getBuilding()
+        if building then
+            local def = building:getDef()
+            local id = def:getID()
+
+            --[[
+            local fileWriter = getFileWriter("buildings.txt", true, true)
+            local output = string.format("%.0f", id) .. ", "
+
+            fileWriter:write(output)
+            fileWriter:close()
+
+            ]]
+
+            if BWOBuildings.IsResidence(building) then
+                print ("this is a residence")
+            end
+        end
 
         local density = BWOUtils.GetDensityScore(player:getX(), player:getY())
         print (density)

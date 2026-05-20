@@ -700,3 +700,40 @@ BWOUtils.VehiclesAlarm = function(px, py, min, max)
         end
     end
 end
+
+BWOUtils.IsUsefulItem = function(item)
+    local cat = item:getDisplayCategory()
+    if instanceof(item, "Food") then
+        if item:getCalories() > 100 then
+            return true
+        end
+    elseif instanceof(item, "HandWeapon") then
+        if item:getMinDamage() >= 0.5 then
+            return true
+        end
+    elseif cat == "Ammo" then
+        return true
+    end
+    return false
+end
+
+function BanditUtils.GetClosestCivilian(bandit)
+    local bx, by, bz = bandit:getX(), bandit:getY(), bandit:getZ()
+    local result
+    local distBest = math.huge
+    local bid = BanditUtils.GetZombieID(bandit)
+    local zombieList = BanditZombie.GetAllB()
+    for id, zombie in pairs(zombieList) do
+        if id ~= bid and zombie.brain and zombie.brain.program and zombie.brain.program.name == "Universal" then 
+            local distSq = ((bx - zombie.x) * (bx - zombie.x)) + ((by - zombie.y) * (by - zombie.y))
+            if zombie.z == bz and distSq < 9 and distSq < distBest then
+                local bandit2 = BanditZombie.GetInstanceById(id)
+                if bandit:CanSee(bandit2) then
+                    result = bandit2
+                end
+            end
+        end
+    end
+
+    return result
+end
