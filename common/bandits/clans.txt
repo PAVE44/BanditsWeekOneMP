@@ -31,14 +31,14 @@
 	spawn: zone = 0
 
 [eacda00e-6f8f-4afa-a813-f847d54720d8]
-	general: name = CriminalsBlack
-	spawn: friendly = false
+	general: name = HipHop
+	spawn: friendly = true
 	spawn: companion = false
-	spawn: defenders = true
+	spawn: defenders = false
 	spawn: campers = false
-	spawn: assault = true
-	spawn: wanderer = true
-	spawn: roadblock = true
+	spawn: assault = false
+	spawn: wanderer = false
+	spawn: roadblock = false
 	spawn: dayStart = 0
 	spawn: dayEnd = 10000
 	spawn: spawnChance = 0
@@ -778,6 +778,22 @@
 	spawn: dayStart = 0
 	spawn: dayEnd = 10000
 	spawn: spawnChance = 0
+	spawn: groupMin = 1
+	spawn: groupMax = 10
+	spawn: zone = 0
+
+[bc1cf1e5-7d86-4fac-85ad-4e22c982efb2]
+	general: name = Homeless
+	spawn: friendly = true
+	spawn: companion = false
+	spawn: defenders = false
+	spawn: campers = false
+	spawn: assault = false
+	spawn: wanderer = false
+	spawn: roadblock = false
+	spawn: dayStart = 0
+	spawn: dayEnd = 10000
+	spawn: spawnChance = 1
 	spawn: groupMin = 1
 	spawn: groupMax = 10
 	spawn: zone = 0

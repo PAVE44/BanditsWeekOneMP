@@ -414,7 +414,7 @@
 	general: female = false
 	general: skin = 5
 	general: hairType = 1
-	general: beardType = 1
+	general: beardType = 10
 	general: hairColor = 12
 	general: health = 5
 	general: strength = 5
@@ -431,14 +431,11 @@
 	clothing: UnderwearBottom = Base.Boxers_Hearts
 	clothing: Hands = Base.Gloves_FingerlessLeatherGloves_Black
 	clothing: LeftWrist = Base.WristWatch_Left_ClassicGold
-	clothing: AmmoStrap = Base.AmmoStrap_Shells
 	clothing: BeltExtra = Base.HolsterSimple_Black
 	clothing: Pants = Base.Trousers_CamoUrban
 	clothing: Shoes = Base.Shoes_ArmyBoots
-	weapons: primary = Base.Shotgun
 	weapons: secondary = Base.Revolver_Short
 	weapons: melee = Base.Crowbar
-	ammo: primary = 2
 	ammo: secondary = 2
 
 [8335fc61-5a00-4beb-b9ac-7553d28b9593]
@@ -527,10 +524,8 @@
 	clothing: AmmoStrap = Base.AmmoStrap_Shells
 	clothing: Pants = Base.Trousers_Black
 	clothing: Shoes = Base.Shoes_ArmyBoots
-	weapons: primary = Base.DoubleBarrelShotgun
 	weapons: secondary = Base.Revolver_Long
 	weapons: melee = Base.BaseballBat_Nails
-	ammo: primary = 2
 	ammo: secondary = 3
 
 [19c1a3e2-f69c-466c-91cc-3c56c289fe8f]
@@ -552,8 +547,6 @@
 	clothing: Eyes = Base.Glasses_Prescription_Aviators
 	clothing: ShortSleeveShirt = Base.Shirt_HawaiianTINT
 	clothing: UnderwearBottom = Base.Boxers_Silk_Black
-	clothing: Hands = Base.Gloves_FingerlessLeatherGloves
-	clothing: ShoulderHolster = Base.HolsterShoulder
 	clothing: Pants = Base.Trousers_LeatherBlack
 	clothing: Shoes = Base.Shoes_ArmyBoots
 	weapons: secondary = Base.Revolver
@@ -13637,4 +13630,189 @@
 	weapons: secondary = Base.Revolver_Short
 	ammo: primary = 1
 	ammo: secondary = 1
+
+[89a99190-54af-4f08-ba6b-5fd4879feabb]
+	general: modid = BanditsWeekOneMultiplayer
+	general: cid = bc1cf1e5-7d86-4fac-85ad-4e22c982efb2
+	general: name = HL_01
+	general: female = false
+	general: skin = 2
+	general: hairType = 29
+	general: beardType = 10
+	general: hairColor = 16
+	general: health = 5
+	general: strength = 5
+	general: endurance = 5
+	general: sight = 5
+	general: exp1 = 0
+	general: exp2 = 0
+	general: exp3 = 0
+	clothing: Hat = Base.Hat_Beany
+	clothing: TankTop = Base.Vest_DefaultTEXTURE
+	clothing: Pants = Base.Trousers_Shellsuit_Black
+	clothing: Socks = Base.Socks_Long_Black
+	clothing: Shoes = Base.Shoes_FlipFlop
+	weapons: melee = Base.Crowbar
+
+[45e2ee3c-3d3b-4e43-bbcb-68f3c5895185]
+	general: modid = BanditsWeekOneMultiplayer
+	general: cid = bc1cf1e5-7d86-4fac-85ad-4e22c982efb2
+	general: name = HL_02
+	general: female = false
+	general: skin = 2
+	general: hairType = 29
+	general: beardType = 10
+	general: hairColor = 16
+	general: health = 5
+	general: strength = 5
+	general: endurance = 5
+	general: sight = 5
+	general: exp1 = 0
+	general: exp2 = 0
+	general: exp3 = 0
+	clothing: TankTop = Base.Vest_DefaultTEXTURE
+	clothing: Tshirt = Base.Tshirt_WhiteTINT
+	clothing: Legs1 = Base.LongJohns_Bottoms
+	clothing: Socks = Base.Socks_Long_Black
+	clothing: Shoes = Base.Shoes_FlipFlop
+	weapons: melee = Base.Crowbar
+
+[59148608-7cf0-47a6-84f6-c83f451b21b0]
+	general: modid = BanditsWeekOneMultiplayer
+	general: cid = bc1cf1e5-7d86-4fac-85ad-4e22c982efb2
+	general: name = HL_03
+	general: female = false
+	general: skin = 2
+	general: hairType = 21
+	general: beardType = 7
+	general: hairColor = 16
+	general: health = 5
+	general: strength = 5
+	general: endurance = 5
+	general: sight = 5
+	general: exp1 = 0
+	general: exp2 = 0
+	general: exp3 = 0
+	clothing: ShortSleeveShirt = Base.Shirt_Crafted_Denim
+	clothing: UnderwearBottom = Base.Boxers_Hearts
+	clothing: Socks = Base.Socks_Ankle
+	clothing: Shoes = Base.Shoes_FlipFlop
+	weapons: melee = Base.Crowbar
+
+[57059bb3-e78a-455c-a6b0-a904178bf602]
+	general: modid = BanditsWeekOneMultiplayer
+	general: cid = bc1cf1e5-7d86-4fac-85ad-4e22c982efb2
+	general: name = HL_04
+	general: female = false
+	general: skin = 3
+	general: hairType = 22
+	general: beardType = 7
+	general: hairColor = 12
+	general: health = 5
+	general: strength = 5
+	general: endurance = 5
+	general: sight = 5
+	general: exp1 = 0
+	general: exp2 = 0
+	general: exp3 = 0
+	clothing: Hat = Base.Hat_Bandana
+	clothing: TankTop = Base.Vest_DefaultTEXTURE_TINT
+	clothing: Pants = Base.Trousers_Shellsuit_TINT
+	clothing: Socks = Base.Socks_Ankle
+	clothing: Shoes = Base.Shoes_FlipFlop
+	weapons: melee = Base.Crowbar
+
+[0cc58af4-a516-4f51-bb80-5df1c20e9365]
+	general: modid = BanditsWeekOneMultiplayer
+	general: cid = bc1cf1e5-7d86-4fac-85ad-4e22c982efb2
+	general: name = HL_05
+	general: female = false
+	general: skin = 3
+	general: hairType = 22
+	general: beardType = 7
+	general: hairColor = 2
+	general: health = 5
+	general: strength = 5
+	general: endurance = 5
+	general: sight = 5
+	general: exp1 = 0
+	general: exp2 = 0
+	general: exp3 = 0
+	clothing: TankTop = Base.Vest_DefaultTEXTURE_TINT
+	clothing: JacketHat = Base.PonchoGarbageBag
+	clothing: Pants = Base.Trousers_Shellsuit_TINT
+	clothing: Socks = Base.Socks_Ankle
+	clothing: Shoes = Base.Shoes_FlipFlop
+	weapons: melee = Base.Crowbar
+
+[c3882ab0-7594-4f45-8ca6-dd868f90ee9d]
+	general: modid = BanditsWeekOneMultiplayer
+	general: cid = bc1cf1e5-7d86-4fac-85ad-4e22c982efb2
+	general: name = HL_06
+	general: female = false
+	general: skin = 3
+	general: hairType = 22
+	general: beardType = 5
+	general: hairColor = 10
+	general: health = 5
+	general: strength = 5
+	general: endurance = 5
+	general: sight = 5
+	general: exp1 = 0
+	general: exp2 = 0
+	general: exp3 = 0
+	clothing: TankTop = Base.Vest_DefaultTEXTURE_TINT
+	clothing: Jacket_Down = Base.PonchoGarbageBagDOWN
+	clothing: Pants = Base.Trousers_Shellsuit_TINT
+	clothing: Socks = Base.Socks_Ankle
+	clothing: Shoes = Base.Shoes_FlipFlop
+	weapons: melee = Base.Crowbar
+
+[00b72a69-deea-491f-8b57-7414232b743f]
+	general: modid = BanditsWeekOneMultiplayer
+	general: cid = bc1cf1e5-7d86-4fac-85ad-4e22c982efb2
+	general: name = HL_07
+	general: female = false
+	general: skin = 4
+	general: hairType = 22
+	general: beardType = 7
+	general: hairColor = 10
+	general: health = 5
+	general: strength = 5
+	general: endurance = 5
+	general: sight = 5
+	general: exp1 = 0
+	general: exp2 = 0
+	general: exp3 = 0
+	clothing: TankTop = Base.Vest_DefaultTEXTURE_TINT
+	clothing: SweaterHat = Base.HoodieUP_WhiteTINT
+	clothing: Pants = Base.Trousers_Shellsuit_TINT
+	clothing: Socks = Base.Socks_Ankle
+	clothing: Shoes = Base.Shoes_FlipFlop
+	tint: SweaterHat = 5059354
+	weapons: melee = Base.Crowbar
+
+[ae1b953b-f9b0-4564-94b3-426a673a97b0]
+	general: modid = BanditsWeekOneMultiplayer
+	general: cid = bc1cf1e5-7d86-4fac-85ad-4e22c982efb2
+	general: name = HL_08
+	general: female = false
+	general: skin = 4
+	general: hairType = 22
+	general: beardType = 7
+	general: hairColor = 10
+	general: health = 5
+	general: strength = 5
+	general: endurance = 5
+	general: sight = 5
+	general: exp1 = 0
+	general: exp2 = 0
+	general: exp3 = 0
+	clothing: Hat = Base.Hat_Beany
+	clothing: TankTop = Base.Vest_DefaultTEXTURE_TINT
+	clothing: Sweater = Base.HoodieDOWN_WhiteTINT
+	clothing: ShortPants = Base.Shorts_LongDenim
+	clothing: Socks = Base.Socks_Ankle
+	clothing: Shoes = Base.Shoes_FlipFlop
+	weapons: melee = Base.Crowbar
 

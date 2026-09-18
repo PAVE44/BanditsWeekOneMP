@@ -177,4 +177,4 @@ local processSquare = function(square)
     end
 end
 
-Events.LoadGridsquare.Add(processSquare)
+-- Events.LoadGridsquare.Add(processSquare)

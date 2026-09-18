@@ -1,0 +1,612 @@
+version = 1
+tileset
+{
+    file = bwo_appliances_radio_01
+    size = 8,3
+    id = 3
+    // bwo_appliances_radio_01_0
+    tile
+    {
+        xy = 0,0
+        BlocksPlacement = 
+        CanScrap = 
+        CustomItem = BanditsBoombox
+        CustomName = Boombox
+        Facing = E
+        GroupName = BWO
+        IsLow = 
+        IsMoveAble = 
+        Material = Electric
+        MaterialType = Plastic
+        PickUpWeight = 40
+    }
+    // bwo_appliances_radio_01_1
+    tile
+    {
+        xy = 1,0
+        BlocksPlacement = 
+        CanScrap = 
+        CustomItem = BanditsBoombox
+        CustomName = Boombox
+        Facing = S
+        GroupName = BWO
+        IsLow = 
+        IsMoveAble = 
+        IsTableTop = 
+        Material = Electric
+        MaterialType = Plastic
+        PickUpWeight = 40
+    }
+}
+tileset
+{
+    file = bwo_lighting_outdoor_01
+    size = 8,11
+    id = 1
+    // bwo_lighting_outdoor_01_0
+    tile
+    {
+        xy = 0,0
+        BlocksPlacement = 
+    }
+    // bwo_lighting_outdoor_01_1
+    tile
+    {
+        xy = 1,0
+        BlocksPlacement = 
+    }
+    // bwo_lighting_outdoor_01_2
+    tile
+    {
+        xy = 2,0
+        BlocksPlacement = 
+    }
+    // bwo_lighting_outdoor_01_3
+    tile
+    {
+        xy = 3,0
+        BlocksPlacement = 
+    }
+    // bwo_lighting_outdoor_01_4
+    tile
+    {
+        xy = 4,0
+        BlocksPlacement = 
+    }
+    // bwo_lighting_outdoor_01_5
+    tile
+    {
+        xy = 5,0
+        BlocksPlacement = 
+    }
+    // bwo_lighting_outdoor_01_6
+    tile
+    {
+        xy = 6,0
+        BlocksPlacement = 
+    }
+    // bwo_lighting_outdoor_01_7
+    tile
+    {
+        xy = 7,0
+        BlocksPlacement = 
+    }
+    // bwo_lighting_outdoor_01_8
+    tile
+    {
+        xy = 0,1
+        BlocksPlacement = 
+    }
+    // bwo_lighting_outdoor_01_9
+    tile
+    {
+        xy = 1,1
+        BlocksPlacement = 
+    }
+    // bwo_lighting_outdoor_01_10
+    tile
+    {
+        xy = 2,1
+        BlocksPlacement = 
+    }
+    // bwo_lighting_outdoor_01_11
+    tile
+    {
+        xy = 3,1
+        BlocksPlacement = 
+    }
+    // bwo_lighting_outdoor_01_12
+    tile
+    {
+        xy = 4,1
+        BlocksPlacement = 
+        IsoType = IsoClothingDryer
+        alwaysDraw = 
+    }
+    // bwo_lighting_outdoor_01_13
+    tile
+    {
+        xy = 5,1
+        BlocksPlacement = 
+        IsoType = IsoClothingDryer
+        alwaysDraw = 
+    }
+    // bwo_lighting_outdoor_01_14
+    tile
+    {
+        xy = 6,1
+        BlocksPlacement = 
+        IsoType = IsoClothingDryer
+        alwaysDraw = 
+    }
+    // bwo_lighting_outdoor_01_15
+    tile
+    {
+        xy = 7,1
+        BlocksPlacement = 
+        IsoType = IsoClothingDryer
+        alwaysDraw = 
+    }
+    // bwo_lighting_outdoor_01_16
+    tile
+    {
+        xy = 0,2
+        BlocksPlacement = 
+    }
+    // bwo_lighting_outdoor_01_17
+    tile
+    {
+        xy = 1,2
+        BlocksPlacement = 
+    }
+    // bwo_lighting_outdoor_01_18
+    tile
+    {
+        xy = 2,2
+        BlocksPlacement = 
+    }
+    // bwo_lighting_outdoor_01_19
+    tile
+    {
+        xy = 3,2
+        BlocksPlacement = 
+    }
+    // bwo_lighting_outdoor_01_20
+    tile
+    {
+        xy = 4,2
+        BlocksPlacement = 
+        IsoType = IsoClothingDryer
+        alwaysDraw = 
+    }
+    // bwo_lighting_outdoor_01_21
+    tile
+    {
+        xy = 5,2
+        BlocksPlacement = 
+        IsoType = IsoClothingDryer
+        alwaysDraw = 
+    }
+    // bwo_lighting_outdoor_01_22
+    tile
+    {
+        xy = 6,2
+        BlocksPlacement = 
+        IsoType = IsoClothingDryer
+        alwaysDraw = 
+    }
+    // bwo_lighting_outdoor_01_23
+    tile
+    {
+        xy = 7,2
+        BlocksPlacement = 
+        IsoType = IsoClothingDryer
+        alwaysDraw = 
+    }
+    // bwo_lighting_outdoor_01_24
+    tile
+    {
+        xy = 0,3
+        BlocksPlacement = 
+    }
+    // bwo_lighting_outdoor_01_25
+    tile
+    {
+        xy = 1,3
+        BlocksPlacement = 
+    }
+    // bwo_lighting_outdoor_01_26
+    tile
+    {
+        xy = 2,3
+        BlocksPlacement = 
+    }
+    // bwo_lighting_outdoor_01_27
+    tile
+    {
+        xy = 3,3
+        BlocksPlacement = 
+    }
+    // bwo_lighting_outdoor_01_28
+    tile
+    {
+        xy = 4,3
+        BlocksPlacement = 
+    }
+    // bwo_lighting_outdoor_01_29
+    tile
+    {
+        xy = 5,3
+        BlocksPlacement = 
+    }
+    // bwo_lighting_outdoor_01_30
+    tile
+    {
+        xy = 6,3
+        BlocksPlacement = 
+    }
+    // bwo_lighting_outdoor_01_31
+    tile
+    {
+        xy = 7,3
+        BlocksPlacement = 
+    }
+    // bwo_lighting_outdoor_01_32
+    tile
+    {
+        xy = 0,4
+        BlocksPlacement = 
+    }
+    // bwo_lighting_outdoor_01_33
+    tile
+    {
+        xy = 1,4
+        BlocksPlacement = 
+    }
+    // bwo_lighting_outdoor_01_34
+    tile
+    {
+        xy = 2,4
+        BlocksPlacement = 
+    }
+    // bwo_lighting_outdoor_01_35
+    tile
+    {
+        xy = 3,4
+        BlocksPlacement = 
+    }
+    // bwo_lighting_outdoor_01_36
+    tile
+    {
+        xy = 4,4
+        BlocksPlacement = 
+    }
+    // bwo_lighting_outdoor_01_37
+    tile
+    {
+        xy = 5,4
+        BlocksPlacement = 
+    }
+    // bwo_lighting_outdoor_01_38
+    tile
+    {
+        xy = 6,4
+        BlocksPlacement = 
+    }
+    // bwo_lighting_outdoor_01_39
+    tile
+    {
+        xy = 7,4
+        BlocksPlacement = 
+    }
+    // bwo_lighting_outdoor_01_40
+    tile
+    {
+        xy = 0,5
+        BlocksPlacement = 
+    }
+    // bwo_lighting_outdoor_01_41
+    tile
+    {
+        xy = 1,5
+        BlocksPlacement = 
+    }
+    // bwo_lighting_outdoor_01_42
+    tile
+    {
+        xy = 2,5
+        BlocksPlacement = 
+    }
+    // bwo_lighting_outdoor_01_43
+    tile
+    {
+        xy = 3,5
+        BlocksPlacement = 
+    }
+    // bwo_lighting_outdoor_01_44
+    tile
+    {
+        xy = 4,5
+        BlocksPlacement = 
+    }
+    // bwo_lighting_outdoor_01_45
+    tile
+    {
+        xy = 5,5
+        BlocksPlacement = 
+    }
+    // bwo_lighting_outdoor_01_46
+    tile
+    {
+        xy = 6,5
+        BlocksPlacement = 
+    }
+    // bwo_lighting_outdoor_01_47
+    tile
+    {
+        xy = 7,5
+        BlocksPlacement = 
+    }
+    // bwo_lighting_outdoor_01_48
+    tile
+    {
+        xy = 0,6
+        BlocksPlacement = 
+    }
+    // bwo_lighting_outdoor_01_49
+    tile
+    {
+        xy = 1,6
+        BlocksPlacement = 
+    }
+    // bwo_lighting_outdoor_01_50
+    tile
+    {
+        xy = 2,6
+        BlocksPlacement = 
+    }
+    // bwo_lighting_outdoor_01_51
+    tile
+    {
+        xy = 3,6
+        BlocksPlacement = 
+    }
+    // bwo_lighting_outdoor_01_52
+    tile
+    {
+        xy = 4,6
+        BlocksPlacement = 
+    }
+    // bwo_lighting_outdoor_01_53
+    tile
+    {
+        xy = 5,6
+        BlocksPlacement = 
+    }
+    // bwo_lighting_outdoor_01_54
+    tile
+    {
+        xy = 6,6
+        BlocksPlacement = 
+    }
+    // bwo_lighting_outdoor_01_55
+    tile
+    {
+        xy = 7,6
+        BlocksPlacement = 
+    }
+    // bwo_lighting_outdoor_01_56
+    tile
+    {
+        xy = 0,7
+        BlocksPlacement = 
+    }
+    // bwo_lighting_outdoor_01_57
+    tile
+    {
+        xy = 1,7
+        BlocksPlacement = 
+    }
+    // bwo_lighting_outdoor_01_58
+    tile
+    {
+        xy = 2,7
+        BlocksPlacement = 
+    }
+    // bwo_lighting_outdoor_01_59
+    tile
+    {
+        xy = 3,7
+        BlocksPlacement = 
+        IsoType = IsoClothingDryer
+        alwaysDraw = 
+    }
+    // bwo_lighting_outdoor_01_60
+    tile
+    {
+        xy = 4,7
+        BlocksPlacement = 
+    }
+    // bwo_lighting_outdoor_01_61
+    tile
+    {
+        xy = 5,7
+        BlocksPlacement = 
+        IsoType = IsoClothingDryer
+        alwaysDraw = 
+    }
+    // bwo_lighting_outdoor_01_62
+    tile
+    {
+        xy = 6,7
+        BlocksPlacement = 
+    }
+    // bwo_lighting_outdoor_01_63
+    tile
+    {
+        xy = 7,7
+        BlocksPlacement = 
+    }
+    // bwo_lighting_outdoor_01_64
+    tile
+    {
+        xy = 0,8
+        BlocksPlacement = 
+    }
+    // bwo_lighting_outdoor_01_65
+    tile
+    {
+        xy = 1,8
+        BlocksPlacement = 
+    }
+    // bwo_lighting_outdoor_01_66
+    tile
+    {
+        xy = 2,8
+        BlocksPlacement = 
+        IsoType = IsoClothingDryer
+        alwaysDraw = 
+    }
+    // bwo_lighting_outdoor_01_67
+    tile
+    {
+        xy = 3,8
+        BlocksPlacement = 
+    }
+    // bwo_lighting_outdoor_01_68
+    tile
+    {
+        xy = 4,8
+        BlocksPlacement = 
+        IsoType = IsoClothingDryer
+        alwaysDraw = 
+    }
+    // bwo_lighting_outdoor_01_69
+    tile
+    {
+        xy = 5,8
+        BlocksPlacement = 
+    }
+    // bwo_lighting_outdoor_01_70
+    tile
+    {
+        xy = 6,8
+        BlocksPlacement = 
+    }
+    // bwo_lighting_outdoor_01_71
+    tile
+    {
+        xy = 7,8
+        BlocksPlacement = 
+    }
+    // bwo_lighting_outdoor_01_72
+    tile
+    {
+        xy = 0,9
+        BlocksPlacement = 
+    }
+    // bwo_lighting_outdoor_01_73
+    tile
+    {
+        xy = 1,9
+        BlocksPlacement = 
+    }
+    // bwo_lighting_outdoor_01_74
+    tile
+    {
+        xy = 2,9
+        BlocksPlacement = 
+        IsoType = IsoClothingDryer
+        alwaysDraw = 
+    }
+    // bwo_lighting_outdoor_01_75
+    tile
+    {
+        xy = 3,9
+        BlocksPlacement = 
+    }
+    // bwo_lighting_outdoor_01_76
+    tile
+    {
+        xy = 4,9
+        BlocksPlacement = 
+        IsoType = IsoClothingDryer
+        alwaysDraw = 
+    }
+    // bwo_lighting_outdoor_01_77
+    tile
+    {
+        xy = 5,9
+        BlocksPlacement = 
+    }
+    // bwo_lighting_outdoor_01_78
+    tile
+    {
+        xy = 6,9
+        BlocksPlacement = 
+    }
+    // bwo_lighting_outdoor_01_79
+    tile
+    {
+        xy = 7,9
+        BlocksPlacement = 
+    }
+    // bwo_lighting_outdoor_01_80
+    tile
+    {
+        xy = 0,10
+        BlocksPlacement = 
+    }
+    // bwo_lighting_outdoor_01_81
+    tile
+    {
+        xy = 1,10
+        BlocksPlacement = 
+    }
+    // bwo_lighting_outdoor_01_82
+    tile
+    {
+        xy = 2,10
+        BlocksPlacement = 
+    }
+    // bwo_lighting_outdoor_01_83
+    tile
+    {
+        xy = 3,10
+        BlocksPlacement = 
+        IsoType = IsoClothingDryer
+        alwaysDraw = 
+    }
+    // bwo_lighting_outdoor_01_84
+    tile
+    {
+        xy = 4,10
+        BlocksPlacement = 
+    }
+    // bwo_lighting_outdoor_01_85
+    tile
+    {
+        xy = 5,10
+        BlocksPlacement = 
+        IsoType = IsoClothingDryer
+        alwaysDraw = 
+    }
+    // bwo_lighting_outdoor_01_86
+    tile
+    {
+        xy = 6,10
+        BlocksPlacement = 
+    }
+    // bwo_lighting_outdoor_01_87
+    tile
+    {
+        xy = 7,10
+        BlocksPlacement = 
+    }
+}
+tileset
+{
+    file = bwo_lighting_outdoor_01_on
+    size = 8,11
+    id = 2
+}

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<animNode>
+	<m_Name>ZSDrinkFromBourbonBottle</m_Name>
+	<m_AnimName>Bob_DrinkFromBourbonBottle</m_AnimName>
+	<m_BlendTime>0.30</m_BlendTime>
+	<m_SpeedScale>0.80</m_SpeedScale>
+	<m_SyncTrackingEnabled>false</m_SyncTrackingEnabled>
+	<m_Conditions>
+		<m_Name>BumpType</m_Name>
+		<m_Type>STRING</m_Type>
+		<m_StringValue>DrinkFromBourbonBottle</m_StringValue>
+	</m_Conditions>
+	<m_SubStateBoneWeights />
+	<m_SubStateBoneWeights />
+	<m_SubStateBoneWeights />
+	<m_SubStateBoneWeights />
+	<m_SubStateBoneWeights />
+	<m_SubStateBoneWeights />
+	<m_SubStateBoneWeights>
+		<boneName>Bip01_R_Clavicle</boneName>
+		<weight>0.50</weight>
+	</m_SubStateBoneWeights>
+</animNode>

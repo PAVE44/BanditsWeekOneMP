@@ -1,0 +1,332 @@
+module Base
+{
+
+    model MWheel
+    {
+        mesh = Vehicles_Wheel,
+        texture = Vehicles/vehicle_wheel,
+    }
+
+    item Wheel {
+        ItemType = base:normal,
+        DisplayName = CarWheel,
+        DisplayCategory = Cars,
+        Type = Normal,
+        Weight = 1,
+        Icon = ToyCar,
+        StaticModel = MWheel,
+        WorldStaticModel = MWheel,
+    }
+
+    model MCarLightsPolice
+    {
+        mesh = vehicles/Vehicles_CarNormalLights,
+        texture = Vehicles/vehicle_carlights_police,
+        scale = 0.01,
+
+        attachment world
+        {
+            offset = 0.0000 0.0000 -0.6050,
+            rotate = 0.0000 0.0000 0.0000,
+        }
+    }
+
+    item CarLightsPolice {
+        ItemType = base:normal,
+        DisplayName = CarLightsPolice,
+        DisplayCategory = Cars,
+        Type = Normal,
+        Weight = 1,
+        Icon = ToyCar,
+        StaticModel = MCarLightsPolice,
+        WorldStaticModel = MCarLightsPolice,
+    }
+
+    model MCarLightsKST
+    {
+        mesh = vehicles/Vehicles_CarNormalLights,
+        texture = Vehicles/vehicle_carlights_kst,
+        scale = 0.01,
+
+        attachment world
+        {
+            offset = 0.0000 0.0000 -0.6050,
+            rotate = 0.0000 0.0000 0.0000,
+        }
+    }
+
+    item CarLightsKST {
+        ItemType = base:normal,
+        DisplayName = CarLightsKST,
+        DisplayCategory = Cars,
+        Type = Normal,
+        Weight = 1,
+        Icon = ToyCar,
+        StaticModel = MCarLightsKST,
+        WorldStaticModel = MCarLightsKST,
+    }
+
+    model MCarNormalBlack
+    {
+        mesh = vehicles/Vehicles_CarNormal,
+        texture = Vehicles/vehicle_carnormal_black,
+        scale = 0.01,
+
+        attachment world
+        {
+            offset = 0.0000 0.0000 -0.6050,
+            rotate = 0.0000 0.0000 0.0000,
+        }
+    }
+
+    item CarNormalBlack {
+        ItemType = base:normal,
+        DisplayName = CarNormalBlack,
+        DisplayCategory = Cars,
+        Type = Normal,
+        Weight = 1,
+        Icon = ToyCar,
+        StaticModel = MCarNormalBlack,
+        WorldStaticModel = MCarNormalBlack,
+    }
+
+    model MCarNormalBlue
+    {
+        mesh = vehicles/Vehicles_CarNormal,
+        texture = Vehicles/vehicle_carnormal_blue,
+        scale = 0.01,
+
+        attachment world
+        {
+            offset = 0.0000 0.0000 -0.6050,
+            rotate = 0.0000 0.0000 0.0000,
+        }
+    }
+
+    item CarNormalBlue {
+        ItemType = base:normal,
+        DisplayName = CarNormalBlue,
+        DisplayCategory = Cars,
+        Type = Normal,
+        Weight = 1,
+        Icon = ToyCar,
+        StaticModel = MCarNormalBlue,
+        WorldStaticModel = MCarNormalBlue,
+    }
+
+    model MCarNormalTaxi
+    {
+        mesh = vehicles/Vehicles_CarNormal,
+        texture = Vehicles/vehicle_cartaxishell,
+        scale = 0.01,
+
+        attachment world
+        {
+            offset = 0.0000 0.0000 -0.6050,
+            rotate = 0.0000 0.0000 0.0000,
+        }
+    }
+
+    item CarNormalTaxi {
+        ItemType = base:normal,
+        DisplayName = CarNormalTaxi,
+        DisplayCategory = Cars,
+        Type = Normal,
+        Weight = 1,
+        Icon = ToyCar,
+        StaticModel = MCarNormalTaxi,
+        WorldStaticModel = MCarNormalTaxi,
+    }
+
+    model MModernCarLightsWestpoint
+    {
+        mesh = vehicles/Vehicles_ModernCarLights,
+        texture = Vehicles/vehicle_moderncarlights_westpoint,
+        scale = 0.01,
+
+        attachment world
+        {
+            offset = 0.0000 0.0000 -0.6050,
+            rotate = 0.0000 0.0000 0.0000,
+        }
+    }
+
+    item ModernCarLightsWestpoint {
+        ItemType = base:normal,
+        DisplayName = ModernCarLightsWestpoint,
+        DisplayCategory = Cars,
+        Type = Normal,
+        Weight = 1,
+        Icon = ToyCar,
+        StaticModel = MModernCarLightsWestpoint,
+        WorldStaticModel = MModernCarLightsWestpoint,
+    }
+
+    model MModernCar02Beige
+    {
+        mesh = vehicles/Vehicles_ModernCar02,
+        texture = Vehicles/vehicle_carmodern2_beige,
+        scale = 0.01,
+
+        attachment world
+        {
+            offset = 0.0000 0.0000 -0.6050,
+            rotate = 0.0000 0.0000 0.0000,
+        }
+    }
+
+    item ModernCar02Beige {
+        ItemType = base:normal,
+        DisplayName = ModernCar02Beige,
+        DisplayCategory = Cars,
+        Type = Normal,
+        Weight = 1,
+        Icon = ToyCar,
+        StaticModel = MModernCar02Beige,
+        WorldStaticModel = MModernCar02Beige,
+    }
+
+    model MModernCar02Black
+    {
+        mesh = vehicles/Vehicles_ModernCar02,
+        texture = Vehicles/vehicle_carmodern2_black,
+        scale = 0.01,
+
+        attachment world
+        {
+            offset = 0.0000 0.0000 -0.6050,
+            rotate = 0.0000 0.0000 0.0000,
+        }
+    }
+
+    item ModernCar02Black {
+        ItemType = base:normal,
+        DisplayName = ModernCar02Black,
+        DisplayCategory = Cars,
+        Type = Normal,
+        Weight = 1,
+        Icon = ToyCar,
+        StaticModel = MModernCar02Black,
+        WorldStaticModel = MModernCar02Black,
+    }
+
+    model MModernCar02Blue
+    {
+        mesh = vehicles/Vehicles_ModernCar02,
+        texture = Vehicles/vehicle_carmodern2_blue,
+        scale = 0.01,
+
+        attachment world
+        {
+            offset = 0.0000 0.0000 -0.6050,
+            rotate = 0.0000 0.0000 0.0000,
+        }
+    }
+
+    item ModernCar02Blue {
+        ItemType = base:normal,
+        DisplayName = ModernCar02Blue,
+        DisplayCategory = Cars,
+        Type = Normal,
+        Weight = 1,
+        Icon = ToyCar,
+        StaticModel = MModernCar02Blue,
+        WorldStaticModel = MModernCar02Blue,
+    }
+
+    model MModernCar02Green
+    {
+        mesh = vehicles/Vehicles_ModernCar02,
+        texture = Vehicles/vehicle_carmodern2_green,
+        scale = 0.01,
+
+        attachment world
+        {
+            offset = 0.0000 0.0000 -0.6050,
+            rotate = 0.0000 0.0000 0.0000,
+        }
+    }
+
+    item ModernCar02Green {
+        ItemType = base:normal,
+        DisplayName = ModernCar02Green,
+        DisplayCategory = Cars,
+        Type = Normal,
+        Weight = 1,
+        Icon = ToyCar,
+        StaticModel = MModernCar02Green,
+        WorldStaticModel = MModernCar02Green,
+    }
+
+    model MModernCar02Gray
+    {
+        mesh = vehicles/Vehicles_ModernCar02,
+        texture = Vehicles/vehicle_carmodern2_grey,
+        scale = 0.01,
+
+        attachment world
+        {
+            offset = 0.0000 0.0000 -0.6050,
+            rotate = 0.0000 0.0000 0.0000,
+        }
+    }
+
+    item ModernCar02Gray {
+        ItemType = base:normal,
+        DisplayName = ModernCar02Gray,
+        DisplayCategory = Cars,
+        Type = Normal,
+        Weight = 1,
+        Icon = ToyCar,
+        StaticModel = MModernCar02Gray,
+        WorldStaticModel = MModernCar02Gray,
+    }
+
+    model MModernCar02Red
+    {
+        mesh = vehicles/Vehicles_ModernCar02,
+        texture = Vehicles/vehicle_carmodern2_red,
+        scale = 0.01,
+
+        attachment world
+        {
+            offset = 0.0000 0.0000 -0.6050,
+            rotate = 0.0000 0.0000 0.0000,
+        }
+    }
+
+    item ModernCar02Red {
+        ItemType = base:normal,
+        DisplayName = ModernCar02Red,
+        DisplayCategory = Cars,
+        Type = Normal,
+        Weight = 1,
+        Icon = ToyCar,
+        StaticModel = MModernCar02Red,
+        WorldStaticModel = MModernCar02Red,
+    }
+
+    model MModernCar02White
+    {
+        mesh = vehicles/Vehicles_ModernCar02,
+        texture = Vehicles/vehicle_carmodern2_white,
+        scale = 0.01,
+
+        attachment world
+        {
+            offset = 0.0000 0.0000 -0.6050,
+            rotate = 0.0000 0.0000 0.0000,
+        }
+    }
+
+    item ModernCar02White {
+        ItemType = base:normal,
+        DisplayName = ModernCar02White,
+        DisplayCategory = Cars,
+        Type = Normal,
+        Weight = 1,
+        Icon = ToyCar,
+        StaticModel = MModernCar02White,
+        WorldStaticModel = MModernCar02White,
+    }
+}

@@ -1,5 +1,25 @@
 BWOMenu = BWOMenu or {}
 
+local function getRandomWorkAreaId()
+    if not BWOAreas or not BWOAreas.areas then
+        return nil
+    end
+
+    local choices = {}
+    for id, area in pairs(BWOAreas.areas) do
+        if area.exits and #area.exits > 0 then
+            table.insert(choices, id)
+        end
+    end
+
+    if #choices == 0 then
+        return nil
+    end
+
+    return BanditUtils.Choice(choices)
+end
+
+
 BWOMenu.PlayMusic = function(player, square)
     local objects = square:getObjects()
     for i=0, objects:size()-1 do
@@ -26,6 +46,130 @@ BWOMenu.PlayMusic = function(player, square)
             end
         end
     end
+end
+
+BWOMenu.SpawnCiv = function(player, square)
+
+    for i = 1, 1 do 
+        local wid = "11902-6859"
+
+        local occupation = {
+            role = "cook",
+            hid = "10982-6642",
+            wid = wid,
+        }
+
+        local args = {
+            size = 1,
+            cid = Bandit.clanMap.Walker,
+            program = "Resident",
+            x = square:getX() + ZombRand(4),
+            y = square:getY() + ZombRand(4),
+            z = square:getZ(),
+            occupation = occupation
+        }
+        sendClientCommand(player, 'Spawner', 'Clan', args)
+    end
+end
+
+BWOMenu.SpawnHomeless = function(player, square)
+    local args = {
+        size = 1,
+        cid = Bandit.clanMap.Homeless,
+        program = "Homeless",
+        x = square:getX(),
+        y = square:getY(),
+        z = square:getZ(),
+    }
+    sendClientCommand(player, 'Spawner', 'Clan', args)
+end
+
+BWOMenu.SpawnRappers = function(player, square)
+    local args = {
+        size = 1,
+        cid = Bandit.clanMap.HipHop,
+        program = "HipHop",
+        x = square:getX(),
+        y = square:getY(),
+        z = square:getZ(),
+    }
+    sendClientCommand(player, 'Spawner', 'Clan', args)
+end
+
+BWOMenu.SpawnResident = function(player, square)
+    local sx, sy, sz
+
+    --BWOAreas.ExtendData()
+    BWOAreas.PrintResidentialPopulationStats()
+
+    local area = BWOAreas.Find(square)
+    if not area then return end
+
+    for _, npc in ipairs(area.pop) do
+        local occupation = {
+            role = npc.role,
+            hid = area.id,
+            wid = npc.data.workAreaId,
+        }
+
+        local args = {
+            size = 1,
+            cid = Bandit.clanMap.Walker,
+            program = "Resident",
+            x = square:getX(),
+            y = square:getY(),
+            z = square:getZ(),
+            occupation = occupation
+        }
+
+        sendClientCommand(player, 'Spawner', 'Clan', args)
+            
+    end
+
+end
+
+
+
+BWOMenu.SpawnFakeVehicle = function(player, square)
+
+
+    local options = {
+        {templateFunc = BWOFakeVehicleParts.CarLightsTemplate, bodyItemType = "Base.CarLightsPolice"},
+        {templateFunc = BWOFakeVehicleParts.CarLightsTemplate, bodyItemType = "Base.CarLightsKST"},
+        {templateFunc = BWOFakeVehicleParts.CarLightsTemplate, bodyItemType = "Base.CarNormalBlack"},
+        {templateFunc = BWOFakeVehicleParts.CarLightsTemplate, bodyItemType = "Base.CarNormalBlue"},
+        {templateFunc = BWOFakeVehicleParts.CarLightsTemplate, bodyItemType = "Base.CarNormalTaxi"},
+        {templateFunc = BWOFakeVehicleParts.ModernCarLightsTemplate, bodyItemType = "Base.ModernCarLightsWestpoint"},
+        {templateFunc = BWOFakeVehicleParts.ModernCarLightsTemplate, bodyItemType = "Base.ModernCar02Beige"},
+        {templateFunc = BWOFakeVehicleParts.ModernCarLightsTemplate, bodyItemType = "Base.ModernCar02Black"},
+        {templateFunc = BWOFakeVehicleParts.ModernCarLightsTemplate, bodyItemType = "Base.ModernCar02Blue"},
+        {templateFunc = BWOFakeVehicleParts.ModernCarLightsTemplate, bodyItemType = "Base.ModernCar02Green"},
+        {templateFunc = BWOFakeVehicleParts.ModernCarLightsTemplate, bodyItemType = "Base.ModernCar02Gray"},
+        {templateFunc = BWOFakeVehicleParts.ModernCarLightsTemplate, bodyItemType = "Base.ModernCar02Red"},
+        {templateFunc = BWOFakeVehicleParts.ModernCarLightsTemplate, bodyItemType = "Base.ModernCar02White"},
+    }
+
+    local option = BanditUtils.Choice(options)
+
+    local vehicle = {
+        debug = false,
+        startX = square and square:getX() or nil,
+        startY = square and square:getY() or nil,
+        
+        --startNodeId = "11614-6898", -- to west
+        --prevNodeId = "11690-6898",
+
+        --startNodeId = "11614-6902", -- to east
+        --prevNodeId  = "11561-6902",
+
+        --startNodeId = "11795-6962", -- curve test
+        --prevNodeId  = "11837-6962",
+        cruiseSpeed = 40,
+        startRot = -90,
+        parts = BWOFakeVehicleParts.InstanceParts(option.templateFunc, option.bodyItemType),
+    }
+
+    BWOFakeVehicle.Add(vehicle)
 end
 
 BWOMenu.SpawnWave = function(player, square, prgName)
@@ -372,12 +516,100 @@ BWOMenu.SpotRooms = function(player)
     end
 end
 
+BWOMenu.ScanAreaRooms = function(player)
+    BWODevTools.ScanRooms(player)
+end
+
+BWOMenu.RescanArea = function(player, id)
+    BWODevTools.RescanArea(player, id)
+end
+
+BWOMenu.DumpNav = function(player)
+    BWODevTools.DumpNav(player)
+end
+
+BWOMenu.LoadNav = function(player)
+    BWODevTools.LoadNav(player)
+end
+
+BWOMenu.AddTrafficLight = function(player, square)
+    local cell = getCell()
+    local sprite = getSprite("bwo_lighting_outdoor_01_13")
+    local ls = IsoLightSwitch.new(cell, square, sprite, square:getRoomID())
+
+    ls:setCanBeModified(true)
+    ls:setPower(1000)
+    ls:setHasBattery(true)
+    ls:setUseBatteryDirect(true)
+    ls:addLightSourceFromSprite()
+    ls:setPrimaryR(255 / 255)
+    ls:setPrimaryG(90 / 255)
+    ls:setPrimaryB(20 / 255)
+    square:AddSpecialObject(ls)
+    square:setSquareChanged()
+end
+
+BWOMenu.ClothingTest = function(player, zombie)
+    local brain = BanditBrain.Get(zombie)
+    brain.clothing["Hat"] = "Base.Hat_Beany"
+    Bandit.ApplyClothing(zombie, brain)
+end
+
+BWOMenu.GetMail = function(player)
+    local box = BWOPostData.GetRandomBox()
+    local mail = BanditCompatibility.InstanceItem("Base.GenericMail")
+
+    mail:setName("JOHN DOE, " .. box.address)
+    local md = mail:getModData()
+    md.BWO = {}
+    md.BWO.box = {}
+    md.BWO.box.id = box.id
+    player:getInventory():AddItem(mail)
+end
+
+-- time actions
+BWOMenu.CleanTrash = function(player, square)
+    local playerInv = player:getInventory()
+    local item = playerInv:getFirstTagEvalRecurse(ItemTag.CLEAR_ASHES, BWOUtils.predicateNotBroken)
+
+    if item then
+        local transferAction = ISInventoryTransferUtil.newInventoryTransferAction(player, item, item:getContainer(), playerInv, 100)
+        ISTimedActionQueue.add(transferAction)
+        ISTimedActionQueue.add(ISEquipWeaponAction:new(player, item, 30, true))
+        if luautils.walkAdj(player, square) then
+            ISTimedActionQueue.add(TACleanTrash:new(player, square))
+        end
+    end
+end
+
+BWOMenu.JukeboxOptions = function(player, square, option)
+    local x, y, z = square:getX(), square:getY(), square:getZ()
+    if luautils.walkAdj(player, square) then
+        ISTimedActionQueue.add(TAJukebox:new(player, square, option))
+    end
+end
+
+BWOMenu.PayCart = function(player, square)
+    if luautils.walkAdj(player, square) then
+        ISTimedActionQueue.add(TAPayCart:new(player))
+    end
+end
+
+
 function BWOMenu.WorldContextMenuPre(playerID, context, worldobjects, test)
 
     local player = getSpecificPlayer(playerID)
     if not player then return end
 
+    local playerInv = player:getInventory()
     local square = BanditCompatibility.GetClickedSquare()
+    local sx, sy, sz = square:getX(), square:getY(), square:getZ()
+    --BWOAreas.ExtendData()
+    BWOAreas.PrintResidentialPopulationStats()
+
+    if square:getRoom() then
+        print ("room: " .. square:getRoom():getName())
+    end
 
     local zombie = square:getZombie()
     if not zombie then
@@ -400,40 +632,89 @@ function BWOMenu.WorldContextMenuPre(playerID, context, worldobjects, test)
         print (name)
     end
 
-    if isDebugEnabled() or isAdmin() then
-
-
-        local building = square:getBuilding()
-        if building then
-            local def = building:getDef()
-            local id = def:getID()
-
-            --[[
-            local fileWriter = getFileWriter("buildings.txt", true, true)
-            local output = string.format("%.0f", id) .. ", "
-
-            fileWriter:write(output)
-            fileWriter:close()
-
-            ]]
-
-            if BWOBuildings.IsResidence(building) then
-                print ("this is a residence")
+    local trash = nil
+    local register = nil
+    local jukebox = nil
+    local objects = square:getObjects()
+    for i=0, objects:size()-1 do
+        local object = objects:get(i)
+        local sprite = object:getSprite()
+        if sprite then
+            local props = sprite:getProperties()
+            if props then
+                if props:has("CustomName") then
+                    local customName = props:get("CustomName")
+                    if customName == "Trash" then
+                        print("Found Trash object")
+                        trash = object
+                        break
+                    elseif customName == "Register" then
+                        register = object
+                    elseif customName == "Jukebox" or customName == "Boombox" then
+                        jukebox = object
+                    end
+                end
             end
         end
+    end
 
-        local density = BWOUtils.GetDensityScore(player:getX(), player:getY())
-        print (density)
+    if trash then
+        local item = playerInv:getFirstTagEvalRecurse(ItemTag.CLEAR_ASHES, BWOUtils.predicateNotBroken)
+        local option = context:addOption("Clean Trash", player, BWOMenu.CleanTrash, square)
+        if not item then
+            local tooltip = ISToolTip:new()
+            option.notAvailable = true
+            tooltip.description = "You need a a tool to clean the trash."
+            option.toolTip = tooltip
+        end
+    elseif register then
+        local money = BWOItemTransfer.GetCash(player)
+        local due = math.ceil(BWOItemTransfer.GetShoppingCartValue(player))
+        if due > 0 then
+            local option = context:addOption("Pay $" .. string.format("%.2f", due), player, BWOMenu.PayCart, square)
+            if money < due then
+                local tooltip = ISToolTip:new()
+                option.notAvailable = true
+                tooltip.description = "You do not have enough money to pay for your shopping cart."
+                option.toolTip = tooltip
+            end
+        end
+    elseif jukebox then
+        local jukebox = BWOJukebox.Get(sx, sy, sz)
+        if not jukebox then
+            jukebox = BWOJukebox.Add(sx, sy, sz)
+        end
+        if jukebox.on then
+            context:addOption(getText("ContextMenu_StopMusic"), player, BWOMenu.JukeboxOptions, square, "off")
+        else
+            context:addOption(getText("ContextMenu_PlayMusic"), player, BWOMenu.JukeboxOptions, square, "on")
+        end
+    end
 
-        local room = square:getRoom()
-        if room then
-            print (room:getName())
+    if isDebugEnabled() then
+
+        BWORoles.checkRequirements(player, "postman")
+        print ("daylength: " .. getSandboxOptions():getDayLengthMinutes())
+        local eventsOption = context:addOption("BWO Dev Tools")
+        local eventsMenu = context:getNew(context)
+
+        context:addSubMenu(eventsOption, eventsMenu)
+
+        local area = BWOAreas.Find(square)
+        if area then
+            BWOItems.ShouldRescan(area.id, sx, sy, sz)
+            eventsMenu:addOption("Rescan Area " .. area.id .. " as " .. area.type, player, BWOMenu.RescanArea, area.id)
         end
 
-        local res = BWOUtils.FindVehicleSpawnPoint(player:getX(), player:getY(), 35, 80)
-        if res.valid then
-            dprint("[SERVER_EVENT][INFO][SpawnGroupVehicle] VEHICLE SPOTS SELECTED X: " .. res.x .. " Y:" .. res.y, 3)
+        eventsMenu:addOption("Scan Rooms to File", player, BWOMenu.ScanAreaRooms)
+        eventsMenu:addOption("Dump Nav to File", player, BWOMenu.DumpNav)
+        eventsMenu:addOption("Load Nav from File", player, BWOMenu.LoadNav)
+        -- eventsMenu:addOption("Add Traffic Light", player, BWOMenu.AddTrafficLight, square)
+        
+        if zombie then
+            -- eventsMenu:addOption("Clothing Test", player, BWOMenu.ClothingTest, zombie)
         end
+        eventsMenu:addOption("Get Mail", player, BWOMenu.GetMail)
 
         local eventsOption = context:addOption("BWO Event")
         local eventsMenu = context:getNew(context)
@@ -489,12 +770,17 @@ function BWOMenu.WorldContextMenuPre(playerID, context, worldobjects, test)
         -- eventsMenu:addOption("Storm", player, BWOMenu.EventStorm)
         -- eventsMenu:addOption("Thieves", player, BWOMenu.EventThieves)
         
-        --[[
+        
         local spawnOption = context:addOption("BWO Spawn")
         local spawnMenu = context:getNew(context)
         context:addSubMenu(spawnOption, spawnMenu)
         
-        spawnMenu:addOption("Babe", player, BWOMenu.SpawnWave, square, "Babe")
+        spawnMenu:addOption("Resident", player, BWOMenu.SpawnResident, square)
+        spawnMenu:addOption("Civ", player, BWOMenu.SpawnCiv, square)
+        spawnMenu:addOption("Homeless", player, BWOMenu.SpawnHomeless, square)
+        spawnMenu:addOption("Rappers", player, BWOMenu.SpawnRappers, square)
+        spawnMenu:addOption("Fake Vehicle", player, BWOMenu.SpawnFakeVehicle, square)
+        --[[
         spawnMenu:addOption("Fireman", player, BWOMenu.SpawnWave, square, "Fireman")
         spawnMenu:addOption("Gardener", player, BWOMenu.SpawnWave, square, "Gardener")
         spawnMenu:addOption("Inhabitant", player, BWOMenu.SpawnRoom, square, "Inhabitant")
@@ -508,7 +794,7 @@ function BWOMenu.WorldContextMenuPre(playerID, context, worldobjects, test)
         spawnMenu:addOption("Walker", player, BWOMenu.SpawnWave, square, "Walker")
         
         context:addOption("BWO Add Effect", player, BWOMenu.AddEffect, square)
-        context:addOption("BWO Spot Rooms", player, BWOMenu.SpotRooms)
+        
         ]]
         
     

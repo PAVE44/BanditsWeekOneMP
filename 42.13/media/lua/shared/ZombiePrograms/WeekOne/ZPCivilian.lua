@@ -13,6 +13,46 @@ end
 
 ZombiePrograms.Civilian.Main = function(bandit)
     local tasks = {}
+    local brain = BanditBrain.Get(bandit)
+    local id = brain.id
+    local bx = bandit:getX()
+    local by = bandit:getY()
+    local bz = bandit:getZ()
+    local cell = bandit:getCell()
+    local square = bandit:getSquare()
+    local room = square:getRoom()
+    local gameTime = getGameTime()
+    local hour = gameTime:getHour()
+    local minute = gameTime:getMinutes()
+
+    if room then
+        local opts = {distLimit=10, charId=id}
+        local seat, dist = BWOInteractables.FindClosest({"Chair", "Couch"}, {x=bx, y=by, z=bz}, opts)
+        if seat then
+            local line = "civ id: " .. id .. " got seat: " .. seat.x .. ", " .. seat.y .. ", " .. seat.z
+            bandit:addLineChatElement(line, 0.2, 0.8, 0.1)
+            local task = {action="SitInChair", anim="SitInChairTalk", x=seat.x, y=seat.y, z=seat.z, facing=seat.f, time=1000}
+            local subTasks = BanditPrograms.GoAndDo(bandit, seat, task)
+            if #subTasks > 0 then
+                -- BWOANPC.AddThinking(bandit, getTexture(tv:getSprite():getName()):splitIcon(), "WatchTV")
+                return {status=true, next="Main", tasks=subTasks}
+            end
+        end
+    end
+
+    -- fallback
+    local subTasks = BanditPrograms.FallbackAction(bandit)
+    if #subTasks > 0 then
+        for _, subTask in pairs(subTasks) do
+            table.insert(tasks, subTask)
+        end
+    end
+
+    return {status=true, next="Main", tasks=tasks}
+end
+
+ZombiePrograms.Civilian.Old = function(bandit)
+    local tasks = {}
     local cell = bandit:getCell()
     local brain = BanditBrain.Get(bandit)
     local id = brain.id

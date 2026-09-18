@@ -2,6 +2,93 @@ BanditPrograms = BanditPrograms or {}
 
 -- this is a collection of universal subprograms that are shared by main npc programs.
 
+BanditPrograms.GoAndDo = function(bandit, point, task, precision, checkCollision, run)
+    local tasks = {}
+
+    if precision == nil then precision = 0.7 end
+    if checkCollision == nil then checkCollision = true end
+    if run == nil then run = false end
+
+    local square = getCell():getGridSquare(point.x, point.y, point.z)
+    if not square then return tasks end
+
+    local asquare = square
+    if not square:isNotBlocked(false) then
+        asquare = BanditUtils.GetAccessSquare(square, bandit)
+    end
+    if not asquare then return tasks end
+
+    local bx, by, bz = bandit:getX(), bandit:getY(), bandit:getZ()
+    local ax, ay, az = asquare:getX(), asquare:getY(), asquare:getZ()
+
+    local collide
+    if checkCollision then
+        collide = LosUtil.lineClearCollide(
+            math.floor(bx), math.floor(by), math.floor(bz),
+            math.floor(ax), math.floor(ay), math.floor(az),
+            false
+        ) 
+    else
+        collide = false
+    end
+
+    local walkType = "Walk"
+    if run then walkType = "Run" end
+    local dist = BanditUtils.DistTo(bx, by, ax + 0.5, ay + 0.5)
+    if dist > precision or collide then
+        table.insert(tasks, BanditUtils.GetMoveTask(0, ax, ay, az, walkType, dist, false))
+        return tasks
+    else
+        table.insert(tasks, task)
+        return tasks
+    end
+end
+
+BanditPrograms.MetalDrum = function(bandit)
+    local tasks = {}
+    local bx, by, bz = bandit:getX(), bandit:getY(), bandit:getZ()
+    local metaldrum, dist = BWOMap.InteractableFind("metaldrum", bx, by, bz)
+    if metaldrum and dist < 20 then
+        local isoMetaldrum = BanditUtils.GetIsoObject(metaldrum.x, metaldrum.y, metaldrum.z, "Metal Drum")
+        if isoMetaldrum then
+            if isoMetaldrum:isLit() then
+                local anim = BanditUtils.Choice({"WarmHands", "Gest1", "GestNo", "GestYes"})
+                local task = {action="FaceLocation", x=metaldrum.x, y=metaldrum.y, time=500, anim=anim}
+                local subTasks = BanditPrograms.GoAndDo(bandit, metaldrum, task, 0.7, true, false)
+                if #subTasks > 0 then return subTasks end
+            else
+                isoMetaldrum:addFuel(100)
+                isoMetaldrum:setLit(true)
+            end
+        end
+    end
+    return tasks
+end
+
+BanditPrograms.Boombox = function(bandit)
+    local tasks = {}
+    local bx, by, bz = bandit:getX(), bandit:getY(), bandit:getZ()
+    local boombox, dist = BWOMap.InteractableFind("boombox", bx, by, bz)
+    if boombox and dist < 20 then
+        local isoBoombox = BanditUtils.GetIsoObject(boombox.x, boombox.y, boombox.z, "Boombox")
+        if isoBoombox then
+            local jukebox = BWOJukebox.Get(boombox.x, boombox.y, boombox.z)
+            if not jukebox then
+                jukebox = BWOJukebox.Add(boombox.x, boombox.y, boombox.z)
+            end
+            if jukebox.on then
+                local anim = BanditUtils.Choice({"Smoke", "Gest1", "GestNo", "GestYes", "WipeBrow", "WipeHead"})
+                local task = {action="FaceLocation", x=boombox.x, y=boombox.y, time=500, anim=anim}
+                local subTasks = BanditPrograms.GoAndDo(bandit, boombox, task, 1.7, true, false)
+                if #subTasks > 0 then return subTasks end
+            else
+                jukebox.on = true
+            end
+        end
+    end
+    return tasks
+end
+
 BanditPrograms.Symptoms = function(bandit)
     local tasks = {}
 
@@ -319,6 +406,154 @@ BanditPrograms.Fallback = function(bandit)
     local anim = BanditUtils.Choice({"WipeBrow", "WipeHead"})
     local task = {action="Time", anim=anim, time=100}
     table.insert(tasks, task)
+
+    return tasks
+end
+
+BanditPrograms.WorkArea = {}
+
+BanditPrograms.WorkArea.Cashier = function(bandit, workArea)
+    local tasks = {}
+    local bx, by, bz = bandit:getX(), bandit:getY(), bandit:getZ()
+    local register = BWOAreas.FindInteractable("Register", workArea, bx, by, bz)
+    if register then
+        local isoRegister = BanditUtils.GetIsoObject(register.x, register.y, register.z, "Register")
+        if isoRegister then
+            local anim = BanditUtils.Choice({"WarmHands", "Gest1", "GestNo", "GestYes"})
+            local task = {action="FaceLocation", x=register.x, y=register.y, time=500, anim=anim}
+            local subTasks = BanditPrograms.GoAndDo(bandit, register, task, 0.7, true, false)
+            if #subTasks > 0 then return subTasks end
+        end
+    end
+    return tasks
+end
+
+BanditPrograms.WorkArea.Police = function(bandit, workArea)
+    local tasks = {}
+    local bx, by, bz = bandit:getX(), bandit:getY(), bandit:getZ()
+    local cm = getClimateManager()
+    local temp = cm:getClimateFloat(4):getFinalValue()
+
+    local outfit = {
+        Hat = {"Base.Hat_Police"},
+        Shirt = {"Base.Shirt_OfficerWhite", "Base.Shirt_PoliceBlue"},
+        Pants = {"Base.Trousers_Police"},
+        BeltExtra = {"Base.HolsterSimple_Black"},
+        Socks = {"Base.Socks_Ankle_Black"},
+        Shoes = {"Base.Shoes_Black"},
+    }
+
+    if temp < 20 then
+        outfit.Jacket = {"Base.Jacket_Police"}
+    end
+
+    local weapons = {
+        melee = "Base.Nightstick",
+        secondary = BanditWeapons.Make("Base.Pistol", 1)
+    }
+  
+    local transformTask = BWOUtils.GetTransformTask(bandit, outfit, weapons)
+    if transformTask then
+        table.insert(tasks, transformTask)
+        return tasks
+    end
+
+    return tasks
+end
+
+BanditPrograms.WorkArea.Cook = function(bandit, workArea)
+    local tasks = {}
+    local bx, by, bz = bandit:getX(), bandit:getY(), bandit:getZ()
+
+    local outfit = {
+        Hat = {"Base.Hat_ChefHat"},
+        Tshirt = {"Base.Tshirt_WhiteLongSleeve"},
+        Pants = {"Base.Trousers_Chef"},
+        Jacket = {"Base.Jacket_Chef"},
+        Socks = {"Base.Socks_Ankle_Black"},
+        Shoes = {"Base.Shoes_White"},
+    }
+
+    local weapons = {
+        melee = "Base.MeatCleaver",
+    }
+
+    local recipes = {
+        [1] = {
+            prepare = {
+                ingredients = {"Base.Flour2", "Base.Yeast", "Base.Salt"},
+                output = "Base.BreadDough",
+                count = 4,
+                time = 400,
+                anim = "Making"
+
+            },
+            cook = {
+                ingredients = {"Base.BreadDough"},
+                output = {"Base.BreadDough"},
+            }
+        }
+    }
+    
+  
+    local transformTask = BWOUtils.GetTransformTask(bandit, outfit, weapons)
+    if transformTask then
+        table.insert(tasks, transformTask)
+        return tasks
+    end
+
+    local selectedRecipe = recipes[1]
+
+    if selectedRecipe.prepare then
+        local hasAllIngredients = true
+        for _, ingredient in ipairs(selectedRecipe.prepare.ingredients) do
+            if not BWOPermaInv.HasType(bandit, ingredient) then
+                hasAllIngredients = false
+                local itemData = BWOItems.Find(workArea, ingredient)
+                if itemData then
+                    local task = {action="Collect", time=300, item=itemData}
+                    local subTasks = BanditPrograms.GoAndDo(bandit, itemData, task, 0.7, true, false)
+                    if #subTasks > 0 then 
+                        local itemIso = BanditCompatibility.InstanceItem(ingredient)
+                        if itemIso then
+                            BWOThinking.AddThinking(bandit, itemIso:getTexture(), "Collect")
+                        end
+                        return subTasks 
+                    end
+                end
+            end
+        end
+
+        if hasAllIngredients then
+            local counter = BWOAreas.FindInteractable("Counter", workArea, bx, by, bz)
+            if counter then
+                local isoCounter = BanditUtils.GetIsoObject(counter.x, counter.y, counter.z, "Counter")
+                if isoCounter then
+                    local task = {action="Craft", time=selectedRecipe.prepare.time, surface=counter, craftData=selectedRecipe.prepare}
+                    local subTasks = BanditPrograms.GoAndDo(bandit, counter, task, 0.7, true, false)
+                    if #subTasks > 0 then 
+                        local itemIso = BanditCompatibility.InstanceItem(selectedRecipe.prepare.output)
+                        if itemIso then
+                            BWOThinking.AddThinking(bandit, itemIso:getTexture(), "Craft")
+                        end
+                        return subTasks 
+                    end
+                end
+            end
+        end
+    end
+
+
+    local oven = BWOAreas.FindInteractable("Oven", workArea, bx, by, bz)
+    if oven then
+        local isoOven = BanditUtils.GetIsoObject(oven.x, oven.y, oven.z, "Oven")
+        if isoOven then
+            local anim = BanditUtils.Choice({"WarmHands", "Gest1", "GestNo", "GestYes"})
+            local task = {action="FaceLocation", x=oven.x, y=oven.y, time=500, anim=anim}
+            local subTasks = BanditPrograms.GoAndDo(bandit, oven, task, 0.7, true, false)
+            if #subTasks > 0 then return subTasks end
+        end
+    end
 
     return tasks
 end

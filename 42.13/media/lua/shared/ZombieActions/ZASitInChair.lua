@@ -20,28 +20,29 @@ ZombieActions.SitInChair.onStart = function(zombie, task)
         local fy = 0
         if task.facing then
             if task.facing == "S" then
-                dx = 0.4
-                dy = 0.8 
-                fy = 20
+                dx = 0.5
+                dy = 0.8
+                fy = 10
             elseif task.facing == "N" then
                 dx = 0.5
                 dy = 0.2
-                fy = -20
+                fy = -10
             elseif task.facing == "E" then
-                dx = 0.8
-                dy = 0.4
-                fx = 20
+                dx = 0.85
+                dy = 0.5
+                fx = 10
             elseif task.facing == "W" then
                 dx = 0.2
                 dy = 0.5
-                fx = -20    
+                fx = -10    
             end
         end
 
-        zombie:setX(task.x + dx)
-        zombie:setY(task.y + dy)
-        zombie:setZ(task.z)
-        zombie:faceLocationF(task.x + fx, task.y + fy)
+        task.nx = task.x + dx
+        task.ny = task.y + dy
+        task.fx = task.x + fx
+        task.fy = task.y + fy
+
     end
 
     if task.sound then
@@ -51,16 +52,30 @@ ZombieActions.SitInChair.onStart = function(zombie, task)
         end
     end
 
+    if task.txt then
+        local textColor = task.txtColor or {r=0.2, g=0.8, b=0.1}
+        zombie:addLineChatElement(task.txt, textColor.r, textColor.g, textColor.b)
+    end
+
+    if task.voice then
+        local bx, by, bz = zombie:getX(), zombie:getY(), zombie:getZ()
+        BWOASound.PlayCharacter({character = zombie, sound = task.voice})
+    end
+
     zombie:setBumpType(task.anim)
 
     return true
 end
 
 ZombieActions.SitInChair.onWorking = function(zombie, task)
- 
+    zombie:setX(task.nx)
+    zombie:setY(task.ny)
+    zombie:setZ(task.z)
+    zombie:faceLocationF(task.fx, task.fy)
+
     local bumpType = zombie:getBumpType()
     if bumpType ~= task.anim then
-        return true
+        zombie:setBumpType(task.anim)
     end
 
     return false

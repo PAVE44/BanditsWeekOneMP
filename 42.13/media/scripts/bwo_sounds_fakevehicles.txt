@@ -1,0 +1,28 @@
+module Bandits{
+
+    sound BWOBMWIdle {
+        category = Object, 
+        loop = false,
+        is3D = true,
+        clip { 
+            file = media/sound/fakevehicles/bmw_idle.ogg, 
+            distanceMin = 1, 
+            distanceMax = 20, 
+            reverbFactor = 0.1, 
+            volume = 1, 
+        } 
+    }
+
+    sound BWOBMWRunning {
+        category = Object, 
+        loop = false,
+        is3D = true,
+        clip { 
+            file = media/sound/fakevehicles/bmw_running.ogg, 
+            distanceMin = 1, 
+            distanceMax = 40, 
+            reverbFactor = 0.1, 
+            volume = 1, 
+        } 
+    }
+}

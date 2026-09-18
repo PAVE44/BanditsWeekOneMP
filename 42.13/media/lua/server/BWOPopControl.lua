@@ -165,8 +165,6 @@ local function everyOneMinute()
                     brain.bornCoords.y = zombie:getY()
                     brain.bornCoords.z = zombie:getZ()
 
-                    brain.residenceId = BWOBuildings.GetRandomResidenceId()
-
                     brain.stationary = false
                     brain.sleeping = false
                     brain.aiming = false
@@ -259,7 +257,7 @@ local function everyOneMinute()
                     brain.hostileP = false
 
                     brain.program = {}
-                    brain.program.name = "Universal"
+                    brain.program.name = "Civilian"
                     brain.program.stage = "Prepare"
                     brain.programFallback = brain.program
 
@@ -303,5 +301,5 @@ end
 -- Events.OnTick.Remove(onTick)
 -- Events.OnTick.Add(onTick)
 
-Events.EveryOneMinute.Remove(everyOneMinute)
-Events.EveryOneMinute.Add(everyOneMinute)
+-- Events.EveryOneMinute.Remove(everyOneMinute)
+-- Events.EveryOneMinute.Add(everyOneMinute)

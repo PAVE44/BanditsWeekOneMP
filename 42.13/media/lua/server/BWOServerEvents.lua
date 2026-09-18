@@ -32,6 +32,12 @@ require "BWOUtils"
 
 BWOServerEvents = BWOServerEvents or {}
 
+
+BWOServerEvents.ScanRooms = function(params)
+    local player = getSpecificPlayer(0)
+    BWODevTools.ScanRooms(player)
+end
+
 -- params: none
 BWOServerEvents.Arson = function(params)
     dprint("[SERVER_EVENT][INFO][Arson] INIT", 3)

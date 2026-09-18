@@ -1,0 +1,38 @@
+module Base
+{
+    sound OldGeneratorLoop
+    {
+        category = Object,
+        clip
+        {
+            file = media/sound/pseudo_generator.ogg,
+            distanceMin = 1,
+            distanceMax = 20,
+            reverbFactor = 0, 
+        }
+    }
+
+    sound OldGeneratorStarting
+    {
+        category = Object,
+        clip
+        {
+            file = media/sound/pseudo_generator.ogg,
+            distanceMin = 1,
+            distanceMax = 20,
+            reverbFactor = 0, 
+        }
+    }
+
+    sound OldGeneratorStopping
+    {
+        category = Object,
+        clip
+        {
+            file = media/sound/pseudo_generator.ogg,
+            distanceMin = 1,
+            distanceMax = 20,
+            reverbFactor = 0, 
+        }
+    }
+} 

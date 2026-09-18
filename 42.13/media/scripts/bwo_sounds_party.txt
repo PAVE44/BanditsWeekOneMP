@@ -1,0 +1,74 @@
+module Bandits
+{
+    sound JukeboxParty1
+    {
+        category = Object, 
+        loop = false,
+        is3D = true,
+        clip
+        {
+            file = media/sound/Jukebox/music_party_1.ogg,
+            distanceMax = 35,
+        }
+    }
+
+    sound JukeboxParty2
+    {
+        category = Object, 
+        loop = false,
+        is3D = true,
+        clip
+        {
+            file = media/sound/Jukebox/music_party_2.ogg,
+            distanceMax = 35,
+        }
+    }
+
+    sound JukeboxParty3
+    {
+        category = Object, 
+        loop = false,
+        is3D = true,
+        clip
+        {
+            file = media/sound/Jukebox/music_party_3.ogg,
+            distanceMax = 35,
+        }
+    }
+
+    sound JukeboxParty4
+    {
+        category = Object, 
+        loop = false,
+        is3D = true,
+        clip
+        {
+            file = media/sound/Jukebox/music_party_4.ogg,
+            distanceMax = 35,
+        }
+    }
+
+    sound JukeboxParty5
+    {
+        category = Object, 
+        loop = false,
+        is3D = true,
+        clip
+        {
+            file = media/sound/Jukebox/music_party_5.ogg,
+            distanceMax = 35,
+        }
+    }
+
+    sound JukeboxRaps
+    {
+        category = Object, 
+        loop = false,
+        is3D = true,
+        clip
+        {
+            file = media/sound/Jukebox/music_raps.ogg,
+            distanceMax = 35,
+        }
+    }
+}

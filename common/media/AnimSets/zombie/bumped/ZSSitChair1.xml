@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <animNode>
 	<m_Name>ZSSitInChair1</m_Name>
-	<m_AnimName>Bob_SittingChair</m_AnimName>
+	<m_AnimName>Bob_SatChair</m_AnimName>
 	<m_Looped>false</m_Looped>
 	<m_UpperOnly>false</m_UpperOnly>
 	<m_EarlyBlendOut>false</m_EarlyBlendOut>

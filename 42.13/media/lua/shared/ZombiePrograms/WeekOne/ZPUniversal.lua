@@ -55,17 +55,6 @@ ZombiePrograms.Universal.Main = function(bandit)
         end
     end
    
-    -- go home
-    if brain.residenceId then
-        local rid = brain.residenceId
-        if BWOBuildings.cache[rid] then
-            bandit:addLineChatElement("HOME ", 0.8, 0.8, 0.1)
-            local home = BWOBuildings.cache[rid]
-            table.insert(tasks, BanditUtils.GetMoveTask(0, home.x, home.y, 0, "Run", 100, false))
-            return {status=true, next="Main", tasks=tasks}
-        end
-    end
-
     -- second distinction level for generic outfits
     local rnd = brain.rnd[3] + min6
 

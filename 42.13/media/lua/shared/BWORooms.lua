@@ -1883,6 +1883,12 @@ end
 
 BWORooms.cache = {}
 
+BWORooms.GetRoomSize = function(room)
+    local roomDef = room:getRoomDef()
+    local size = (roomDef:getX2() - roomDef:getX()) * (roomDef:getY2() - roomDef:getY())
+    return size
+end
+
 BWORooms.UpdateCache = function()
     local cache = {}
     local i = 0

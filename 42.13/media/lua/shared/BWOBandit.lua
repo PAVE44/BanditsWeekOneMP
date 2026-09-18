@@ -15,6 +15,8 @@ Bandit.SoundTab.REACTCRIME = {prefix = "BWOReactCrime_", chance = 100, randMax =
 Bandit.clanMap = Bandit.clanMap or {}
 
 Bandit.clanMap.Resident = "f52b03f4-c5b1-4bbb-a110-b74038312fe2"
+Bandit.clanMap.Homeless = "bc1cf1e5-7d86-4fac-85ad-4e22c982efb2"
+Bandit.clanMap.HipHop = "eacda00e-6f8f-4afa-a813-f847d54720d8"
 Bandit.clanMap.Office = "affef50f-660a-4231-bc6d-e0054fcf3afd"
 Bandit.clanMap.Runner = "bd53300c-f715-4cf7-a91f-1836a2282944"
 Bandit.clanMap.Postal = "e216b4ea-e57f-4b15-8cd8-140b82e7b5ea"
@@ -68,7 +70,6 @@ Bandit.clanMap.KentuckianFinest = "6e10d15d-1dd3-4169-8eb7-2d9747812bfe"
 -- bandits
 Bandit.clanMap.Biker = "f3ad89be-9368-4df7-a63b-0c315a96f23b"
 Bandit.clanMap.CriminalWhite = "8736f2bd-3b08-4ae3-b5f2-1d6a3225e892"
-Bandit.clanMap.CriminalBlack = "eacda00e-6f8f-4afa-a813-f847d54720d8"
 Bandit.clanMap.CriminalClassy = "d6c3c644-42e7-466a-8ce4-c002ad29dd50"
 Bandit.clanMap.BanditSpike = "72fbcd15-a81b-476a-8c25-1b2caea694de"
 Bandit.clanMap.BanditStrong = "bbe0c8c9-1135-4ced-abd2-73807e166a1e"

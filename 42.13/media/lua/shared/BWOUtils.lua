@@ -1,5 +1,23 @@
 BWOUtils = BWOUtils or {}
 
+BWOUtils.predicateAll = function(item)
+	return true
+end
+
+BWOUtils.predicateNotBroken = function(item)
+	return not item:isBroken()
+end
+
+BWOUtils.predicateShopping = function(item)
+    local md = item:getModData()
+    md.BWO = md.BWO or {}
+    return md.BWO.shopping and not md.BWO.bought or false
+end
+
+BWOUtils.predicateMoney = function(item)
+    return item:getFullType() == "Base.Money"
+end
+
 -- Fisher-Yates shuffle
 BWOUtils.Shuffle = function(t)
     for i = #t, 2, -1 do
@@ -13,17 +31,439 @@ BWOUtils.IsInCircle = function(x, y, cx, cy, r)
     return d2 <= r ^ 2
 end
 
+BWOUtils.CoordId = function(x, y)
+    return x .. "-" .. y
+end
+
+local function distSq(x1, y1, x2, y2)
+    local dx = x2 - x1
+    local dy = y2 - y1
+    return dx * dx + dy * dy
+end
+
+local function getWalkGraph()
+    if not BWONavigation or not BWONavigation.walk then
+        return nil
+    end
+    return BWONavigation.walk
+end
+
+local function getDriveGraph()
+    if not BWONavigation or not BWONavigation.drive then
+        return nil
+    end
+    return BWONavigation.drive
+end
+
+local function getNearestGraphNode(graph, x, y)
+    if not graph then
+        return nil
+    end
+
+    local bestId, bestNode, bestDsq = nil, nil, math.huge
+
+    for id, node in pairs(graph) do
+        if node and node.x and node.y then
+            local dsq = distSq(x, y, node.x, node.y)
+            if dsq < bestDsq then
+                bestDsq = dsq
+                bestId = id
+                bestNode = node
+            end
+        end
+    end
+
+    if not bestId then
+        return nil
+    end
+
+    return bestId, bestNode, math.sqrt(bestDsq)
+end
+
+local function heuristic(graph, fromId, toId)
+    local from = graph[fromId]
+    local to = graph[toId]
+    if not from or not to then
+        return math.huge
+    end
+    return math.sqrt(distSq(from.x, from.y, to.x, to.y))
+end
+
+local function reconstructPath(cameFrom, current)
+    local path = {current}
+    while cameFrom[current] do
+        current = cameFrom[current]
+        table.insert(path, 1, current)
+    end
+    return path
+end
+
+local function findPathAStar(graph, startId, goalId, maxIterations)
+    if not graph or not startId or not goalId then
+        return nil
+    end
+    if not graph[startId] or not graph[goalId] then
+        return nil
+    end
+
+    local limit = maxIterations or 5000
+    local openSet = {}
+    local closedSet = {}
+    local cameFrom = {}
+    local gScore = {}
+    local fScore = {}
+
+    openSet[startId] = true
+    gScore[startId] = 0
+    fScore[startId] = heuristic(graph, startId, goalId)
+
+    local iterations = 0
+    while true do
+        iterations = iterations + 1
+        if iterations > limit then
+            return nil
+        end
+
+        local current
+        local bestF = math.huge
+        for nodeId, _ in pairs(openSet) do
+            local f = fScore[nodeId] or math.huge
+            if f < bestF then
+                bestF = f
+                current = nodeId
+            end
+        end
+
+        if not current then
+            return nil
+        end
+
+        if current == goalId then
+            return reconstructPath(cameFrom, current)
+        end
+
+        openSet[current] = nil
+        closedSet[current] = true
+
+        local currentNode = graph[current]
+        if currentNode and currentNode.links then
+            for neighborId, cost in pairs(currentNode.links) do
+                if graph[neighborId] then
+                    local stepCost = tonumber(cost) or heuristic(graph, current, neighborId)
+                    local tentative = (gScore[current] or math.huge) + stepCost
+                    if tentative < (gScore[neighborId] or math.huge) then
+                        cameFrom[neighborId] = current
+                        gScore[neighborId] = tentative
+                        fScore[neighborId] = tentative + heuristic(graph, neighborId, goalId)
+                        openSet[neighborId] = true
+                        closedSet[neighborId] = nil
+                    elseif not closedSet[neighborId] then
+                        openSet[neighborId] = true
+                    end
+                end
+            end
+        end
+    end
+end
+
+local function getWalkPath(startX, startY, goalX, goalY, graph, maxIterations)
+    local navGraph = graph or getWalkGraph()
+    if not navGraph then
+        return nil
+    end
+
+    local startId = getNearestGraphNode(navGraph, startX, startY)
+    local goalId = getNearestGraphNode(navGraph, goalX, goalY)
+    if not startId or not goalId then
+        return nil
+    end
+
+    local path = findPathAStar(navGraph, startId, goalId, maxIterations)
+    if not path then
+        return nil
+    end
+
+    return path, startId, goalId
+end
+
+BWOUtils.GetWalkGraph = function()
+    return getWalkGraph()
+end
+
+BWOUtils.GetNearestWalkNodeId = function(x, y, graph)
+    local navGraph = graph or getWalkGraph()
+    if not navGraph then
+        return nil
+    end
+    return getNearestGraphNode(navGraph, x, y)
+end
+
+BWOUtils.GetWalkPathToNodeId = function(startX, startY, goalId, graph, maxIterations)
+    local navGraph = graph or getWalkGraph()
+    if not navGraph or not goalId then
+        return nil
+    end
+
+    local targetId = tostring(goalId)
+    if not navGraph[targetId] then
+        return nil
+    end
+
+    local startId = getNearestGraphNode(navGraph, startX, startY)
+    if not startId then
+        return nil
+    end
+
+    local path = findPathAStar(navGraph, startId, targetId, maxIterations)
+    if not path then
+        return nil
+    end
+
+    return path, startId, targetId
+end
+
+BWOUtils.GetDriveGraph = function()
+    return getDriveGraph()
+end
+
+BWOUtils.GetNearestDriveNodeId = function(x, y, graph)
+    local navGraph = graph or getDriveGraph()
+    if not navGraph then
+        return nil
+    end
+    return getNearestGraphNode(navGraph, x, y)
+end
+
+BWOUtils.GetDrivePathToNodeId = function(startX, startY, goalId, graph, maxIterations)
+    local navGraph = graph or getDriveGraph()
+    if not navGraph or not goalId then
+        return nil
+    end
+
+    local targetId = tostring(goalId)
+    if not navGraph[targetId] then
+        return nil
+    end
+
+    local startId = getNearestGraphNode(navGraph, startX, startY)
+    if not startId then
+        return nil
+    end
+
+    local path = findPathAStar(navGraph, startId, targetId, maxIterations)
+    if not path then
+        return nil
+    end
+
+    return path, startId, targetId
+end
+
+local function clearGraphNavState(brain)
+    brain.navPath = nil
+    brain.navPathIndex = nil
+    brain.navGoalId = nil
+end
+
+local function clearNavPathState(brain)
+    clearGraphNavState(brain)
+    brain.navDirectTargetId = nil
+end
+
+BWOUtils.GetTransformTask = function(bandit, outfit, weapons)
+    local brain = BanditBrain.Get(bandit)
+    
+    local changed = false
+    for bodyPart, items in pairs(outfit) do
+        local rnd = brain.id % #items
+        local chosenItem = items[rnd + 1]
+
+        if brain.clothing[bodyPart] ~= chosenItem then
+            brain.clothing[bodyPart] = chosenItem
+            changed = true
+        end
+    end
+
+    for bodyPart, items in pairs(brain.clothing) do
+        if not outfit[bodyPart] then
+            brain.clothing[bodyPart] = nil
+            changed = true
+        end
+    end
+
+    if weapons.melee then
+        if brain.weapons.melee ~= weapons.melee then
+            brain.weapons.melee = weapons.melee
+            changed = true
+        end
+    end
+    if weapons.primary then
+        if not brain.weapons.primary.name or brain.weapons.primary.name ~= weapons.primary.name then
+            brain.weapons.primary = weapons.primary
+            changed = true
+        end
+    end
+    if weapons.secondary then
+        if not brain.weapons.secondary.name or brain.weapons.secondary.name ~= weapons.secondary.name then
+            brain.weapons.secondary = weapons.secondary
+            changed = true
+        end
+    end
+
+    if changed then
+        local task = {action="Transform", time=100}
+        return task
+    end
+    return nil
+end
+
+BWOUtils.GetMoveTaskNav = function(bandit, targetX, targetY, targetZ, opts)
+    if not bandit or not targetX or not targetY then
+        return nil
+    end
+
+    local brain = BanditBrain.Get(bandit)
+    if not brain then
+        return nil
+    end
+
+    local options = opts or {}
+    local directDistance = options.directDistance or 6
+    local reachedDistance = options.reachedDistance or 1.4
+    local stopDistance = options.stopDistance or 1
+    local moveType = options.moveType or "Walk"
+
+    local bxf = bandit:getX()
+    local byf = bandit:getY()
+    local bx = math.floor(bxf)
+    local by = math.floor(byf)
+    local bz = targetZ or math.floor(bandit:getZ())
+    local directTargetId = tostring(targetX) .. ":" .. tostring(targetY) .. ":" .. tostring(bz)
+
+    local targetDist = BanditUtils.DistTo(bxf, byf, targetX, targetY)
+    if brain.navDirectTargetId and brain.navDirectTargetId ~= directTargetId then
+        brain.navDirectTargetId = nil
+    end
+
+    if targetDist < directDistance then
+        brain.navDirectTargetId = directTargetId
+    end
+
+    if brain.navDirectTargetId == directTargetId then
+        -- bandit:addLineChatElement(("direct: " .. targetX .. "," .. targetY), 1, 1, 1)
+        clearGraphNavState(brain)
+        brain.navDirectTargetId = directTargetId
+        if targetDist > stopDistance then
+            return BanditUtils.GetMoveTask(0, targetX, targetY, bz, moveType, targetDist, false)
+        end
+        brain.navDirectTargetId = nil
+        return nil
+    end
+
+    local graph = getWalkGraph()
+    if graph then
+        local goalId = getNearestGraphNode(graph, targetX, targetY)
+        if goalId then
+            local needsNewPath = (not brain.navPath) or (brain.navGoalId ~= goalId) or (not brain.navPathIndex)
+            if needsNewPath then
+                local path, _, pathGoalId = getWalkPath(bx, by, targetX, targetY, graph)
+                if path and #path > 0 then
+                    brain.navPath = path
+                    brain.navGoalId = pathGoalId
+                    brain.navPathIndex = (#path > 1) and 2 or 1
+                else
+                    clearGraphNavState(brain)
+                    brain.navDirectTargetId = directTargetId
+                end
+            end
+
+            local currentPath = brain.navPath
+            local currentIndex = brain.navPathIndex
+            if currentPath and currentIndex then
+                local nextId = currentPath[currentIndex]
+                local nextNode = graph[nextId]
+
+                if nextNode then
+                    local guard = 0
+                    while nextNode and guard < 8 do
+                        local waypointDist = BanditUtils.DistTo(bxf, byf, nextNode.x, nextNode.y)
+                        if waypointDist > reachedDistance then
+                            break
+                        end
+
+                        currentIndex = currentIndex + 1
+                        brain.navPathIndex = currentIndex
+                        nextId = currentPath[currentIndex]
+                        nextNode = graph[nextId]
+                        guard = guard + 1
+                    end
+
+                    if not nextNode then
+                        clearGraphNavState(brain)
+                        brain.navDirectTargetId = directTargetId
+                    end
+
+                    if nextNode then
+                        local stepDist = BanditUtils.DistTo(bxf, byf, nextNode.x, nextNode.y)
+                        if stepDist > stopDistance then
+                            return BanditUtils.GetMoveTask(0, nextNode.x, nextNode.y, bz, moveType, stepDist, false)
+                        end
+                    end
+                end
+            end
+        end
+    end
+
+    if targetDist > stopDistance then
+        return BanditUtils.GetMoveTask(0, targetX, targetY, bz, moveType, targetDist, false)
+    end
+
+    return nil
+end
+
 -- returns a list of all online players
 BWOUtils.GetAllPlayers = function()
-    local playerList = getOnlinePlayers()
     local allPlayers = {}
+
+    local gamemode = getWorld():getGameMode()
+
+    local playerList
+    if gamemode == "Multiplayer" then
+        playerList = getOnlinePlayers()
+    else
+        playerList = IsoPlayer.getPlayers()
+    end
     for i = 0, playerList:size() - 1 do
         local player = playerList:get(i)
         if player then
             table.insert(allPlayers, player)
         end
     end
+
     return allPlayers
+end
+
+BWOUtils.SquareHasOtherCharacters = function(id, square)
+    local chrs = square:getMovingObjects()
+    for i=0, chrs:size()-1 do
+        local chr = chrs:get(i)
+        if instanceof(chr, "IsoZombie") then
+            if BanditUtils.GetCharacterID(chr) ~= id then
+                return true
+            end
+        else
+            if instanceof(chr, "IsoPlayer") then
+                return true
+            end
+        end
+    end
+end
+
+BWOUtils.GetRandomPlayer = function()
+    local allPlayers = BWOUtils.GetAllPlayers()
+    if #allPlayers == 0 then
+        return nil
+    end
+    return allPlayers[ZombRand(#allPlayers) + 1]
 end
 
 -- returns a list of all online players
@@ -64,6 +504,24 @@ BWOUtils.GetDistantPlayers = function()
         end
     end
     return distantPlayers
+end
+
+-- returns a list of players that are at least minDist apart
+BWOUtils.GetClosestPlayer = function(x, y)
+    local allPlayers = BWOUtils.GetAllPlayers()
+
+    local maxDist = math.huge
+
+    local closestPlayer = nil
+    for i = 1, #allPlayers do
+        local player = allPlayers[i]
+        local dist = BanditUtils.DistTo(x, y, player:getX(), player:getY())
+        if dist < maxDist then
+            maxDist = dist
+            closestPlayer = player
+        end
+    end
+    return closestPlayer
 end
 
 -- returns a list of groups of players, where each player in a group is at least
@@ -737,3 +1195,96 @@ function BanditUtils.GetClosestCivilian(bandit)
 
     return result
 end
+
+function BanditUtils.MakeHomeless(bandit)
+    local banditVisuals = bandit:getHumanVisual()
+
+    local maxIndex = BloodBodyPartType.MAX:index()
+    for i = 0, maxIndex - 1 do
+        local part = BloodBodyPartType.FromIndex(i)
+        banditVisuals:setDirt(part, 1)
+    end
+
+    local itemVisuals = bandit:getItemVisuals()
+    for i = 0, itemVisuals:size() - 1 do
+        local item = itemVisuals:get(i)
+        if item then
+            local itemType = item:getItemType()
+            if itemType then
+                local itemTemp = BanditCompatibility.InstanceItem(itemType)
+                 if itemTemp and itemTemp:IsClothing() then
+                    local coveredPartList = itemTemp:getCoveredParts()
+                    for i=0, coveredPartList:size()-1 do
+                        local coveredPart = coveredPartList:get(i)
+                        item:setHole(coveredPart)
+                    end
+                end
+            end
+        end
+    end
+    bandit:resetModel()
+end
+
+function BanditUtils.GetIsoObject(x, y, z, customName)
+    local cell = getCell()
+    local square = cell:getGridSquare(x, y, z)
+    if not square then return nil end
+
+    local objects = square:getObjects()
+    for i=0, objects:size()-1 do
+        local object = objects:get(i)
+        local sprite = object:getSprite()
+        if sprite then
+            local props = sprite:getProperties()
+            if props and props:has("CustomName") and  props:get("CustomName") == customName then
+                return object
+            end
+        end
+    end
+end
+
+BWOUtils.GetItemClass = function(item)
+    local class = "normal"
+
+    if item:isRecordedMedia() then
+        class = "media"
+    elseif (item:isFood() and not item:isPoison()) then
+        if item:getOpeningRecipe() or item:getDoubleClickRecipe() then
+            class = "food_packaged"
+        else
+            class = "food"
+        end
+    elseif instanceof(item, "ComboItem") then
+        local fluidContainer = item:getFluidContainer()
+        if fluidContainer and not fluidContainer:isPoisonous() and not fluidContainer:isEmpty() and not fluidContainer:isTainted() then
+            class = "drink"
+        end
+    elseif item:IsClothing() then
+        class = "clothing"
+    end
+    return class
+end
+
+BWOUtils.GetSurfaceOffset = function(x, y, z)
+
+    local cell = getCell()
+    local square = cell:getGridSquare(x, y, z)
+    local tileObjects = square:getLuaTileObjectList()
+    local squareSurfaceOffset = 0
+
+    -- get the object with the highest offset
+    for k, object in pairs(tileObjects) do
+        local surfaceOffsetNoTable = object:getSurfaceOffsetNoTable()
+        if surfaceOffsetNoTable > squareSurfaceOffset then
+            squareSurfaceOffset = surfaceOffsetNoTable
+        end
+
+        local surfaceOffset = object:getSurfaceOffset()
+        if surfaceOffset > squareSurfaceOffset then
+            squareSurfaceOffset = surfaceOffset
+        end
+    end
+
+    return squareSurfaceOffset / 96
+end
+

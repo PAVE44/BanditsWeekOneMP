@@ -49,7 +49,7 @@ end
 -- fires single event server-side
 -- server-side event will call client logic shortafter
 local function eventProcessor()
-    if not isServer() then return end
+    if isClient() then return end
 
     for i, eventTimed in ipairs(events) do
         local currentTime = BWOUtils.GetTime()
@@ -73,52 +73,6 @@ local function eventProcessor()
         end
     end
 
-end
-
--- extra spawn for specific room types
-local function roomSpawner()
-    local roomSpawns = scenario:getRoomSpawns()
-
-    local worldAge = BWOUtils.GetWorldAge()
-
-    local cache = BWORooms.cache
-    if #cache == 0 then
-        dprint("[EVENT_MANAGER][INFO] REBUILDING ROOM CACHE", 3)
-        BWORooms.UpdateCache()
-    end
-
-    dprint("[EVENT_MANAGER][INFO] ROOM CACHE IS: " .. #cache, 3)
-
-    local players = BWOUtils.GetAllPlayers()
-
-    for _, rdata in ipairs(cache) do
-        if roomSpawns[rdata.name] then
-            for i = 1, #players do
-                local player = players[i]
-                local px, py = player:getX(), player:getY()
-                local distSq = ((px - rdata.x) * (px - rdata.x)) + ((py - rdata.y) * (py - rdata.y))
-                if distSq > 900 and distSq < 3600 then -- > 30 and < 60
-                    for _, sdata in ipairs(roomSpawns[rdata.name]) do
-                        if not rdata.spawned and worldAge >= sdata.waMin and worldAge < sdata.waMax then
-                            dprint("[EVENT_MANAGER][INFO] ROOM SPAWN: " .. rdata.name, 3)
-                            local args = {
-                                cid = sdata.cid,
-                                program = "Bandit",
-                                hostile = sdata.hostile,
-                                size = sdata.size,
-                                x = rdata.x,
-                                y = rdata.y,
-                                z = rdata.z,
-                            }
-                            BanditServer.Spawner.Clan(player, args)
-
-                            rdata.spawned = true
-                        end
-                    end
-                end
-            end
-        end
-    end
 end
 
 local function waitingRoomManager()
@@ -271,7 +225,7 @@ local function mainProcessor()
 
     sequenceProcessor()
 
-    roomSpawner()
+    -- roomSpawner()
 
     -- BWOServerEvents.MetaSound()
 end
